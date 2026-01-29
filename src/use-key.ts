@@ -102,8 +102,6 @@ const useKey = (
         return;
       }
 
-      console.log("Sequence Reference:", sequenceReference.current);
-
       sequenceReference.current.forEach((sequence, index) => {
         if (sequence.chord.length === 1) {
           if (sequence.chord[0] === event.key) {
