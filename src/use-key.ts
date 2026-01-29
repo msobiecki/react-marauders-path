@@ -1,6 +1,8 @@
 import { RefObject, useCallback, useEffect, useRef } from "react";
 
-type KeyEvent = string | string[];
+type KeySequence = string; // e.g., 'a', 'ArrowUp', 'Shift', 'a+b', 'a b'
+
+type KeyEvent = KeySequence | KeySequence[];
 
 interface KeyOptions {
   eventType: "keyup" | "keydown";
@@ -13,7 +15,8 @@ interface KeyOptions {
 }
 
 interface SequenceState {
-  keys: string[];
+  key: KeySequence;
+  chord: (KeySequence | KeySequence[])[];
   index: number;
   timeout: ReturnType<typeof setTimeout> | null;
 }
@@ -21,8 +24,16 @@ interface SequenceState {
 type UseKeySchema = KeyEvent;
 
 type UseKeyCallback =
-  | ((event: KeyboardEvent, key: KeyEvent, ...properties: unknown[]) => boolean)
-  | ((event: KeyboardEvent, key: KeyEvent, ...properties: unknown[]) => void);
+  | ((
+      event: KeyboardEvent,
+      key: KeySequence,
+      ...properties: unknown[]
+    ) => boolean)
+  | ((
+      event: KeyboardEvent,
+      key: KeySequence,
+      ...properties: unknown[]
+    ) => void);
 
 type UseKeyOptions = Partial<KeyOptions>;
 
@@ -91,13 +102,15 @@ const useKey = (
         return;
       }
 
+      console.log("Sequence Reference:", sequenceReference.current);
+
       sequenceReference.current.forEach((sequence, index) => {
-        if (sequence.keys.length === 1) {
-          if (sequence.keys[0] === event.key) {
+        if (sequence.chord.length === 1) {
+          if (sequence.chord[0] === event.key) {
             if (eventStopImmediatePropagation) {
               event.stopImmediatePropagation();
             }
-            const shouldPrevent = callback(event, sequence.keys[0]);
+            const shouldPrevent = callback(event, sequence.key);
             if (shouldPrevent) {
               event.preventDefault();
             }
@@ -107,7 +120,7 @@ const useKey = (
             }
           }
         } else {
-          const expected = sequence.keys[sequence.index];
+          const expected = sequence.chord[sequence.index];
           if (event.key === expected) {
             const updatedSequence = {
               ...sequence,
@@ -127,11 +140,11 @@ const useKey = (
 
             sequenceReference.current[index] = updatedSequence;
 
-            if (updatedSequence.index === updatedSequence.keys.length) {
+            if (updatedSequence.index === updatedSequence.chord.length) {
               if (eventStopImmediatePropagation) {
                 event.stopImmediatePropagation();
               }
-              const shouldPrevent = callback(event, updatedSequence.keys);
+              const shouldPrevent = callback(event, updatedSequence.key);
               if (shouldPrevent) {
                 event.preventDefault();
               }
@@ -159,12 +172,12 @@ const useKey = (
   );
 
   useEffect(() => {
-    const rawKeys = Array.isArray(key) ? key : [key];
-    sequenceReference.current = rawKeys.map((k) => {
-      if (typeof k === "string" && k.includes(" ")) {
-        return { keys: k.split(" "), index: 0, timeout: null };
+    const keys = Array.isArray(key) ? key : [key];
+    sequenceReference.current = keys.map((key) => {
+      if (typeof key === "string" && key.includes(" ")) {
+        return { key, chord: key.split(" "), index: 0, timeout: null };
       }
-      return { keys: [k], index: 0, timeout: null };
+      return { key, chord: [key], index: 0, timeout: null };
     });
   }, [key]);
 
