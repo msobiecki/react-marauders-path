@@ -54,8 +54,19 @@ const useKey = (
     ...options,
   };
 
+  const targetReference = useRef<EventTarget | null>(null);
+  const listenerReference = useRef<EventListener | null>(null);
   const firedOnceReference = useRef(false);
   const sequenceReference = useRef<SequenceState[]>([]);
+
+  const destroyListener = useCallback(() => {
+    const target = targetReference.current;
+    const listener = listenerReference.current;
+    if (!target || !listener) {
+      return;
+    }
+    target.removeEventListener(eventType, listener);
+  }, [eventType]);
 
   const resetSequence = useCallback((sequence: SequenceState) => {
     const resetSequence = { ...sequence, index: 0, timeout: null };
@@ -92,6 +103,7 @@ const useKey = (
             }
             if (eventOnce) {
               firedOnceReference.current = true;
+              destroyListener();
             }
           }
         } else {
@@ -125,6 +137,7 @@ const useKey = (
               }
               if (eventOnce) {
                 firedOnceReference.current = true;
+                destroyListener();
               }
               resetSequence(updatedSequence);
             }
@@ -135,13 +148,13 @@ const useKey = (
       });
     },
     [
-      container,
+      callback,
+      destroyListener,
       eventOnce,
       eventRepeat,
       eventStopImmediatePropagation,
-      callback,
-      sequenceTimeout,
       resetSequence,
+      sequenceTimeout,
     ],
   );
 
@@ -156,15 +169,19 @@ const useKey = (
   }, [key]);
 
   useEffect(() => {
-    const target = container?.current ?? globalThis;
+    targetReference.current = container?.current ?? globalThis;
+
     const listener = (event: Event) =>
       handleEventListener(event as KeyboardEvent);
 
-    target.addEventListener(eventType, listener, {
+    targetReference.current.addEventListener(eventType, listener, {
       capture: eventCapture,
     });
+    listenerReference.current = listener;
+
     return () => {
-      target.removeEventListener(eventType, listener);
+      targetReference.current?.removeEventListener(eventType, listener);
+      listenerReference.current = null;
       sequenceReference.current.forEach((sequence) => resetSequence(sequence));
     };
   }, [
