@@ -29,7 +29,7 @@
     "husky": "^9.1.7",
     "semantic-release": "^25.0.2",
     "@msobiecki/eslint-config": "^9.11.0",
-    "@types/node": "^25.0.2",
+    "@types/node": "^25.2.0",
     "@types/react": "^19.2.7",
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react-swc": "^4.2.2",
