@@ -130,15 +130,12 @@ npm lint
 
 ## Project Status
 
-- ✅ Core `useKey` hook
-- ✅ `useKeyOnce` hook
-- ✅ Key sequences support
-- 🚧 Key combinations support
-- 🚧 Mouse events
-- 🚧 Complete unit test coverage
-- 🚧 Extended examples
+- 🚧 Core `useKey` key schema case sensitive
+- 🚧 Core `useKey` basic unit test coverage
+- 🚧 Core `useKey` combinations support
+- 🚧 Core `useMouse` hook
 - 🚧 Coverage
-- 🚧 Publish
+- 🚧 Example of usage
 
 ## License
 
