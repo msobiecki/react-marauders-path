@@ -130,7 +130,6 @@ npm lint
 
 ## Project Status
 
-- 🚧 Core `useKey` key schema case sensitive
 - 🚧 Core `useKey` basic unit test coverage
 - 🚧 Core `useKey` combinations support
 - 🚧 Core `useMouse` hook
