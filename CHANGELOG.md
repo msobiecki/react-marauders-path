@@ -1,3 +1,10 @@
+# [1.2.0](https://github.com/msobiecki/react-marauders-path/compare/v1.1.0...v1.2.0) (2026-02-05)
+
+
+### Features
+
+* implement basic use-key hook ([0574230](https://github.com/msobiecki/react-marauders-path/commit/0574230d3452736435614b48a5be68e7470d6058))
+
 # [1.1.0](https://github.com/msobiecki/react-marauders-path/compare/v1.0.0...v1.1.0) (2026-02-05)
 
 
