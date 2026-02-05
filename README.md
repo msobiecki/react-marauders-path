@@ -104,9 +104,6 @@ npm run dev
 This example demonstrates:
 
 - Real-time keyboard input handling
-- Game loop integration
-- Movement and camera control
-- Collision detection
 
 ## Development
 
