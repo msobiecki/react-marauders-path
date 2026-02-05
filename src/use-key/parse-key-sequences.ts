@@ -1,6 +1,22 @@
 import { normalizeKeySequence } from "./normalize-key";
-import type { SequenceState, KeyEvent } from "./use-key.types";
+import { SequenceState, KeyEvent } from "./use-key.types";
 
+/**
+ * Parses keyboard event patterns into sequence states.
+ *
+ * Converts key patterns (single keys, chords, sequences, or arrays thereof)
+ * into SequenceState objects with normalized keys and tracking properties.
+ * Sequences with spaces are split into chord arrays.
+ *
+ * @param {KeyEvent} input - A single key pattern or array of key patterns
+ * @returns {SequenceState[]} Array of parsed sequence states
+ *
+ * @example
+ * parseKeySequences('a')           // [{ key: 'a', chord: ['a'], index: 0, timeout: null }]
+ * parseKeySequences('shift+a')     // [{ key: 'Shift+a', chord: ['Shift+a'], index: 0, timeout: null }]
+ * parseKeySequences('a b c')       // [{ key: 'a b c', chord: ['a', 'b', 'c'], index: 0, timeout: null }]
+ * parseKeySequences(['a', 'b'])    // [{ ... }, { ... }]
+ */
 export const parseKeySequences = (input: KeyEvent): SequenceState[] => {
   const keys = Array.isArray(input) ? input : [input];
 

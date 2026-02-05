@@ -1,4 +1,4 @@
-import type { RefObject } from "react";
+import { RefObject } from "react";
 
 /** Atomic key like 'a', 'ArrowUp', 'Shift' */
 export type Key = string;

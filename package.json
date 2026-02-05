@@ -13,6 +13,7 @@
   "scripts": {
     "dev": "vite build --watch",
     "build": "vite build",
+    "test": "vitest",
     "lint": "eslint",
     "prepare": "husky"
   },
@@ -24,22 +25,25 @@
     "@anolilab/multi-semantic-release": "^4.1.1",
     "@commitlint/cli": "^20.4.1",
     "@commitlint/config-conventional": "^20.4.1",
+    "@msobiecki/eslint-config": "^9.11.0",
     "@semantic-release/changelog": "^6.0.3",
     "@semantic-release/git": "^10.0.1",
-    "husky": "^9.1.7",
-    "semantic-release": "^25.0.3",
-    "@msobiecki/eslint-config": "^9.11.0",
+    "@testing-library/react": "^16.3.2",
     "@types/node": "^25.2.0",
     "@types/react": "^19.2.7",
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react-swc": "^4.2.3",
     "eslint": "^9.39.2",
+    "husky": "^9.1.7",
+    "jsdom": "^28.0.0",
     "lint-staged": "^16.2.7",
     "prettier": "^3.7.4",
+    "semantic-release": "^25.0.3",
     "ts-node": "^10.9.2",
     "typescript": "^5.9.3",
     "vite": "^7.3.0",
-    "vite-plugin-dts": "^4.5.4"
+    "vite-plugin-dts": "^4.5.4",
+    "vitest": "^4.0.18"
   },
   "packageManager": "npm@10.9.2"
 }

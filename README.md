@@ -127,10 +127,10 @@ npm lint
 
 ## Project Status
 
-- 🚧 Core `useKey` basic unit test coverage
-- 🚧 Core `useKey` combinations support
+- 🚧 Core `useKey` hook combinations support
+- 🚧 `useKey` hook combinations unit test coverage
 - 🚧 Core `useMouse` hook
-- 🚧 Coverage
+- 🚧 Core `useMouse` hook unit test coverage
 - 🚧 Example of usage
 
 ## License
