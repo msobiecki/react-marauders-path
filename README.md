@@ -212,6 +212,7 @@ npm lint
 
 ## Project Status
 
+- 🚧 Core `useKey` combination sequence pattern
 - 🚧 Core `useMouse` hook
 - 🚧 Core `useMouse` hook unit test coverage
 - 🚧 Example of usage

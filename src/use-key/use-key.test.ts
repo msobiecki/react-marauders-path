@@ -60,8 +60,8 @@ describe("useKey hook", () => {
       expect(callback).not.toHaveBeenCalledWith(expect.any(KeyboardEvent), "b");
     });
 
-    describe("case-insensitive key patterns", () => {
-      it("should handle case-insensitive key patterns", () => {
+    describe("case-insensitive special keys", () => {
+      it("should handle case-insensitive special key patterns", () => {
         const callback = vi.fn();
         renderHook(() => useKey("A", callback, { eventType: "keyup" }));
         dispatchKeyboardEvent("keyup", "a");
@@ -150,8 +150,8 @@ describe("useKey hook", () => {
         expect(callback).toHaveBeenCalledWith(expect.any(KeyboardEvent), "F1");
       });
 
-      describe("case-insensitive key patterns", () => {
-        it("should handle case-insensitive key patterns", () => {
+      describe("case-insensitive function keys", () => {
+        it("should handle case-insensitive function key patterns", () => {
           const callback = vi.fn();
           renderHook(() => useKey("f1", callback, { eventType: "keyup" }));
           dispatchKeyboardEvent("keyup", "F1");
@@ -199,7 +199,7 @@ describe("useKey hook", () => {
     });
   });
 
-  describe("single key with combination keys", () => {
+  describe("combination key patterns", () => {
     it("should invoke callback on a+b combination keyup event", () => {
       const callback = vi.fn();
       renderHook(() => useKey("a+b", callback, { eventType: "keyup" }));
@@ -225,7 +225,7 @@ describe("useKey hook", () => {
     });
   });
 
-  describe("single key with sequence keys", () => {
+  describe("sequence key patterns", () => {
     it("should handle sequence of keys with default threshold", () => {
       const callback = vi.fn();
       renderHook(() => useKey("a b c", callback, { eventType: "keyup" }));
@@ -257,7 +257,7 @@ describe("useKey hook", () => {
     });
   });
 
-  describe("array keys with single key", () => {
+  describe("array patterns with single keys", () => {
     it("should invoke callback for array of patterns", () => {
       const callback = vi.fn();
       renderHook(() =>
@@ -324,7 +324,7 @@ describe("useKey hook", () => {
     });
   });
 
-  describe("array keys with sequence keys", () => {
+  describe("array patterns with sequence keys", () => {
     it("should handle multiple sequence patterns", () => {
       const callback = vi.fn();
       renderHook(() =>
@@ -403,6 +403,28 @@ describe("useKey hook", () => {
 
       expect(callback).toHaveBeenCalledTimes(2);
     });
+
+    // it("should handle array with combination patterns", () => {
+    //   const callback = vi.fn();
+    //   renderHook(() =>
+    //     useKey(["ctrl+a b c"], callback, { eventType: "keyup" }),
+    //   );
+
+    //   dispatchKeyboardEvent("keydown", "Control");
+    //   dispatchKeyboardEvent("keydown", "a");
+    //   dispatchKeyboardEvent("keyup", "Control");
+    //   dispatchKeyboardEvent("keyup", "a");
+    //   vi.advanceTimersByTime(150);
+    //   dispatchKeyboardEvent("keyup", "b");
+    //   vi.advanceTimersByTime(150);
+    //   dispatchKeyboardEvent("keyup", "c");
+
+    //   expect(callback).toHaveBeenCalledTimes(1);
+    //   expect(callback).toHaveBeenCalledWith(
+    //     expect.any(KeyboardEvent),
+    //     "Control+a b c",
+    //   );
+    // });
   });
 
   describe("hook options", () => {
