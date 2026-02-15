@@ -22,7 +22,7 @@ const defaultOptions: KeyOptions = {
   eventOnce: false,
   eventStopImmediatePropagation: false,
   sequenceThreshold: 1000,
-  combinationThreshold: 1000,
+  combinationThreshold: 200,
   container: { current: null },
 };
 
@@ -116,6 +116,10 @@ const useKey = (
     }
   }, []);
 
+  const resetCombination = useCallback(() => {
+    combinationReference.current.activeKeys.clear();
+  }, []);
+
   const resetSequence = useCallback((sequence: SequenceState) => {
     sequenceReference.current = resetSequenceState(
       sequence,
@@ -134,32 +138,34 @@ const useKey = (
     [eventOnce, eventRepeat],
   );
 
-  const updateCombinationState = useCallback((event: KeyboardEvent) => {
-    const now = Date.now();
-    const combination = combinationReference.current;
-
-    if (event.type === EventType.KeyDown) {
-      combination.activeKeys.set(event.key, { pressedAt: now });
-    } else if (event.type === EventType.KeyUp) {
-      const state = combination.activeKeys.get(event.key);
-      if (state) state.releasedAt = now;
-    }
+  const registerKeyDown = useCallback((event: KeyboardEvent) => {
+    combinationReference.current.activeKeys.set(event.key, {
+      pressedAt: Date.now(),
+    });
   }, []);
 
-  const cleanupCombinationState = useCallback(() => {
-    const now = Date.now();
-    const combination = combinationReference.current;
+  const registerKeyUp = useCallback((event: KeyboardEvent) => {
+    const state = combinationReference.current.activeKeys.get(event.key);
+    if (state) state.releasedAt = Date.now();
+  }, []);
 
-    [...combination.activeKeys.entries()].forEach(([keyName, state]) => {
-      if (state.releasedAt && now - state.releasedAt > combinationThreshold) {
-        combination.activeKeys.delete(keyName);
-        return;
-      }
-      if (!state.releasedAt && now - state.pressedAt > combinationThreshold) {
-        combination.activeKeys.delete(keyName);
+  const cleanupCombinationKeys = useCallback(() => {
+    const now = Date.now();
+    const combo = combinationReference.current;
+
+    [...combo.activeKeys.entries()].forEach(([key, state]) => {
+      if (eventType === EventType.KeyDown) {
+        if (state.releasedAt) {
+          combo.activeKeys.delete(key);
+        }
+      } else if (
+        state.releasedAt &&
+        now - state.releasedAt > combinationThreshold
+      ) {
+        combo.activeKeys.delete(key);
       }
     });
-  }, [combinationThreshold]);
+  }, [eventType, combinationThreshold]);
 
   const handleSingleKey = useCallback(
     (
@@ -169,7 +175,60 @@ const useKey = (
     ) => {
       const expectedKey = sequence.chord[0];
 
-      if (expectedKey !== SPECIAL_KEYS.ANY && expectedKey !== event.key) return;
+      if (Array.isArray(expectedKey)) {
+        const { activeKeys } = combinationReference.current;
+        let combinationMatched = false;
+
+        if (eventType === EventType.KeyDown) {
+          combinationMatched = expectedKey.every((key) => activeKeys.has(key));
+        } else if (eventType === EventType.KeyUp) {
+          const keyStates = expectedKey.map((key) => activeKeys.get(key));
+
+          if (keyStates.some((state) => !state?.releasedAt)) {
+            return;
+          }
+
+          const pressedTimes: number[] = keyStates
+            .map((state) => state?.pressedAt)
+            .filter((value): value is number => value !== undefined);
+          const releasedTimes: number[] = keyStates
+            .map((state) => state?.releasedAt)
+            .filter((value): value is number => value !== undefined);
+
+          const minReleased = Math.min(...releasedTimes);
+          const maxReleased = Math.max(...releasedTimes);
+          const maxPressed = Math.max(...pressedTimes);
+
+          if (maxPressed > minReleased) {
+            return;
+          }
+
+          if (maxReleased - minReleased > combinationThreshold) {
+            return;
+          }
+
+          combinationMatched = true;
+        }
+
+        if (!combinationMatched) {
+          return;
+        }
+
+        invokeKeyAction(event, sequence.key, keyCallback, {
+          stopImmediate: eventStopImmediatePropagation,
+          once: eventOnce,
+          onOnce: () => {
+            firedOnceReference.current = true;
+            destroyListener();
+          },
+        });
+
+        return;
+      }
+
+      if (expectedKey !== SPECIAL_KEYS.ANY && expectedKey !== event.key) {
+        return;
+      }
 
       invokeKeyAction(event, sequence.key, keyCallback, {
         stopImmediate: eventStopImmediatePropagation,
@@ -180,7 +239,13 @@ const useKey = (
         },
       });
     },
-    [destroyListener, eventOnce, eventStopImmediatePropagation],
+    [
+      combinationThreshold,
+      destroyListener,
+      eventOnce,
+      eventStopImmediatePropagation,
+      eventType,
+    ],
   );
 
   const handleSequenceStep = useCallback(
@@ -228,9 +293,6 @@ const useKey = (
 
   const evaluateSequences = useCallback(
     (event: KeyboardEvent, keyCallback: UseKeyCallback) => {
-      const combination = combinationReference.current;
-      console.log("tracking", combination.activeKeys);
-
       sequenceReference.current.forEach((sequence) => {
         if (sequence.chord.length === 1) {
           handleSingleKey(event, sequence, keyCallback);
@@ -248,14 +310,12 @@ const useKey = (
         return;
       }
 
-      updateCombinationState(event);
-      cleanupCombinationState();
+      cleanupCombinationKeys();
       evaluateSequences(event, keyCallback);
     },
     [
       shouldProcessEvent,
-      updateCombinationState,
-      cleanupCombinationState,
+      cleanupCombinationKeys,
       evaluateSequences,
       keyCallback,
     ],
@@ -269,6 +329,20 @@ const useKey = (
     targetReference.current = container?.current ?? globalThis;
     abortControllerReference.current = new AbortController();
 
+    const keyDownListener = (event: Event) =>
+      registerKeyDown(event as KeyboardEvent);
+    targetReference.current.addEventListener("keydown", keyDownListener, {
+      capture: eventCapture,
+      signal: abortControllerReference.current.signal,
+    });
+
+    const keyUpListener = (event: Event) =>
+      registerKeyUp(event as KeyboardEvent);
+    targetReference.current.addEventListener("keyup", keyUpListener, {
+      capture: eventCapture,
+      signal: abortControllerReference.current.signal,
+    });
+
     const eventListener = (event: Event) =>
       handleEventListener(event as KeyboardEvent);
 
@@ -279,10 +353,20 @@ const useKey = (
 
     return () => {
       abortControllerReference.current?.abort();
-      combinationReference.current.activeKeys.clear();
+
+      resetCombination();
       sequenceReference.current.forEach((sequence) => resetSequence(sequence));
     };
-  }, [eventType, eventCapture, container, handleEventListener, resetSequence]);
+  }, [
+    eventType,
+    eventCapture,
+    container,
+    registerKeyDown,
+    handleEventListener,
+    resetCombination,
+    resetSequence,
+    registerKeyUp,
+  ]);
 };
 
 /**

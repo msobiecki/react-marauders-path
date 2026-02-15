@@ -20,7 +20,7 @@ export interface KeyOptions {
   container: RefObject<HTMLElement | null>;
 }
 
-interface CombinationActiveKey {
+export interface CombinationActiveKey {
   pressedAt: number;
   releasedAt?: number;
 }
