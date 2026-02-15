@@ -39,6 +39,24 @@ useKey(["a", "b", "c"], (event, key) => {
 });
 ```
 
+### Combination Keys Schema
+
+```typescript
+// Listen for simultaneous key press (a + b pressed together within 500ms)
+useKey("a+b", (event, key) => {
+  console.log(`Pressed ${key}`);
+});
+```
+
+### Multiple Patterns of Combination Keys Schema
+
+```typescript
+// Listen for multiple combination patterns
+useKey(["a+b", "c+d"], (event, key) => {
+  console.log(`Pressed ${key}`);
+});
+```
+
 ### Sequential Keys Schema
 
 ```typescript
@@ -58,24 +76,6 @@ useKey(
     console.log(`Pressed ${key}`);
   },
 );
-```
-
-### Combination Keys Schema
-
-```typescript
-// Listen for simultaneous key press (a + b pressed together within 500ms)
-useKey("a+b", (event, key) => {
-  console.log(`Pressed ${key}`);
-});
-```
-
-### Multiple Patterns of Combination Keys Schema
-
-```typescript
-// Listen for multiple combination patterns
-useKey(["a+b", "c+d"], (event, key) => {
-  console.log(`Pressed ${key}`);
-});
 ```
 
 ## API

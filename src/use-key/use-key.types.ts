@@ -1,21 +1,16 @@
 import { RefObject } from "react";
 
-/** Atomic key like 'a', 'ArrowUp', 'Shift' */
 export type Key = string;
 
-/** Simultaneous keys like 'a+b' */
-export type KeyChord = string;
+export type KeyEvent = Key | Key[];
 
-/** Sequential keys like 'a b' */
-export type KeySequence = string;
-
-/** Any valid keyboard pattern */
-export type KeyPattern = Key | KeyChord | KeySequence;
-
-export type KeyEvent = KeyPattern | KeyPattern[];
+export enum EventType {
+  KeyUp = "keyup",
+  KeyDown = "keydown",
+}
 
 export interface KeyOptions {
-  eventType: "keyup" | "keydown";
+  eventType: EventType | "keyup" | "keydown";
   eventRepeat: boolean;
   eventCapture: boolean;
   eventOnce: boolean;
@@ -25,9 +20,20 @@ export interface KeyOptions {
   container: RefObject<HTMLElement | null>;
 }
 
+interface CombinationActiveKey {
+  pressedAt: number;
+  releasedAt?: number;
+}
+
+export interface CombinationState {
+  activeKeys: Map<Key, CombinationActiveKey>;
+}
+
+export type KeyChord = (Key | Key[])[];
+
 export interface SequenceState {
-  key: KeyPattern;
-  chord: KeyPattern[];
+  key: Key;
+  chord: KeyChord;
   index: number;
   sequenceTimeout: ReturnType<typeof setTimeout> | null;
 }
@@ -35,15 +41,7 @@ export interface SequenceState {
 export type UseKeySchema = KeyEvent;
 
 export type UseKeyCallback =
-  | ((
-      event: KeyboardEvent,
-      key: KeySequence,
-      ...properties: unknown[]
-    ) => boolean)
-  | ((
-      event: KeyboardEvent,
-      key: KeySequence,
-      ...properties: unknown[]
-    ) => void);
+  | ((event: KeyboardEvent, key: Key, ...properties: unknown[]) => boolean)
+  | ((event: KeyboardEvent, key: Key, ...properties: unknown[]) => void);
 
 export type UseKeyOptions = Partial<KeyOptions>;

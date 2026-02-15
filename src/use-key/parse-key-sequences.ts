@@ -13,28 +13,26 @@ import { SequenceState, KeyEvent } from "./use-key.types";
  *
  * @example
  * parseKeySequences('a')           // [{ key: 'a', chord: ['a'], index: 0, sequenceTimeout: null }]
- * parseKeySequences('shift+a')     // [{ key: 'Shift+a', chord: ['Shift+a'], index: 0, sequenceTimeout: null }]
+ * parseKeySequences('shift+a')     // [{ key: 'Shift+a', chord: [['Shift','a']], index: 0, sequenceTimeout: null }]
  * parseKeySequences('a b c')       // [{ key: 'a b c', chord: ['a', 'b', 'c'], index: 0, sequenceTimeout: null }]
+ * parseKeySequences('shift+a a b c')     // [{ key: 'Shift+a a b c', chord: [['Shift','a'], 'a', 'b', 'c'], index: 0, sequenceTimeout: null }]
  * parseKeySequences(['a', 'b'])    // [{ ... }, { ... }]
  */
 export const parseKeySequences = (input: KeyEvent): SequenceState[] => {
   const keys = Array.isArray(input) ? input : [input];
 
-  return keys.map((key) => {
-    if (typeof key === "string" && key.includes(" ")) {
-      const normalizedKey = normalizeKeySequence(key);
-      return {
-        key: normalizedKey,
-        chord: normalizedKey.split(" "),
-        index: 0,
-        sequenceTimeout: null,
-      };
-    }
+  return keys.map((pattern) => {
+    const normalizedKey = normalizeKeySequence(pattern);
 
-    const normalizedKey = normalizeKeySequence(key);
+    const sequenceParts = normalizedKey.split(" ");
+
+    const chord = sequenceParts.map((part) =>
+      part.includes("+") ? part.split("+") : part,
+    );
+
     return {
       key: normalizedKey,
-      chord: [normalizedKey],
+      chord,
       index: 0,
       sequenceTimeout: null,
     };

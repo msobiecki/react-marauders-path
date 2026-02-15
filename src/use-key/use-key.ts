@@ -6,6 +6,8 @@ import {
   UseKeySchema,
   UseKeyCallback,
   UseKeyOptions,
+  CombinationState,
+  EventType,
 } from "./use-key.types";
 import { parseKeySequences } from "./parse-key-sequences";
 import { advanceSequenceState, resetSequenceState } from "./sequence-state";
@@ -14,13 +16,13 @@ import { shouldHandleKeyboardEvent } from "./event-guards";
 import { SPECIAL_KEYS } from "./normalize-key";
 
 const defaultOptions: KeyOptions = {
-  eventType: "keyup",
+  eventType: EventType.KeyUp,
   eventRepeat: false,
   eventCapture: false,
   eventOnce: false,
   eventStopImmediatePropagation: false,
   sequenceThreshold: 1000,
-  combinationThreshold: 100,
+  combinationThreshold: 1000,
   container: { current: null },
 };
 
@@ -34,7 +36,7 @@ const defaultOptions: KeyOptions = {
  * @param {UseKeySchema} key - Single key, combination, sequence, or array of patterns to listen for
  * @param {UseKeyCallback} keyCallback - Callback function invoked when key pattern matches
  * @param {UseKeyOptions} [options] - Configuration options for the hook
- * @param {string} [options.eventType='keyup'] - Type of keyboard event ('keydown' or 'keyup')
+ * @param {EventType} [options.eventType=EventType.KeyUp] - Type of keyboard event ('keydown' or 'keyup')
  * @param {boolean} [options.eventRepeat=false] - Allow repeated key presses to trigger callback
  * @param {boolean} [options.eventCapture=false] - Use event capture phase instead of bubbling
  * @param {boolean} [options.eventOnce=false] - Trigger callback only once
@@ -52,18 +54,6 @@ const defaultOptions: KeyOptions = {
  * useKey(['a', 'b', 'c'], (event, key) => console.log(`Pressed ${key}`));
  *
  * @example
- * // Sequential keys schema
- * useKey('ArrowUp ArrowUp ArrowDown ArrowDown', (event, key) => {
- *   console.log(`Pressed ${key}`);
- * });
- *
- * @example
- * // Multiple patterns of sequential keys schema
- * useKey(['ArrowUp ArrowUp ArrowDown ArrowDown', 'ArrowLeft ArrowRight'], (event, key) => {
- *   console.log(`Pressed ${key}`);
- * });
- *
- * @example
  * // Combination keys schema
  * useKey('a+b', (event, key) => {
  *   console.log(`Pressed ${key}`);
@@ -72,6 +62,18 @@ const defaultOptions: KeyOptions = {
  * @example
  * // Multiple patterns of combination keys schema
  * useKey(['a+b', 'c+d'], (event, key) => {
+ *   console.log(`Pressed ${key}`);
+ * });
+ *
+ * @example
+ * // Sequential keys schema
+ * useKey('ArrowUp ArrowUp ArrowDown ArrowDown', (event, key) => {
+ *   console.log(`Pressed ${key}`);
+ * });
+ *
+ * @example
+ * // Multiple patterns of sequential keys schema
+ * useKey(['ArrowUp ArrowUp ArrowDown ArrowDown', 'ArrowLeft ArrowRight'], (event, key) => {
  *   console.log(`Pressed ${key}`);
  * });
  *
@@ -96,13 +98,16 @@ const useKey = (
     eventOnce,
     eventStopImmediatePropagation,
     sequenceThreshold,
-    // combinationThreshold,
+    combinationThreshold,
     container,
   } = { ...defaultOptions, ...options };
 
   const targetReference = useRef<EventTarget | null>(null);
   const abortControllerReference = useRef<AbortController | null>(null);
   const firedOnceReference = useRef(false);
+  const combinationReference = useRef<CombinationState>({
+    activeKeys: new Map(),
+  });
   const sequenceReference = useRef<SequenceState[]>([]);
 
   const destroyListener = useCallback(() => {
@@ -118,76 +123,141 @@ const useKey = (
     );
   }, []);
 
-  const handleEventListener = useCallback(
+  const shouldProcessEvent = useCallback(
     (event: KeyboardEvent) => {
-      if (
-        !shouldHandleKeyboardEvent(event, {
-          once: eventOnce,
-          repeat: eventRepeat,
-          firedOnce: firedOnceReference.current,
-        })
-      ) {
+      return shouldHandleKeyboardEvent(event, {
+        once: eventOnce,
+        repeat: eventRepeat,
+        firedOnce: firedOnceReference.current,
+      });
+    },
+    [eventOnce, eventRepeat],
+  );
+
+  const updateCombinationState = useCallback((event: KeyboardEvent) => {
+    const now = Date.now();
+    const combination = combinationReference.current;
+
+    if (event.type === EventType.KeyDown) {
+      combination.activeKeys.set(event.key, { pressedAt: now });
+    } else if (event.type === EventType.KeyUp) {
+      const state = combination.activeKeys.get(event.key);
+      if (state) state.releasedAt = now;
+    }
+  }, []);
+
+  const cleanupCombinationState = useCallback(() => {
+    const now = Date.now();
+    const combination = combinationReference.current;
+
+    [...combination.activeKeys.entries()].forEach(([keyName, state]) => {
+      if (state.releasedAt && now - state.releasedAt > combinationThreshold) {
+        combination.activeKeys.delete(keyName);
+        return;
+      }
+      if (!state.releasedAt && now - state.pressedAt > combinationThreshold) {
+        combination.activeKeys.delete(keyName);
+      }
+    });
+  }, [combinationThreshold]);
+
+  const handleSingleKey = useCallback(
+    (
+      event: KeyboardEvent,
+      sequence: SequenceState,
+      keyCallback: UseKeyCallback,
+    ) => {
+      const expectedKey = sequence.chord[0];
+
+      if (expectedKey !== SPECIAL_KEYS.ANY && expectedKey !== event.key) return;
+
+      invokeKeyAction(event, sequence.key, keyCallback, {
+        stopImmediate: eventStopImmediatePropagation,
+        once: eventOnce,
+        onOnce: () => {
+          firedOnceReference.current = true;
+          destroyListener();
+        },
+      });
+    },
+    [destroyListener, eventOnce, eventStopImmediatePropagation],
+  );
+
+  const handleSequenceStep = useCallback(
+    (
+      event: KeyboardEvent,
+      sequence: SequenceState,
+      keyCallback: UseKeyCallback,
+    ) => {
+      const expectedKey = sequence.chord[sequence.index];
+
+      if (expectedKey !== SPECIAL_KEYS.ANY && expectedKey !== event.key) {
+        resetSequence(sequence);
         return;
       }
 
-      sequenceReference.current.forEach((sequence) => {
-        // Single key
-        if (sequence.chord.length === 1) {
-          const expectedKey = sequence.chord[0];
+      const [updatedSequence, updatedSequences] = advanceSequenceState(
+        sequence,
+        sequenceReference.current,
+        sequenceThreshold,
+        resetSequence,
+      );
+      sequenceReference.current = updatedSequences;
 
-          if (expectedKey !== SPECIAL_KEYS.ANY && expectedKey !== event.key) {
-            return;
-          }
+      if (updatedSequence.index === updatedSequence.chord.length) {
+        invokeKeyAction(event, updatedSequence.key, keyCallback, {
+          stopImmediate: eventStopImmediatePropagation,
+          once: eventOnce,
+          onOnce: () => {
+            firedOnceReference.current = true;
+            destroyListener();
+          },
+        });
 
-          invokeKeyAction(event, sequence.key, keyCallback, {
-            stopImmediate: eventStopImmediatePropagation,
-            once: eventOnce,
-            onOnce: () => {
-              firedOnceReference.current = true;
-              destroyListener();
-            },
-          });
-
-          return;
-        }
-
-        // Sequence of keys
-        const expectedKey = sequence.chord[sequence.index];
-        if (expectedKey !== SPECIAL_KEYS.ANY && expectedKey !== event.key) {
-          resetSequence(sequence);
-          return;
-        }
-
-        const [updatedSequence, updatedSequences] = advanceSequenceState(
-          sequence,
-          sequenceReference.current,
-          sequenceThreshold,
-          resetSequence,
-        );
-        sequenceReference.current = updatedSequences;
-
-        if (updatedSequence.index === updatedSequence.chord.length) {
-          invokeKeyAction(event, updatedSequence.key, keyCallback, {
-            stopImmediate: eventStopImmediatePropagation,
-            once: eventOnce,
-            onOnce: () => {
-              firedOnceReference.current = true;
-              destroyListener();
-            },
-          });
-
-          resetSequence(updatedSequence);
-        }
-      });
+        resetSequence(updatedSequence);
+      }
     },
     [
-      keyCallback,
       destroyListener,
       eventOnce,
-      eventRepeat,
       eventStopImmediatePropagation,
       resetSequence,
       sequenceThreshold,
+    ],
+  );
+
+  const evaluateSequences = useCallback(
+    (event: KeyboardEvent, keyCallback: UseKeyCallback) => {
+      const combination = combinationReference.current;
+      console.log("tracking", combination.activeKeys);
+
+      sequenceReference.current.forEach((sequence) => {
+        if (sequence.chord.length === 1) {
+          handleSingleKey(event, sequence, keyCallback);
+        } else {
+          handleSequenceStep(event, sequence, keyCallback);
+        }
+      });
+    },
+    [handleSingleKey, handleSequenceStep],
+  );
+
+  const handleEventListener = useCallback(
+    (event: KeyboardEvent) => {
+      if (!shouldProcessEvent(event)) {
+        return;
+      }
+
+      updateCombinationState(event);
+      cleanupCombinationState();
+      evaluateSequences(event, keyCallback);
+    },
+    [
+      shouldProcessEvent,
+      updateCombinationState,
+      cleanupCombinationState,
+      evaluateSequences,
+      keyCallback,
     ],
   );
 
@@ -209,6 +279,7 @@ const useKey = (
 
     return () => {
       abortControllerReference.current?.abort();
+      combinationReference.current.activeKeys.clear();
       sequenceReference.current.forEach((sequence) => resetSequence(sequence));
     };
   }, [eventType, eventCapture, container, handleEventListener, resetSequence]);
