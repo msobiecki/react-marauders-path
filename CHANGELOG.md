@@ -1,3 +1,15 @@
+# [1.5.0](https://github.com/msobiecki/react-marauders-path/compare/v1.4.0...v1.5.0) (2026-02-15)
+
+
+### Features
+
+* implement use-key hook abort signal ([d3ea889](https://github.com/msobiecki/react-marauders-path/commit/d3ea889b8437ad2c165cd245d864082c3a3e2783))
+* implement use-key hook abort signal ([b322491](https://github.com/msobiecki/react-marauders-path/commit/b322491da6a275411d7fd15d537b4d6c3c1f2e2f))
+* implement use-key hook abort signal ([43ba40c](https://github.com/msobiecki/react-marauders-path/commit/43ba40c48dba28115f71e80bf64f99f4bfa0b218))
+* implement use-key hook abort signal ([0feaaf7](https://github.com/msobiecki/react-marauders-path/commit/0feaaf7eb5cfd39a40b8d4668976e93ca4978a67))
+* implement use-key hook abort signal ([31f5449](https://github.com/msobiecki/react-marauders-path/commit/31f5449c927bc31b761c761827fbbf8c6e879e0d))
+* implement use-key hook abort signal ([c58db36](https://github.com/msobiecki/react-marauders-path/commit/c58db3663776a0aeeb218e10f0db564104793f65))
+
 # [1.4.0](https://github.com/msobiecki/react-marauders-path/compare/v1.3.0...v1.4.0) (2026-02-05)
 
 
