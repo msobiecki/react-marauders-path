@@ -16,7 +16,7 @@ npm install @msobiecki/react-marauders-path
 
 ## Quick Start
 
-### Single Key Schema
+#### Single Key Schema
 
 ```typescript
 import { useKey } from '@msobiecki/react-marauders-path';
@@ -30,7 +30,7 @@ function MyComponent() {
 }
 ```
 
-### Multiple Patterns of Single Keys Schema
+### Multiple Patterns of Single Key Schema
 
 ```typescript
 // Listen to multiple key patterns
@@ -39,7 +39,7 @@ useKey(["a", "b", "c"], (event, key) => {
 });
 ```
 
-### Combination Keys Schema
+#### Combination Key Schema
 
 ```typescript
 // Listen for simultaneous key press (a + b pressed together within 500ms)
@@ -48,7 +48,7 @@ useKey("a+b", (event, key) => {
 });
 ```
 
-### Multiple Patterns of Combination Keys Schema
+### Multiple Patterns of Combination Key Schema
 
 ```typescript
 // Listen for multiple combination patterns
@@ -57,7 +57,7 @@ useKey(["a+b", "c+d"], (event, key) => {
 });
 ```
 
-### Sequential Keys Schema
+### Sequential Key Schema
 
 ```typescript
 // Listen for Konami code
@@ -66,7 +66,7 @@ useKey("ArrowUp ArrowUp ArrowDown ArrowDown", (event, key) => {
 });
 ```
 
-### Multiple Patterns of Sequential Keys Schema
+#### Multiple Patterns of Sequential Key Schema
 
 ```typescript
 // Listen for multiple sequences
