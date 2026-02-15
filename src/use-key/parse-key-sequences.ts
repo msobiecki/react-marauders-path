@@ -24,7 +24,9 @@ export const parseKeySequences = (input: KeyEvent): SequenceState[] => {
   return keys.map((pattern) => {
     const normalizedKey = normalizeKeySequence(pattern);
 
-    const sequenceParts = normalizedKey.split(" ");
+    const sequenceParts = normalizedKey
+      .split(" ")
+      .filter((part) => part.length > 0);
 
     const chord = sequenceParts.map((part) =>
       part.includes("+") ? part.split("+") : part,

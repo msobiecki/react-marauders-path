@@ -2,8 +2,8 @@ import { describe, it, expect } from "vitest";
 import { parseKeySequences } from "./parse-key-sequences";
 
 describe("parseKeySequences", () => {
-  describe("single key input", () => {
-    it("should parse a single key string", () => {
+  describe("single key patterns", () => {
+    it("should parse a single key variant", () => {
       const result = parseKeySequences("a");
       expect(result).toHaveLength(1);
       expect(result[0]).toEqual({
@@ -14,7 +14,17 @@ describe("parseKeySequences", () => {
       });
     });
 
-    it("should parse special keys", () => {
+    it("should parse a single key variant", () => {
+      const result = parseKeySequences("A");
+      expect(result[0]).toEqual({
+        key: "a",
+        chord: ["a"],
+        index: 0,
+        sequenceTimeout: null,
+      });
+    });
+
+    it("should parse special key variant", () => {
       const result = parseKeySequences("Enter");
       expect(result).toHaveLength(1);
       expect(result[0]).toEqual({
@@ -25,7 +35,7 @@ describe("parseKeySequences", () => {
       });
     });
 
-    it("should normalize single key", () => {
+    it("should parse special key variant", () => {
       const result = parseKeySequences("ENTER");
       expect(result[0]).toEqual({
         key: "Enter",
@@ -36,31 +46,42 @@ describe("parseKeySequences", () => {
     });
   });
 
-  describe("combination input (keys with +)", () => {
+  describe("combination key patterns", () => {
     it("should parse a simple combination", () => {
-      const result = parseKeySequences("shift+a");
+      const result = parseKeySequences("a+b");
       expect(result).toHaveLength(1);
       expect(result[0]).toEqual({
-        key: "Shift+a",
-        chord: [["Shift", "a"]],
+        key: "a+b",
+        chord: [["a", "b"]],
         index: 0,
         sequenceTimeout: null,
       });
     });
 
-    it("should normalize combination", () => {
-      const result = parseKeySequences("CTRL+ALT+DEL");
+    it("should parse a simple combination", () => {
+      const result = parseKeySequences("A+B");
       expect(result).toHaveLength(1);
       expect(result[0]).toEqual({
-        key: "Control+Alt+Delete",
-        chord: [["Control", "Alt", "Delete"]],
+        key: "a+b",
+        chord: [["a", "b"]],
         index: 0,
         sequenceTimeout: null,
       });
     });
 
-    it("should parse multiple keys in combination", () => {
+    it("should parse a complex combination", () => {
       const result = parseKeySequences("control+shift+s");
+      expect(result[0]).toEqual({
+        key: "Control+Shift+s",
+        chord: [["Control", "Shift", "s"]],
+        index: 0,
+        sequenceTimeout: null,
+      });
+    });
+
+    it("should parse a complex combination", () => {
+      const result = parseKeySequences("CTRL+SHIFT+S");
+      expect(result).toHaveLength(1);
       expect(result[0]).toEqual({
         key: "Control+Shift+s",
         chord: [["Control", "Shift", "s"]],
@@ -70,8 +91,8 @@ describe("parseKeySequences", () => {
     });
   });
 
-  describe("sequence input (keys with spaces)", () => {
-    it("should parse a simple sequence of single keys", () => {
+  describe("sequence key patterns", () => {
+    it("should parse a simple sequence", () => {
       const result = parseKeySequences("a b");
       expect(result).toHaveLength(1);
       expect(result[0]).toEqual({
@@ -82,7 +103,18 @@ describe("parseKeySequences", () => {
       });
     });
 
-    it("should parse sequence with multiple keys", () => {
+    it("should parse a simple sequence", () => {
+      const result = parseKeySequences("A B");
+      expect(result).toHaveLength(1);
+      expect(result[0]).toEqual({
+        key: "a b",
+        chord: ["a", "b"],
+        index: 0,
+        sequenceTimeout: null,
+      });
+    });
+
+    it("should parse a simple sequence", () => {
       const result = parseKeySequences("a b c d");
       expect(result).toHaveLength(1);
       expect(result[0]).toEqual({
@@ -93,7 +125,7 @@ describe("parseKeySequences", () => {
       });
     });
 
-    it("should normalize sequence keys", () => {
+    it("should parse a complex sequence", () => {
       const result = parseKeySequences("SHIFT+A ENTER");
       expect(result).toHaveLength(1);
       expect(result[0]).toEqual({
@@ -104,20 +136,20 @@ describe("parseKeySequences", () => {
       });
     });
 
-    it("should parse complex sequence with initial combination", () => {
-      const result = parseKeySequences("ctrl+s a b c");
+    it("should parse a complex sequence", () => {
+      const result = parseKeySequences("a b c ctrl+s");
       expect(result).toHaveLength(1);
       expect(result[0]).toEqual({
-        key: "Control+s a b c",
-        chord: [["Control", "s"], "a", "b", "c"],
+        key: "a b c Control+s",
+        chord: ["a", "b", "c", ["Control", "s"]],
         index: 0,
         sequenceTimeout: null,
       });
     });
   });
 
-  describe("array input", () => {
-    it("should parse array of single keys", () => {
+  describe("array patterns", () => {
+    it("should parse array of single key variant", () => {
       const result = parseKeySequences(["a", "b", "c"]);
       expect(result).toHaveLength(3);
       expect(result[0].key).toBe("a");
@@ -125,7 +157,14 @@ describe("parseKeySequences", () => {
       expect(result[2].key).toBe("c");
     });
 
-    it("should parse array of sequences", () => {
+    it("should parse array with combination keys variant", () => {
+      const result = parseKeySequences(["ctrl+a", "shift+b"]);
+      expect(result).toHaveLength(2);
+      expect(result[0].key).toBe("Control+a");
+      expect(result[1].key).toBe("Shift+b");
+    });
+
+    it("should parse array with sequence keys variant", () => {
       const result = parseKeySequences(["a b", "c d"]);
       expect(result).toHaveLength(2);
       expect(result[0]).toEqual({
@@ -142,7 +181,7 @@ describe("parseKeySequences", () => {
       });
     });
 
-    it("should parse array with mixed types including initial combination", () => {
+    it("should parse array with mixed patterns variant", () => {
       const result = parseKeySequences(["a", "ctrl+b", "c d", "shift+a b"]);
       expect(result).toHaveLength(4);
       expect(result[0].chord).toEqual(["a"]);
@@ -181,6 +220,11 @@ describe("parseKeySequences", () => {
     it("should handle deep sequences", () => {
       const result = parseKeySequences("a b c d e f g h i j");
       expect(result[0].chord).toHaveLength(10);
+    });
+
+    it("should preserve multiple spaces in sequence", () => {
+      const result = parseKeySequences("a  b");
+      expect(result[0].chord).toHaveLength(2);
     });
   });
 });

@@ -59,6 +59,10 @@ export const normalizeKey = (key: string): string => {
     return key;
   }
 
+  if (key === " ") {
+    return " ";
+  }
+
   const trimmed = key.trim();
 
   const upper = trimmed.toUpperCase();
@@ -89,14 +93,21 @@ export const normalizeKey = (key: string): string => {
  * normalizeKeySequence('Shift+A Enter')  // 'Shift+a Enter'
  */
 export const normalizeKeySequence = (sequence: string): string => {
-  return sequence
-    .trim()
-    .split(/\s+/)
-    .map((part) =>
-      part
+  // Split by whitespace while preserving the whitespace structure
+  const parts = sequence.split(/(\s+)/);
+
+  return parts
+    .map((part) => {
+      // If it's whitespace, preserve it as-is
+      if (/^\s+$/.test(part)) {
+        return part;
+      }
+
+      // Otherwise, normalize the key/combination
+      return part
         .split("+")
         .map((key) => normalizeKey(key))
-        .join("+"),
-    )
-    .join(" ");
+        .join("+");
+    })
+    .join("");
 };

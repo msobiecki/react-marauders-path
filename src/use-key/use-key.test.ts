@@ -29,7 +29,7 @@ describe("useKey hook", () => {
     vi.useRealTimers();
   });
 
-  describe("single schema key with single key", () => {
+  describe("single key patterns", () => {
     it("should invoke callback on keyup event", () => {
       const callback = vi.fn();
       renderHook(() => useKey("a", callback, { eventType: "keyup" }));
@@ -199,7 +199,7 @@ describe("useKey hook", () => {
     });
   });
 
-  describe("single schema key with combination keys", () => {
+  describe("single key with combination keys", () => {
     it("should invoke callback on a+b combination keyup event", () => {
       const callback = vi.fn();
       renderHook(() => useKey("a+b", callback, { eventType: "keyup" }));
@@ -225,7 +225,7 @@ describe("useKey hook", () => {
     });
   });
 
-  describe("single schema key with sequence keys", () => {
+  describe("single key with sequence keys", () => {
     it("should handle sequence of keys with default threshold", () => {
       const callback = vi.fn();
       renderHook(() => useKey("a b c", callback, { eventType: "keyup" }));
@@ -257,7 +257,7 @@ describe("useKey hook", () => {
     });
   });
 
-  describe("array keys with single key patterns", () => {
+  describe("array keys with single key", () => {
     it("should invoke callback for array of patterns", () => {
       const callback = vi.fn();
       renderHook(() =>
@@ -298,7 +298,7 @@ describe("useKey hook", () => {
     });
   });
 
-  describe("array keys with combination keys", () => {
+  describe("array patterns with combination keys", () => {
     it("should invoke callback on a+b combination keyup event", () => {
       const callback = vi.fn();
       renderHook(() => useKey(["a+b"], callback, { eventType: "keyup" }));
@@ -324,7 +324,7 @@ describe("useKey hook", () => {
     });
   });
 
-  describe("array keys with sequence patterns", () => {
+  describe("array keys with sequence keys", () => {
     it("should handle multiple sequence patterns", () => {
       const callback = vi.fn();
       renderHook(() =>
