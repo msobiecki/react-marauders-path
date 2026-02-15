@@ -50,29 +50,29 @@ const defaultOptions: KeyOptions = {
  * useKey('a', (event, key) => console.log(`Pressed ${key}`));
  *
  * @example
- * // Multiple patterns of single keys schema
+ * // Multiple patterns of single key schema
  * useKey(['a', 'b', 'c'], (event, key) => console.log(`Pressed ${key}`));
  *
  * @example
- * // Combination keys schema
+ * // Combination key schema
  * useKey('a+b', (event, key) => {
  *   console.log(`Pressed ${key}`);
  * });
  *
  * @example
- * // Multiple patterns of combination keys schema
+ * // Multiple patterns of combination key schema
  * useKey(['a+b', 'c+d'], (event, key) => {
  *   console.log(`Pressed ${key}`);
  * });
  *
  * @example
- * // Sequential keys schema
+ * // Sequential key schema
  * useKey('ArrowUp ArrowUp ArrowDown ArrowDown', (event, key) => {
  *   console.log(`Pressed ${key}`);
  * });
  *
  * @example
- * // Multiple patterns of sequential keys schema
+ * // Multiple patterns of sequential key schema
  * useKey(['ArrowUp ArrowUp ArrowDown ArrowDown', 'ArrowLeft ArrowRight'], (event, key) => {
  *   console.log(`Pressed ${key}`);
  * });
