@@ -88,18 +88,15 @@ const useKey = (
   } = { ...defaultOptions, ...options };
 
   const targetReference = useRef<EventTarget | null>(null);
-  const listenerReference = useRef<EventListener | null>(null);
+  const abortControllerReference = useRef<AbortController | null>(null);
   const firedOnceReference = useRef(false);
   const sequenceReference = useRef<SequenceState[]>([]);
 
   const destroyListener = useCallback(() => {
-    if (targetReference.current && listenerReference.current) {
-      targetReference.current.removeEventListener(
-        eventType,
-        listenerReference.current,
-      );
+    if (abortControllerReference.current) {
+      abortControllerReference.current.abort();
     }
-  }, [eventType]);
+  }, []);
 
   const resetSequence = useCallback((sequence: SequenceState) => {
     sequenceReference.current = resetSequenceState(
@@ -187,18 +184,18 @@ const useKey = (
 
   useEffect(() => {
     targetReference.current = container?.current ?? globalThis;
+    abortControllerReference.current = new AbortController();
 
     const eventListener = (event: Event) =>
       handleEventListener(event as KeyboardEvent);
 
     targetReference.current.addEventListener(eventType, eventListener, {
       capture: eventCapture,
+      signal: abortControllerReference.current.signal,
     });
 
-    listenerReference.current = eventListener;
     return () => {
-      targetReference.current?.removeEventListener(eventType, eventListener);
-      listenerReference.current = null;
+      abortControllerReference.current?.abort();
       sequenceReference.current.forEach((sequence) => resetSequence(sequence));
     };
   }, [eventType, eventCapture, container, handleEventListener, resetSequence]);
