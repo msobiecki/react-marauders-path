@@ -148,6 +148,7 @@ describe("normalizeKey", () => {
       expect(normalizeKey("=")).toBe("=");
       expect(normalizeKey("[")).toBe("[");
       expect(normalizeKey("]")).toBe("]");
+      expect(normalizeKey("+")).toBe("+");
     });
   });
 });
@@ -158,7 +159,7 @@ describe("normalizeKeySequence", () => {
     expect(normalizeKeySequence("Enter")).toBe("Enter");
   });
 
-  it("should normalize chord (keys connected with +)", () => {
+  it("should normalize combinations (keys connected with +)", () => {
     expect(normalizeKeySequence("shift+a")).toBe("Shift+a");
     expect(normalizeKeySequence("CTRL+ALT+DEL")).toBe("Control+Alt+Delete");
     expect(normalizeKeySequence("control+shift+s")).toBe("Control+Shift+s");
@@ -169,13 +170,9 @@ describe("normalizeKeySequence", () => {
     expect(normalizeKeySequence("Shift+A Enter")).toBe("Shift+a Enter");
   });
 
-  it("should normalize complex sequences with both chords and sequences", () => {
+  it("should normalize complex sequences with both combinations and sequences", () => {
     expect(normalizeKeySequence("shift+a shift+b c")).toBe("Shift+a Shift+b c");
     expect(normalizeKeySequence("CTRL+S CTRL+V")).toBe("Control+s Control+v");
-  });
-
-  it("should handle multiple spaces in sequence", () => {
-    expect(normalizeKeySequence("a  b")).toBe("a  b");
   });
 
   it("should handle mixed case special keys", () => {
@@ -196,7 +193,13 @@ describe("normalizeKeySequence", () => {
     expect(normalizeKeySequence("Home End")).toBe("Home End");
   });
 
-  it("should preserve order in chord", () => {
+  it("should preserve order in combination", () => {
     expect(normalizeKeySequence("a+shift+control")).toBe("a+Shift+Control");
+  });
+
+  describe("edge cases", () => {
+    it("should handle multiple spaces in sequence", () => {
+      expect(normalizeKeySequence("a  b")).toBe("a b");
+    });
   });
 });

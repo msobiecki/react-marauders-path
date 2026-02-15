@@ -11,18 +11,18 @@ import { SequenceState } from "./use-key.types";
  * @returns {SequenceState[]} New array with the reset sequence
  *
  * @example
- * const sequences = [{ key: 'a', index: 2, timeout: id1, ... }];
+ * const sequences = [{ key: 'a', index: 2, sequenceTimeout: id1, ... }];
  * const reset = resetSequenceState(sequences[0], sequences);
- * // reset[0].index === 0 && reset[0].timeout === null
+ * // reset[0].index === 0 && reset[0].sequenceTimeout === null
  */
 export const resetSequenceState = (
   sequence: SequenceState,
   sequences: SequenceState[],
 ): SequenceState[] => {
-  const reset = { ...sequence, index: 0, timeout: null };
+  const reset = { ...sequence, index: 0, sequenceTimeout: null };
 
-  if (sequence.timeout) {
-    clearTimeout(sequence.timeout);
+  if (sequence.sequenceTimeout) {
+    clearTimeout(sequence.sequenceTimeout);
   }
 
   return sequences.map((candidateSequence) =>
@@ -38,7 +38,7 @@ export const resetSequenceState = (
  *
  * @param {SequenceState} sequence - The sequence to advance
  * @param {SequenceState[]} sequences - The full sequences array
- * @param {number|undefined} timeoutMs - Timeout duration in milliseconds (falsy = no timeout)
+ * @param {number|undefined} timeout - Timeout duration in milliseconds (falsy = no timeout)
  * @param {Function} onTimeout - Callback invoked when timeout expires
  * @returns {[SequenceState, SequenceState[]]} Tuple of advanced sequence and updated sequences array
  *
@@ -54,20 +54,23 @@ export const resetSequenceState = (
 export const advanceSequenceState = (
   sequence: SequenceState,
   sequences: SequenceState[],
-  timeoutMs: number | undefined,
+  timeout: number | undefined,
   onTimeout: (sequence: SequenceState) => void,
 ): [SequenceState, SequenceState[]] => {
   const nextSequence: SequenceState = {
     ...sequence,
     index: sequence.index + 1,
-    timeout: sequence.timeout,
+    sequenceTimeout: sequence.sequenceTimeout,
   };
 
-  if (timeoutMs) {
-    if (nextSequence.timeout) {
-      clearTimeout(nextSequence.timeout);
+  if (timeout) {
+    if (nextSequence.sequenceTimeout) {
+      clearTimeout(nextSequence.sequenceTimeout);
     }
-    nextSequence.timeout = setTimeout(() => onTimeout(nextSequence), timeoutMs);
+    nextSequence.sequenceTimeout = setTimeout(
+      () => onTimeout(nextSequence),
+      timeout,
+    );
   }
 
   const newSequences = sequences.map((candidateSequence) =>

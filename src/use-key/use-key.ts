@@ -19,18 +19,19 @@ const defaultOptions: KeyOptions = {
   eventCapture: false,
   eventOnce: false,
   eventStopImmediatePropagation: false,
-  sequenceTimeout: 1000,
+  sequenceThreshold: 1000,
+  combinationThreshold: 100,
   container: { current: null },
 };
 
 /**
- * React hook for handling keyboard events with support for key sequences and chords.
+ * React hook for handling keyboard events with support for key sequences and combinations.
  *
- * Enables listening for single key presses, key combinations (chords), and sequential key presses.
+ * Enables listening for single key presses, key combinations, and sequential key presses.
  * Supports customizable options like event type, repeat handling, and one-time listeners.
  *
  * @template T - The callback function type
- * @param {UseKeySchema} key - Single key, chord, sequence, or array of patterns to listen for
+ * @param {UseKeySchema} key - Single key, combination, sequence, or array of patterns to listen for
  * @param {UseKeyCallback} keyCallback - Callback function invoked when key pattern matches
  * @param {UseKeyOptions} [options] - Configuration options for the hook
  * @param {string} [options.eventType='keyup'] - Type of keyboard event ('keydown' or 'keyup')
@@ -38,39 +39,50 @@ const defaultOptions: KeyOptions = {
  * @param {boolean} [options.eventCapture=false] - Use event capture phase instead of bubbling
  * @param {boolean} [options.eventOnce=false] - Trigger callback only once
  * @param {boolean} [options.eventStopImmediatePropagation=false] - Stop immediate propagation
- * @param {number} [options.sequenceTimeout=1000] - Timeout in ms between sequence keys
+ * @param {number} [options.sequenceThreshold=1000] - Timeout in ms between sequence keys
+ * @param {number} [options.combinationThreshold=100] - Timeout in ms between combination keys
  * @param {RefObject<HTMLElement>} [options.container] - DOM element to attach listener to (default: window)
  *
  * @example
- * // Single key
+ * // Single key schema
  * useKey('a', (event, key) => console.log(`Pressed ${key}`));
  *
  * @example
- * // Keyboard shortcut (chord)
- * useKey('ctrl+s', (event, key) => {
- *   event.preventDefault();
- *   console.log('Save!');
- * });
+ * // Multiple patterns of single keys schema
+ * useKey(['a', 'b', 'c'], (event, key) => console.log(`Pressed ${key}`));
  *
  * @example
- * // Sequential keys
+ * // Sequential keys schema
  * useKey('ArrowUp ArrowUp ArrowDown ArrowDown', (event, key) => {
- *   console.log('Konami code!');
- * }, { sequenceTimeout: 2000 });
- *
- * @example
- * // Multiple patterns
- * useKey(['a', 'b', 'c'], (event, key) => {
- *   console.log(`Matched: ${key}`);
+ *   console.log(`Pressed ${key}`);
  * });
  *
  * @example
- * // With options
- * useKey('Enter', handleSubmit, {
+ * // Multiple patterns of sequential keys schema
+ * useKey(['ArrowUp ArrowUp ArrowDown ArrowDown', 'ArrowLeft ArrowRight'], (event, key) => {
+ *   console.log(`Pressed ${key}`);
+ * });
+ *
+ * @example
+ * // Combination keys schema
+ * useKey('a+b', (event, key) => {
+ *   console.log(`Pressed ${key}`);
+ * });
+ *
+ * @example
+ * // Multiple patterns of combination keys schema
+ * useKey(['a+b', 'c+d'], (event, key) => {
+ *   console.log(`Pressed ${key}`);
+ * });
+ *
+ * @example
+ * // Using options to listen for a key on keydown event and stop propagation
+ * useKey('Any', handleSubmit, {
  *   eventType: 'keydown',
  *   eventStopImmediatePropagation: true,
  *   container: inputRef
  * });
+ *
  */
 const useKey = (
   key: UseKeySchema,
@@ -83,7 +95,8 @@ const useKey = (
     eventCapture,
     eventOnce,
     eventStopImmediatePropagation,
-    sequenceTimeout,
+    sequenceThreshold,
+    // combinationThreshold,
     container,
   } = { ...defaultOptions, ...options };
 
@@ -148,7 +161,7 @@ const useKey = (
         const [updatedSequence, updatedSequences] = advanceSequenceState(
           sequence,
           sequenceReference.current,
-          sequenceTimeout,
+          sequenceThreshold,
           resetSequence,
         );
         sequenceReference.current = updatedSequences;
@@ -174,7 +187,7 @@ const useKey = (
       eventRepeat,
       eventStopImmediatePropagation,
       resetSequence,
-      sequenceTimeout,
+      sequenceThreshold,
     ],
   );
 

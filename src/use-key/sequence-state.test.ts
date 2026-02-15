@@ -10,9 +10,9 @@ describe("resetSequenceState", () => {
   beforeEach(() => {
     vi.useFakeTimers();
     mockSequences = [
-      { key: "a", chord: ["a"], index: 1, timeout: null },
-      { key: "b", chord: ["b"], index: 2, timeout: null },
-      { key: "c", chord: ["c"], index: 3, timeout: null },
+      { key: "a", chord: ["a"], index: 1, sequenceTimeout: null },
+      { key: "b", chord: ["b"], index: 2, sequenceTimeout: null },
+      { key: "c", chord: ["c"], index: 3, sequenceTimeout: null },
     ];
   });
 
@@ -27,24 +27,24 @@ describe("resetSequenceState", () => {
     expect(result[0].index).toBe(0);
   });
 
-  it("should reset the timeout to null", () => {
+  it("should reset the sequenceTimeout to null", () => {
     const sequence = mockSequences[0];
     const mockTimeout = setTimeout(() => {
       /* no-op */
     }, 1000) as unknown as ReturnType<typeof setTimeout>;
-    sequence.timeout = mockTimeout;
+    sequence.sequenceTimeout = mockTimeout;
 
     const result = resetSequenceState(sequence, mockSequences);
-    expect(result[0].timeout).toBe(null);
+    expect(result[0].sequenceTimeout).toBe(null);
   });
 
-  it("should clear existing timeout", () => {
+  it("should clear existing sequenceTimeout", () => {
     const clearTimeoutSpy = vi.spyOn(globalThis, "clearTimeout");
     const mockTimeout = setTimeout(() => {
       /* no-op */
     }, 1000) as unknown as ReturnType<typeof setTimeout>;
     const sequence = mockSequences[0];
-    sequence.timeout = mockTimeout;
+    sequence.sequenceTimeout = mockTimeout;
 
     resetSequenceState(sequence, mockSequences);
     expect(clearTimeoutSpy).toHaveBeenCalledWith(mockTimeout);
@@ -72,9 +72,9 @@ describe("resetSequenceState", () => {
     expect(result).not.toBe(mockSequences);
   });
 
-  it("should handle sequence with null timeout", () => {
+  it("should handle sequence with null sequenceTimeout", () => {
     const sequence = mockSequences[0];
-    sequence.timeout = null;
+    sequence.sequenceTimeout = null;
     expect(() => {
       resetSequenceState(sequence, mockSequences);
     }).not.toThrow();
@@ -96,9 +96,9 @@ describe("advanceSequenceState", () => {
     vi.useFakeTimers();
     mockOnTimeout = vi.fn();
     mockSequences = [
-      { key: "a", chord: ["a"], index: 0, timeout: null },
-      { key: "b", chord: ["b"], index: 1, timeout: null },
-      { key: "c", chord: ["c"], index: 2, timeout: null },
+      { key: "a", chord: ["a"], index: 0, sequenceTimeout: null },
+      { key: "b", chord: ["b"], index: 1, sequenceTimeout: null },
+      { key: "c", chord: ["c"], index: 2, sequenceTimeout: null },
     ];
   });
 
@@ -142,7 +142,7 @@ describe("advanceSequenceState", () => {
     expect(newSequences[2].index).toBe(2);
   });
 
-  it("should not set timeout when timeoutMs is undefined", () => {
+  it("should not set sequenceTimeout when timeout is undefined", () => {
     const sequence = mockSequences[0];
     const [nextSequence] = advanceSequenceState(
       sequence,
@@ -150,10 +150,10 @@ describe("advanceSequenceState", () => {
       undefined,
       mockOnTimeout,
     );
-    expect(nextSequence.timeout).toBe(null);
+    expect(nextSequence.sequenceTimeout).toBe(null);
   });
 
-  it("should set timeout when timeoutMs is provided", () => {
+  it("should set sequenceTimeout when timeout is provided", () => {
     const sequence = mockSequences[0];
     const [nextSequence] = advanceSequenceState(
       sequence,
@@ -161,10 +161,10 @@ describe("advanceSequenceState", () => {
       1000,
       mockOnTimeout,
     );
-    expect(nextSequence.timeout).not.toBe(null);
+    expect(nextSequence.sequenceTimeout).not.toBe(null);
   });
 
-  it("should call onTimeout after specified timeout duration", () => {
+  it("should call onTimeout after specified sequenceTimeout duration", () => {
     const sequence = mockSequences[0];
     const [nextSequence] = advanceSequenceState(
       sequence,
@@ -176,24 +176,24 @@ describe("advanceSequenceState", () => {
     expect(mockOnTimeout).toHaveBeenCalledWith(nextSequence);
   });
 
-  it("should clear previous timeout before setting new one", () => {
+  it("should clear previous sequenceTimeout before setting new one", () => {
     const clearTimeoutSpy = vi.spyOn(globalThis, "clearTimeout");
     const previousTimeout = setTimeout(() => {
       /* no-op */
     }, 500) as unknown as ReturnType<typeof setTimeout>;
     const sequence = mockSequences[0];
-    sequence.timeout = previousTimeout;
+    sequence.sequenceTimeout = previousTimeout;
 
     advanceSequenceState(sequence, mockSequences, 1000, mockOnTimeout);
     expect(clearTimeoutSpy).toHaveBeenCalledWith(previousTimeout);
   });
 
-  it("should handle sequence with existing timeout", () => {
+  it("should handle sequence with existing sequenceTimeout", () => {
     const previousTimeout = setTimeout(() => {
       /* no-op */
     }, 500) as unknown as ReturnType<typeof setTimeout>;
     const sequence = mockSequences[0];
-    sequence.timeout = previousTimeout;
+    sequence.sequenceTimeout = previousTimeout;
 
     const [nextSequence] = advanceSequenceState(
       sequence,
@@ -201,7 +201,7 @@ describe("advanceSequenceState", () => {
       1000,
       mockOnTimeout,
     );
-    expect(nextSequence.timeout).not.toBeNull();
+    expect(nextSequence.sequenceTimeout).not.toBeNull();
   });
 
   it("should return new sequence objects", () => {
@@ -257,7 +257,7 @@ describe("advanceSequenceState", () => {
     expect(sequence.index).toBe(3);
   });
 
-  it("should not set timeout if timeoutMs is 0", () => {
+  it("should not set sequenceTimeout if timeoutMs is 0", () => {
     const sequence = mockSequences[0];
     const [nextSequence] = advanceSequenceState(
       sequence,
@@ -266,7 +266,7 @@ describe("advanceSequenceState", () => {
       mockOnTimeout,
     );
 
-    expect(nextSequence.timeout).toBe(null);
+    expect(nextSequence.sequenceTimeout).toBe(null);
     vi.advanceTimersByTime(0);
     expect(mockOnTimeout).not.toHaveBeenCalled();
   });

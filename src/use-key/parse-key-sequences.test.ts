@@ -11,7 +11,7 @@ describe("parseKeySequences", () => {
         key: "a",
         chord: ["a"],
         index: 0,
-        timeout: null,
+        sequenceTimeout: null,
       });
     });
 
@@ -22,7 +22,7 @@ describe("parseKeySequences", () => {
         key: "Enter",
         chord: ["Enter"],
         index: 0,
-        timeout: null,
+        sequenceTimeout: null,
       });
     });
 
@@ -32,41 +32,41 @@ describe("parseKeySequences", () => {
         key: "Enter",
         chord: ["Enter"],
         index: 0,
-        timeout: null,
+        sequenceTimeout: null,
       });
     });
   });
 
-  describe("chord input (keys with +)", () => {
-    it("should parse a simple chord", () => {
+  describe("combination input (keys with +)", () => {
+    it("should parse a simple combination", () => {
       const result = parseKeySequences("shift+a");
       expect(result).toHaveLength(1);
       expect(result[0]).toEqual({
         key: "Shift+a",
         chord: ["Shift+a"],
         index: 0,
-        timeout: null,
+        sequenceTimeout: null,
       });
     });
 
-    it("should normalize chord", () => {
+    it("should normalize combination", () => {
       const result = parseKeySequences("CTRL+ALT+DEL");
       expect(result).toHaveLength(1);
       expect(result[0]).toEqual({
         key: "Control+Alt+Delete",
         chord: ["Control+Alt+Delete"],
         index: 0,
-        timeout: null,
+        sequenceTimeout: null,
       });
     });
 
-    it("should parse multiple keys in chord", () => {
+    it("should parse multiple keys in combination", () => {
       const result = parseKeySequences("control+shift+s");
       expect(result[0]).toEqual({
         key: "Control+Shift+s",
         chord: ["Control+Shift+s"],
         index: 0,
-        timeout: null,
+        sequenceTimeout: null,
       });
     });
   });
@@ -79,7 +79,7 @@ describe("parseKeySequences", () => {
         key: "a b",
         chord: ["a", "b"],
         index: 0,
-        timeout: null,
+        sequenceTimeout: null,
       });
     });
 
@@ -90,7 +90,7 @@ describe("parseKeySequences", () => {
         key: "a b c d",
         chord: ["a", "b", "c", "d"],
         index: 0,
-        timeout: null,
+        sequenceTimeout: null,
       });
     });
 
@@ -101,18 +101,18 @@ describe("parseKeySequences", () => {
         key: "Shift+a Enter",
         chord: ["Shift+a", "Enter"],
         index: 0,
-        timeout: null,
+        sequenceTimeout: null,
       });
     });
 
-    it("should parse complex sequence with chords", () => {
+    it("should parse complex sequence with combinations", () => {
       const result = parseKeySequences("ctrl+s ctrl+v");
       expect(result).toHaveLength(1);
       expect(result[0]).toEqual({
         key: "Control+s Control+v",
         chord: ["Control+s", "Control+v"],
         index: 0,
-        timeout: null,
+        sequenceTimeout: null,
       });
     });
   });
@@ -133,13 +133,13 @@ describe("parseKeySequences", () => {
         key: "a b",
         chord: ["a", "b"],
         index: 0,
-        timeout: null,
+        sequenceTimeout: null,
       });
       expect(result[1]).toEqual({
         key: "c d",
         chord: ["c", "d"],
         index: 0,
-        timeout: null,
+        sequenceTimeout: null,
       });
     });
 
@@ -165,9 +165,9 @@ describe("parseKeySequences", () => {
       expect(result[0].index).toBe(0);
     });
 
-    it("should initialize timeout to null", () => {
+    it("should initialize sequenceTimeout to null", () => {
       const result = parseKeySequences("a");
-      expect(result[0].timeout).toBe(null);
+      expect(result[0].sequenceTimeout).toBe(null);
     });
 
     it("should handle spaces in key sequence correctly", () => {

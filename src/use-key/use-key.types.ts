@@ -20,7 +20,8 @@ export interface KeyOptions {
   eventCapture: boolean;
   eventOnce: boolean;
   eventStopImmediatePropagation?: boolean;
-  sequenceTimeout: number;
+  sequenceThreshold: number;
+  combinationThreshold: number;
   container: RefObject<HTMLElement | null>;
 }
 
@@ -28,7 +29,7 @@ export interface SequenceState {
   key: KeyPattern;
   chord: KeyPattern[];
   index: number;
-  timeout: ReturnType<typeof setTimeout> | null;
+  sequenceTimeout: ReturnType<typeof setTimeout> | null;
 }
 
 export type UseKeySchema = KeyEvent;

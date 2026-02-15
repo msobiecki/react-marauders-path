@@ -74,12 +74,12 @@ export const normalizeKey = (key: string): string => {
 };
 
 /**
- * Normalizes a key sequence or chord string.
+ * Normalizes a key sequence or combinations string.
  *
- * Processes sequences separated by spaces and chords separated by + signs.
+ * Processes sequences separated by spaces and combinations separated by + signs.
  * Each component is individually normalized using normalizeKey().
  *
- * @param {string} sequence - The key sequence or chord to normalize
+ * @param {string} sequence - The key sequence or combination to normalize
  * @returns {string} The normalized sequence
  *
  * @example
@@ -90,7 +90,8 @@ export const normalizeKey = (key: string): string => {
  */
 export const normalizeKeySequence = (sequence: string): string => {
   return sequence
-    .split(" ")
+    .trim()
+    .split(/\s+/)
     .map((part) =>
       part
         .split("+")

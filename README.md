@@ -16,44 +16,65 @@ npm install @msobiecki/react-marauders-path
 
 ## Quick Start
 
-### Basic Key Detection
+### Single Key Schema
 
 ```typescript
 import { useKey } from '@msobiecki/react-marauders-path';
 
 function MyComponent() {
-  useKey('ArrowUp', (event) => {
-    console.log('ArrowUp pressed');
+  useKey('a', (event, key) => {
+    console.log(`Pressed ${key}`);
   });
 
-  return <div>Press arrow up</div>;
+  return <div>Press 'a'</div>;
 }
 ```
 
-### Key Combinations
-
-```typescript
-// Listen for simultaneous key press (Control + a)
-useKey("Control+a", (event) => {
-  console.log("Control and a pressed together");
-});
-```
-
-### Key Sequences
-
-```typescript
-// Listen for key sequence (a then b)
-useKey(["a", "b"], (event) => {
-  console.log("a then b pressed in sequence");
-});
-```
-
-### Multiple Keys
+### Multiple Patterns of Single Keys Schema
 
 ```typescript
 // Listen to multiple key patterns
-useKey(["ArrowUp", "w"], (event) => {
-  console.log("Either ArrowUp or W pressed");
+useKey(["a", "b", "c"], (event, key) => {
+  console.log(`Pressed ${key}`);
+});
+```
+
+### Sequential Keys Schema
+
+```typescript
+// Listen for Konami code
+useKey("ArrowUp ArrowUp ArrowDown ArrowDown", (event, key) => {
+  console.log(`Pressed ${key}`);
+});
+```
+
+### Multiple Patterns of Sequential Keys Schema
+
+```typescript
+// Listen for multiple sequences
+useKey(
+  ["ArrowUp ArrowUp ArrowDown ArrowDown", "ArrowLeft ArrowRight"],
+  (event, key) => {
+    console.log(`Pressed ${key}`);
+  },
+);
+```
+
+### Combination Keys Schema
+
+```typescript
+// Listen for simultaneous key press (a + b pressed together within 500ms)
+useKey("a+b", (event, key) => {
+  console.log(`Pressed ${key}`);
+});
+```
+
+### Multiple Patterns of Combination Keys Schema
+
+```typescript
+// Listen for multiple combination patterns
+useKey(["a+b", "c+d"], (event, key) => {
+  console.log(`Pressed ${key}`);
 });
 ```
 
@@ -78,7 +99,8 @@ interface UseKeyOptions {
   eventCapture?: boolean; // Default: false
   eventOnce?: boolean; // Default: false
   eventStopImmediatePropagation?: boolean; // Default: false
-  sequenceTimeout?: number; // Default: 1000 (ms)
+  sequenceThreshold?: number; // Default: 1000 (ms) - Timeout between sequence keys
+  combinationThreshold?: number; // Default: 500 (ms) - Timeout between combination keys
   container?: RefObject<HTMLElement>; // Default: window
 }
 ```
@@ -88,6 +110,66 @@ interface UseKeyOptions {
 One-time keyboard event listener. Automatically removes after first trigger.
 
 **Parameters:** Same as `useKey`
+
+## Advanced Examples
+
+### Using Options for Event Type and Propagation Control
+
+```typescript
+useKey(
+  "Enter",
+  (event, key) => {
+    handleSubmit();
+  },
+  {
+    eventType: "keydown",
+    eventStopImmediatePropagation: true,
+    container: inputRef,
+  },
+);
+```
+
+### Listening for Key Repeat
+
+```typescript
+// Allow repeated key presses to trigger callback (useful for games)
+useKey(
+  "ArrowUp",
+  (event, key) => {
+    moveUp();
+  },
+  {
+    eventType: "keydown",
+    eventRepeat: true,
+  },
+);
+```
+
+### Custom Thresholds for Sequences and Combinations
+
+```typescript
+// Increase threshold for slower typists
+useKey(
+  "a b c",
+  (event, key) => {
+    console.log(`Sequence: ${key}`);
+  },
+  {
+    sequenceThreshold: 2000, // 2 seconds between keys
+  },
+);
+
+// Increase threshold for combination keys
+useKey(
+  "a+b",
+  (event, key) => {
+    console.log(`Combination: ${key}`);
+  },
+  {
+    combinationThreshold: 1000, // 1 second window for simultaneous press
+  },
+);
+```
 
 ## Examples
 
@@ -103,7 +185,10 @@ npm run dev
 
 This example demonstrates:
 
-- Real-time keyboard input handling
+- Real-time keyboard input handling with arrow keys
+- Sequential key patterns (e.g., Konami code)
+- Combination keys (simultaneous key presses)
+- Game collision detection and movement
 
 ## Development
 
