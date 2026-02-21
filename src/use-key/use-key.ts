@@ -167,6 +167,63 @@ const useKey = (
     });
   }, [eventType, combinationThreshold]);
 
+  const validateCombination = useCallback(
+    (
+      expectedKey: string[],
+      activeKeys: Map<string, { pressedAt: number; releasedAt?: number }>,
+    ): boolean => {
+      if (eventType === EventType.KeyDown) {
+        return (
+          activeKeys.size === expectedKey.length &&
+          expectedKey.every((key) => {
+            if (key === SPECIAL_KEYS.ANY) {
+              return activeKeys.size > 0;
+            }
+            return activeKeys.has(key);
+          })
+        );
+      }
+      if (eventType === EventType.KeyUp) {
+        const keyStates = expectedKey.map((key) => {
+          if (key === SPECIAL_KEYS.ANY) {
+            const entries = [...activeKeys.entries()];
+            const lastEntry = entries.at(-1);
+            return lastEntry ? lastEntry[1] : undefined;
+          }
+          return activeKeys.get(key);
+        });
+
+        if (keyStates.some((state) => !state?.releasedAt)) {
+          return false;
+        }
+
+        const pressedTimes: number[] = keyStates
+          .map((state) => state?.pressedAt)
+          .filter((value): value is number => value !== undefined);
+        const releasedTimes: number[] = keyStates
+          .map((state) => state?.releasedAt)
+          .filter((value): value is number => value !== undefined);
+
+        const minReleased = Math.min(...releasedTimes);
+        const maxReleased = Math.max(...releasedTimes);
+        const maxPressed = Math.max(...pressedTimes);
+
+        if (maxPressed > minReleased) {
+          return false;
+        }
+
+        if (maxReleased - minReleased > combinationThreshold) {
+          return false;
+        }
+
+        return true;
+      }
+
+      return false;
+    },
+    [eventType, combinationThreshold],
+  );
+
   const handleSingleKey = useCallback(
     (
       event: KeyboardEvent,
@@ -177,54 +234,8 @@ const useKey = (
 
       if (Array.isArray(expectedKey)) {
         const { activeKeys } = combinationReference.current;
-        let combinationMatched = false;
 
-        if (eventType === EventType.KeyDown) {
-          combinationMatched =
-            activeKeys.size === expectedKey.length &&
-            expectedKey.every((key) => {
-              if (key === SPECIAL_KEYS.ANY) {
-                return activeKeys.size > 0;
-              }
-              return activeKeys.has(key);
-            });
-        } else if (eventType === EventType.KeyUp) {
-          const keyStates = expectedKey.map((key) => {
-            if (key === SPECIAL_KEYS.ANY) {
-              const entries = [...activeKeys.entries()];
-              const lastEntry = entries.at(-1);
-              return lastEntry ? lastEntry[1] : undefined;
-            }
-            return activeKeys.get(key);
-          });
-
-          if (keyStates.some((state) => !state?.releasedAt)) {
-            return;
-          }
-
-          const pressedTimes: number[] = keyStates
-            .map((state) => state?.pressedAt)
-            .filter((value): value is number => value !== undefined);
-          const releasedTimes: number[] = keyStates
-            .map((state) => state?.releasedAt)
-            .filter((value): value is number => value !== undefined);
-
-          const minReleased = Math.min(...releasedTimes);
-          const maxReleased = Math.max(...releasedTimes);
-          const maxPressed = Math.max(...pressedTimes);
-
-          if (maxPressed > minReleased) {
-            return;
-          }
-
-          if (maxReleased - minReleased > combinationThreshold) {
-            return;
-          }
-
-          combinationMatched = true;
-        }
-
-        if (!combinationMatched) {
+        if (!validateCombination(expectedKey, activeKeys)) {
           return;
         }
 
@@ -254,11 +265,10 @@ const useKey = (
       });
     },
     [
-      combinationThreshold,
       destroyListener,
       eventOnce,
       eventStopImmediatePropagation,
-      eventType,
+      validateCombination,
     ],
   );
 
@@ -269,6 +279,37 @@ const useKey = (
       keyCallback: UseKeyCallback,
     ) => {
       const expectedKey = sequence.chord[sequence.index];
+
+      if (Array.isArray(expectedKey)) {
+        const { activeKeys } = combinationReference.current;
+
+        if (!validateCombination(expectedKey, activeKeys)) {
+          return;
+        }
+
+        const [updatedSequence, updatedSequences] = advanceSequenceState(
+          sequence,
+          sequenceReference.current,
+          sequenceThreshold,
+          resetSequence,
+        );
+        sequenceReference.current = updatedSequences;
+
+        if (updatedSequence.index === updatedSequence.chord.length) {
+          invokeKeyAction(event, updatedSequence.key, keyCallback, {
+            stopImmediate: eventStopImmediatePropagation,
+            once: eventOnce,
+            onOnce: () => {
+              firedOnceReference.current = true;
+              destroyListener();
+            },
+          });
+
+          resetSequence(updatedSequence);
+        }
+
+        return;
+      }
 
       if (expectedKey !== SPECIAL_KEYS.ANY && expectedKey !== event.key) {
         resetSequence(sequence);
@@ -302,6 +343,7 @@ const useKey = (
       eventStopImmediatePropagation,
       resetSequence,
       sequenceThreshold,
+      validateCombination,
     ],
   );
 

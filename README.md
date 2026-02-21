@@ -180,7 +180,7 @@ npm run dev
 
 This example demonstrates:
 
-- Real-time keyboard input handling
+- Combined mouse, touch, and keyboard input
 
 ## Development
 
@@ -204,10 +204,14 @@ npm lint
 
 ## Project Status
 
-- 🚧 Core `useKey` combination sequence pattern
-- 🚧 Core `useMouse` hook
-- 🚧 Core `useMouse` hook unit test coverage
-- 🚧 Example of usage
+Hooks
+
+- 🚧 `useMouse` – Mouse interaction handling
+- 🚧 `useMouse` – Unit test coverage
+- 🚧 `useTouch` – Touch interaction handling
+- 🚧 `useTouch` – Unit test coverage
+- 🚧 `useInteraction` – Unified mouse, touch, and keyboard interaction handling
+- 🚧 `useInteraction` – Unit test coverage
 
 ## License
 
