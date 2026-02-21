@@ -1,3 +1,10 @@
+# [1.8.0](https://github.com/msobiecki/react-marauders-path/compare/v1.7.0...v1.8.0) (2026-02-21)
+
+
+### Features
+
+* implement use-key test cases ([57bc1bd](https://github.com/msobiecki/react-marauders-path/commit/57bc1bd07d7e66a2d34efc89f230e0f3c08f102a))
+
 # [1.7.0](https://github.com/msobiecki/react-marauders-path/compare/v1.6.0...v1.7.0) (2026-02-21)
 
 
