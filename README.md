@@ -33,7 +33,6 @@ function MyComponent() {
 ### Multiple Patterns of Single Key Schema
 
 ```typescript
-// Listen to multiple key patterns
 useKey(["a", "b", "c"], (event, key) => {
   console.log(`Pressed ${key}`);
 });
@@ -42,7 +41,6 @@ useKey(["a", "b", "c"], (event, key) => {
 #### Combination Key Schema
 
 ```typescript
-// Listen for simultaneous key press (a + b pressed together within 500ms)
 useKey("a+b", (event, key) => {
   console.log(`Pressed ${key}`);
 });
@@ -51,7 +49,6 @@ useKey("a+b", (event, key) => {
 ### Multiple Patterns of Combination Key Schema
 
 ```typescript
-// Listen for multiple combination patterns
 useKey(["a+b", "c+d"], (event, key) => {
   console.log(`Pressed ${key}`);
 });
@@ -60,7 +57,6 @@ useKey(["a+b", "c+d"], (event, key) => {
 ### Sequential Key Schema
 
 ```typescript
-// Listen for Konami code
 useKey("ArrowUp ArrowUp ArrowDown ArrowDown", (event, key) => {
   console.log(`Pressed ${key}`);
 });
@@ -69,7 +65,6 @@ useKey("ArrowUp ArrowUp ArrowDown ArrowDown", (event, key) => {
 #### Multiple Patterns of Sequential Key Schema
 
 ```typescript
-// Listen for multiple sequences
 useKey(
   ["ArrowUp ArrowUp ArrowDown ArrowDown", "ArrowLeft ArrowRight"],
   (event, key) => {
@@ -100,7 +95,7 @@ interface UseKeyOptions {
   eventOnce?: boolean; // Default: false
   eventStopImmediatePropagation?: boolean; // Default: false
   sequenceThreshold?: number; // Default: 1000 (ms) - Timeout between sequence keys
-  combinationThreshold?: number; // Default: 500 (ms) - Timeout between combination keys
+  combinationThreshold?: number; // Default: 200 (ms) - Timeout between combination keys
   container?: RefObject<HTMLElement>; // Default: window
 }
 ```
@@ -185,10 +180,7 @@ npm run dev
 
 This example demonstrates:
 
-- Real-time keyboard input handling with arrow keys
-- Sequential key patterns (e.g., Konami code)
-- Combination keys (simultaneous key presses)
-- Game collision detection and movement
+- Real-time keyboard input handling
 
 ## Development
 

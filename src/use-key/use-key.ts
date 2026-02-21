@@ -42,7 +42,7 @@ const defaultOptions: KeyOptions = {
  * @param {boolean} [options.eventOnce=false] - Trigger callback only once
  * @param {boolean} [options.eventStopImmediatePropagation=false] - Stop immediate propagation
  * @param {number} [options.sequenceThreshold=1000] - Timeout in ms between sequence keys
- * @param {number} [options.combinationThreshold=100] - Timeout in ms between combination keys
+ * @param {number} [options.combinationThreshold=200] - Timeout in ms between combination keys
  * @param {RefObject<HTMLElement>} [options.container] - DOM element to attach listener to (default: window)
  *
  * @example
@@ -180,9 +180,23 @@ const useKey = (
         let combinationMatched = false;
 
         if (eventType === EventType.KeyDown) {
-          combinationMatched = expectedKey.every((key) => activeKeys.has(key));
+          combinationMatched =
+            activeKeys.size === expectedKey.length &&
+            expectedKey.every((key) => {
+              if (key === SPECIAL_KEYS.ANY) {
+                return activeKeys.size > 0;
+              }
+              return activeKeys.has(key);
+            });
         } else if (eventType === EventType.KeyUp) {
-          const keyStates = expectedKey.map((key) => activeKeys.get(key));
+          const keyStates = expectedKey.map((key) => {
+            if (key === SPECIAL_KEYS.ANY) {
+              const entries = [...activeKeys.entries()];
+              const lastEntry = entries.at(-1);
+              return lastEntry ? lastEntry[1] : undefined;
+            }
+            return activeKeys.get(key);
+          });
 
           if (keyStates.some((state) => !state?.releasedAt)) {
             return;
