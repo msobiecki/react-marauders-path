@@ -8,6 +8,9 @@ import {
 } from "@msobiecki/eslint-config";
 
 export default defineConfig([
+  {
+    ignores: ["examples/**"],
+  },
   basePreset,
   bestPracticePreset,
   reactPreset,

@@ -7,6 +7,7 @@ A lightweight, type-safe React library for handling keyboard events. Perfect for
 ## Features
 
 - 🎮 **Keyboard Event Handling** - Simple API for detecting single keys, key combinations, and sequences
+- 🎡 **Wheel Event Handling** - Mouse wheel scrolling with delta tracking and batching support
 
 ## Installation
 
@@ -15,6 +16,8 @@ npm install @msobiecki/react-marauders-path
 ```
 
 ## Quick Start
+
+### Key Event Hook
 
 #### Single Key Schema
 
@@ -30,7 +33,7 @@ function MyComponent() {
 }
 ```
 
-### Multiple Patterns of Single Key Schema
+#### Multiple Patterns of Single Key Schema
 
 ```typescript
 useKey(["a", "b", "c"], (event, key) => {
@@ -46,7 +49,7 @@ useKey("a+b", (event, key) => {
 });
 ```
 
-### Multiple Patterns of Combination Key Schema
+#### Multiple Patterns of Combination Key Schema
 
 ```typescript
 useKey(["a+b", "c+d"], (event, key) => {
@@ -54,7 +57,7 @@ useKey(["a+b", "c+d"], (event, key) => {
 });
 ```
 
-### Sequential Key Schema
+#### Sequential Key Schema
 
 ```typescript
 useKey("ArrowUp ArrowUp ArrowDown ArrowDown", (event, key) => {
@@ -71,6 +74,20 @@ useKey(
     console.log(`Pressed ${key}`);
   },
 );
+```
+
+### Wheel Event Hook
+
+```typescript
+import { useWheel } from '@msobiecki/react-marauders-path';
+
+function MyComponent() {
+  useWheel((event, delta) => {
+    console.log(`Scrolled - X: ${delta.x}, Y: ${delta.y}`);
+  });
+
+  return <div>Scroll to interact</div>;
+}
 ```
 
 ## API
@@ -105,6 +122,38 @@ interface UseKeyOptions {
 One-time keyboard event listener. Automatically removes after first trigger.
 
 **Parameters:** Same as `useKey`
+
+### `useWheel(callback, options?)`
+
+Hook for handling mouse wheel events with support for different delta modes and options.
+
+**Parameters:**
+
+- `callback: (event: WheelEvent, delta: WheelData) => void | boolean` - Called when wheel event occurs
+- `options?: UseWheelOptions` - Optional configuration
+
+**Options:**
+
+```typescript
+interface UseWheelOptions {
+  eventPassive?: boolean; // Default: true - Use passive event listener
+  eventCapture?: boolean; // Default: false - Use capture phase
+  eventOnce?: boolean; // Default: false - Listen only once
+  eventStopImmediatePropagation?: boolean; // Default: false
+  container?: RefObject<HTMLElement>; // Default: window
+  raf?: boolean; // Default: false - Use requestAnimationFrame for batching
+}
+```
+
+**Delta Data:**
+
+```typescript
+interface WheelData {
+  x: number; // Delta X value
+  y: number; // Delta Y value
+  z: number; // Delta Z value
+}
+```
 
 ## Advanced Examples
 

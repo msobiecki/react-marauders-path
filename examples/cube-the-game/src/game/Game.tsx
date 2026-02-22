@@ -1,14 +1,14 @@
 import { useMemo, useRef } from "react";
-import { useKey } from "@msobiecki/react-marauders-path";
+import { useKey, useWheel } from "@msobiecki/react-marauders-path";
 
 import Canvas from "../engine/Canvas";
 import useGameLoop from "../engine/use-game-loop";
 
 import { GameScene } from "./game-scene";
 
-const WORLD_WIDTH = 1000;
-const WORLD_HEIGHT = 1000;
-const WORLD_ENVIRONMENT_OBJECTS = 50;
+const WORLD_WIDTH = 5000;
+const WORLD_HEIGHT = 5000;
+const WORLD_ENVIRONMENT_OBJECTS = 500;
 
 const Game = () => {
   const scene = useMemo(
@@ -113,6 +113,11 @@ const Game = () => {
     },
     { eventType: "keyup" },
   );
+
+  useWheel((event, delta) => {
+    event.preventDefault();
+    scene.camera.addZoom(-delta.y * 0.001);
+  });
 
   useGameLoop((delta) => {
     scene.update(delta, inputReference.current);

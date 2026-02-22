@@ -225,11 +225,7 @@ const useKey = (
   );
 
   const handleSingleKey = useCallback(
-    (
-      event: KeyboardEvent,
-      sequence: SequenceState,
-      keyCallback: UseKeyCallback,
-    ) => {
+    (event: KeyboardEvent, sequence: SequenceState) => {
       const expectedKey = sequence.chord[0];
 
       if (Array.isArray(expectedKey)) {
@@ -265,19 +261,16 @@ const useKey = (
       });
     },
     [
-      destroyListener,
-      eventOnce,
       eventStopImmediatePropagation,
+      eventOnce,
+      keyCallback,
       validateCombination,
+      destroyListener,
     ],
   );
 
   const handleSequenceStep = useCallback(
-    (
-      event: KeyboardEvent,
-      sequence: SequenceState,
-      keyCallback: UseKeyCallback,
-    ) => {
+    (event: KeyboardEvent, sequence: SequenceState) => {
       const expectedKey = sequence.chord[sequence.index];
 
       if (Array.isArray(expectedKey)) {
@@ -338,22 +331,23 @@ const useKey = (
       }
     },
     [
-      destroyListener,
       eventOnce,
       eventStopImmediatePropagation,
-      resetSequence,
       sequenceThreshold,
+      keyCallback,
+      resetSequence,
       validateCombination,
+      destroyListener,
     ],
   );
 
   const evaluateSequences = useCallback(
-    (event: KeyboardEvent, keyCallback: UseKeyCallback) => {
+    (event: KeyboardEvent) => {
       sequenceReference.current.forEach((sequence) => {
         if (sequence.chord.length === 1) {
-          handleSingleKey(event, sequence, keyCallback);
+          handleSingleKey(event, sequence);
         } else {
-          handleSequenceStep(event, sequence, keyCallback);
+          handleSequenceStep(event, sequence);
         }
       });
     },
@@ -367,14 +361,9 @@ const useKey = (
       }
 
       cleanupCombinationKeys();
-      evaluateSequences(event, keyCallback);
+      evaluateSequences(event);
     },
-    [
-      shouldProcessEvent,
-      cleanupCombinationKeys,
-      evaluateSequences,
-      keyCallback,
-    ],
+    [shouldProcessEvent, cleanupCombinationKeys, evaluateSequences],
   );
 
   useEffect(() => {
@@ -418,10 +407,10 @@ const useKey = (
     eventCapture,
     container,
     registerKeyDown,
+    registerKeyUp,
     handleEventListener,
     resetCombination,
     resetSequence,
-    registerKeyUp,
   ]);
 };
 

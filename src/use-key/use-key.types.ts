@@ -14,7 +14,7 @@ export interface KeyOptions {
   eventRepeat: boolean;
   eventCapture: boolean;
   eventOnce: boolean;
-  eventStopImmediatePropagation?: boolean;
+  eventStopImmediatePropagation: boolean;
   sequenceThreshold: number;
   combinationThreshold: number;
   container: RefObject<HTMLElement | null>;

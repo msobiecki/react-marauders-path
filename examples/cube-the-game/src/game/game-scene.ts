@@ -68,6 +68,13 @@ export class GameScene {
   }
 
   render(context: CanvasRenderingContext2D, width: number, height: number) {
+    context.clearRect(0, 0, width, height);
+
+    context.save();
+
+    // Apply zoom
+    context.scale(this.camera.zoom, this.camera.zoom);
+
     this.camera.follow(
       this.player.position.x,
       this.player.position.y,
@@ -75,11 +82,11 @@ export class GameScene {
       height,
     );
 
-    context.clearRect(0, 0, width, height);
-
+    // Background
     context.fillStyle = "#1a1a1a";
     context.fillRect(0, 0, width, height);
 
+    // Environment
     context.fillStyle = "#2e8b57";
     this.environment.forEach((object) => {
       context.fillRect(
@@ -90,6 +97,7 @@ export class GameScene {
       );
     });
 
+    // Campfire glow
     const centerX = this.campfire.x + this.campfire.w / 2 - this.camera.x;
     const centerY = this.campfire.y + this.campfire.h / 2 - this.camera.y;
 
@@ -113,6 +121,7 @@ export class GameScene {
     context.arc(centerX, centerY, 30 + pulse, 0, Math.PI * 2);
     context.fill();
 
+    // Campfire body
     context.fillStyle = this.win ? "gold" : "orange";
     context.fillRect(
       this.campfire.x - this.camera.x,
@@ -121,6 +130,7 @@ export class GameScene {
       this.campfire.h,
     );
 
+    // Player
     context.fillStyle = "red";
     context.fillRect(
       this.player.position.x - this.camera.x,
@@ -129,6 +139,9 @@ export class GameScene {
       this.player.size,
     );
 
+    context.restore();
+
+    // UI (render AFTER restore so it doesn't zoom)
     const margin = 40;
     context.textAlign = "center";
     context.textBaseline = "bottom";
@@ -136,7 +149,6 @@ export class GameScene {
     if (!this.win) {
       context.fillStyle = "white";
       context.font = "24px sans-serif";
-
       context.fillText("Move with Arrow Keys", width / 2, height - margin - 60);
       context.fillText("Find the campfire 🔥", width / 2, height - margin - 30);
       context.fillText("Press ENTER to light it", width / 2, height - margin);
