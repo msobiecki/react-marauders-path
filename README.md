@@ -154,6 +154,7 @@ interface WheelData {
   x: number; // Delta X value
   y: number; // Delta Y value
   z: number; // Delta Z value
+  deltaMode: number; // Delta mode value
 }
 ```
 
