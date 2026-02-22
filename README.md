@@ -1,8 +1,8 @@
 # react-marauders-path
 
-![react-marauders-path](./docs/images/logotype.png)
-
 A lightweight, type-safe React library for handling keyboard events. Perfect for games, interactive applications, and keyboard-driven interfaces.
+
+![react-marauders-path](./docs/images/logotype.png)
 
 ## Features
 
