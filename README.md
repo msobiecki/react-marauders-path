@@ -1,5 +1,7 @@
 # react-marauders-path
 
+[![License](https://img.shields.io/badge/license-%20%20GNU%20GPLv3%20-green.svg)](https://github.com/msobiecki/react-marauders-path/blob/master/LICENSE)
+
 A lightweight, type-safe React library for handling keyboard events. Perfect for games, interactive applications, and keyboard-driven interfaces.
 
 ![react-marauders-path](./docs/images/logotype.png)
