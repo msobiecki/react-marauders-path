@@ -1,3 +1,10 @@
+# [1.13.0](https://github.com/msobiecki/react-marauders-path/compare/v1.12.0...v1.13.0) (2026-02-22)
+
+
+### Features
+
+* implement useWheel logic ([f02c561](https://github.com/msobiecki/react-marauders-path/commit/f02c56187487af8890e7d5c588c167d5246a5428))
+
 # [1.12.0](https://github.com/msobiecki/react-marauders-path/compare/v1.11.0...v1.12.0) (2026-02-22)
 
 
