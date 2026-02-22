@@ -136,9 +136,9 @@ Hook for handling mouse wheel events with support for different delta modes and 
 
 ```typescript
 interface UseWheelOptions {
-  eventPassive?: boolean; // Default: true - Use passive event listener
-  eventCapture?: boolean; // Default: false - Use capture phase
-  eventOnce?: boolean; // Default: false - Listen only once
+  eventPassive?: boolean; // Default: true
+  eventCapture?: boolean; // Default: false
+  eventOnce?: boolean; // Default: false
   eventStopImmediatePropagation?: boolean; // Default: false
   container?: RefObject<HTMLElement>; // Default: window
   raf?: boolean; // Default: false - Use requestAnimationFrame for batching
