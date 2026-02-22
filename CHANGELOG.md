@@ -1,3 +1,10 @@
+# [1.9.0](https://github.com/msobiecki/react-marauders-path/compare/v1.8.0...v1.9.0) (2026-02-21)
+
+
+### Features
+
+* implement example ([5fe36f7](https://github.com/msobiecki/react-marauders-path/commit/5fe36f7e9c5bac49ce31f26a543d8732f8bfc0f4))
+
 # [1.8.0](https://github.com/msobiecki/react-marauders-path/compare/v1.7.0...v1.8.0) (2026-02-21)
 
 
