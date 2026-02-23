@@ -15,6 +15,10 @@ const dispatchKeyboardEvent = (
     cancelable: true,
     ...options,
   });
+  if ("stopImmediatePropagation" in event) {
+    vi.spyOn(event, "stopImmediatePropagation");
+  }
+
   target.dispatchEvent(event);
   return event;
 };
@@ -1466,56 +1470,52 @@ describe("useKey hook", () => {
 
     describe("eventStopImmediatePropagation option", () => {
       it("should respect eventStopImmediatePropagation option - true", () => {
-        const callback1 = vi.fn();
-        const callback2 = vi.fn();
+        const callback = vi.fn();
+        const otherCallback = vi.fn();
 
-        renderHook(() =>
-          useKey("a", callback1, {
+        const { unmount } = renderHook(() =>
+          useKey("a", callback, {
             eventType: "keyup",
             eventStopImmediatePropagation: true,
           }),
         );
 
-        renderHook(() =>
-          useKey("a", callback2, {
-            eventType: "keyup",
-          }),
-        );
+        globalThis.addEventListener("keyup", otherCallback);
 
-        dispatchKeyboardEvent("keyup", "a");
+        const keyEvent = dispatchKeyboardEvent("keyup", "a");
+        const keyEventSpy = vi.spyOn(keyEvent, "stopImmediatePropagation");
 
-        expect(callback1).toHaveBeenCalledTimes(1);
-        expect(callback1).toHaveBeenCalledWith(expect.any(KeyboardEvent), "a");
-        expect(callback2).not.toHaveBeenCalledTimes(1);
-        expect(callback2).not.toHaveBeenCalledWith(
-          expect.any(KeyboardEvent),
-          "a",
-        );
+        expect(keyEventSpy).toHaveBeenCalledTimes(1);
+        expect(callback).toHaveBeenCalledTimes(1);
+        expect(callback).toHaveBeenCalledWith(expect.any(KeyboardEvent), "a");
+        expect(otherCallback).not.toHaveBeenCalled();
+
+        unmount();
       });
 
       it("should respect eventStopImmediatePropagation option - false", () => {
-        const callback1 = vi.fn();
-        const callback2 = vi.fn();
+        const callback = vi.fn();
+        const otherCallback = vi.fn();
 
-        renderHook(() =>
-          useKey("a", callback1, {
+        const { unmount } = renderHook(() =>
+          useKey("a", callback, {
             eventType: "keyup",
             eventStopImmediatePropagation: false,
           }),
         );
 
-        renderHook(() =>
-          useKey("a", callback2, {
-            eventType: "keyup",
-          }),
-        );
+        globalThis.addEventListener("keyup", otherCallback);
 
-        dispatchKeyboardEvent("keyup", "a");
+        const keyEvent = dispatchKeyboardEvent("keyup", "a");
+        const keyEventSpy = vi.spyOn(keyEvent, "stopImmediatePropagation");
 
-        expect(callback1).toHaveBeenCalledTimes(1);
-        expect(callback1).toHaveBeenCalledWith(expect.any(KeyboardEvent), "a");
-        expect(callback2).toHaveBeenCalledTimes(1);
-        expect(callback2).toHaveBeenCalledWith(expect.any(KeyboardEvent), "a");
+        expect(keyEventSpy).not.toHaveBeenCalled();
+        expect(callback).toHaveBeenCalledTimes(1);
+        expect(callback).toHaveBeenCalledWith(expect.any(KeyboardEvent), "a");
+        expect(otherCallback).toHaveBeenCalledTimes(1);
+        expect(otherCallback).toHaveBeenCalledWith(expect.any(KeyboardEvent));
+
+        unmount();
       });
     });
 

@@ -230,11 +230,14 @@ describe("useSwipe hook", () => {
     describe("eventStopImmediatePropagation option", () => {
       it("should respect eventStopImmediatePropagation option - true", () => {
         const callback = vi.fn();
-        renderHook(() =>
+        const otherCallback = vi.fn();
+        const { unmount } = renderHook(() =>
           useSwipe(SwipeDirections.Right, callback, {
             eventStopImmediatePropagation: true,
           }),
         );
+
+        globalThis.addEventListener("touchend", otherCallback);
 
         dispatchTouchEvent("touchstart", 0, 0);
         vi.advanceTimersByTime(50);
@@ -243,15 +246,21 @@ describe("useSwipe hook", () => {
 
         expect(stopSpy).toHaveBeenCalledTimes(1);
         expect(callback).toHaveBeenCalledTimes(1);
+        expect(otherCallback).not.toHaveBeenCalled();
+
+        unmount();
       });
 
       it("should respect eventStopImmediatePropagation option - false", () => {
         const callback = vi.fn();
-        renderHook(() =>
+        const otherCallback = vi.fn();
+        const { unmount } = renderHook(() =>
           useSwipe(SwipeDirections.Right, callback, {
             eventStopImmediatePropagation: false,
           }),
         );
+
+        globalThis.addEventListener("touchend", otherCallback);
 
         dispatchTouchEvent("touchstart", 0, 0);
         vi.advanceTimersByTime(50);
@@ -260,6 +269,9 @@ describe("useSwipe hook", () => {
 
         expect(stopSpy).not.toHaveBeenCalled();
         expect(callback).toHaveBeenCalledTimes(1);
+        expect(otherCallback).toHaveBeenCalledTimes(1);
+
+        unmount();
       });
     });
 
