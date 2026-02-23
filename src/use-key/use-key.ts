@@ -7,7 +7,7 @@ import {
   UseKeyCallback,
   UseKeyOptions,
   CombinationState,
-  EventType,
+  EventTypes,
 } from "./use-key.types";
 import { parseKeySequences } from "./parse-key-sequences";
 import { advanceSequenceState, resetSequenceState } from "./sequence-state";
@@ -16,7 +16,7 @@ import { shouldHandleKeyboardEvent } from "./event-guards";
 import { SPECIAL_KEYS } from "./normalize-key";
 
 const defaultOptions: KeyOptions = {
-  eventType: EventType.KeyUp,
+  eventType: EventTypes.KeyUp,
   eventRepeat: false,
   eventCapture: false,
   eventOnce: false,
@@ -154,7 +154,7 @@ const useKey = (
     const combo = combinationReference.current;
 
     [...combo.activeKeys.entries()].forEach(([key, state]) => {
-      if (eventType === EventType.KeyDown) {
+      if (eventType === EventTypes.KeyDown) {
         if (state.releasedAt) {
           combo.activeKeys.delete(key);
         }
@@ -172,7 +172,7 @@ const useKey = (
       expectedKey: string[],
       activeKeys: Map<string, { pressedAt: number; releasedAt?: number }>,
     ): boolean => {
-      if (eventType === EventType.KeyDown) {
+      if (eventType === EventTypes.KeyDown) {
         return (
           activeKeys.size === expectedKey.length &&
           expectedKey.every((key) => {
@@ -183,7 +183,7 @@ const useKey = (
           })
         );
       }
-      if (eventType === EventType.KeyUp) {
+      if (eventType === EventTypes.KeyUp) {
         const keyStates = expectedKey.map((key) => {
           if (key === SPECIAL_KEYS.ANY) {
             const entries = [...activeKeys.entries()];
@@ -413,36 +413,5 @@ const useKey = (
     resetSequence,
   ]);
 };
-
-/**
- * React hook for handling keyboard events that trigger only once.
- *
- * Convenience wrapper around useKey with eventOnce automatically set to true.
- * The listener is automatically removed after the first match.
- *
- * @param {UseKeySchema} key - Single key, chord, sequence, or array of patterns
- * @param {UseKeyCallback} keyCallback - Callback function invoked once when pattern matches
- * @param {Omit<UseKeyOptions, 'eventOnce'>} [options] - Configuration options (eventOnce is always true)
- * @returns {void}
- *
- * @example
- * // Listen for Escape key press once
- * useKeyOnce('Escape', () => {
- *   console.log('Escape pressed!');
- *   // Listener automatically removed
- * });
- *
- * @example
- * // One-time save shortcut
- * useKeyOnce('ctrl+s', (event) => {
- *   event.preventDefault();
- *   saveFile();
- * }, { eventType: 'keydown' });
- */
-export const useKeyOnce = (
-  key: UseKeySchema,
-  keyCallback: UseKeyCallback,
-  options: Omit<UseKeyOptions, "eventOnce"> = defaultOptions,
-) => useKey(key, keyCallback, { ...options, eventOnce: true });
 
 export default useKey;

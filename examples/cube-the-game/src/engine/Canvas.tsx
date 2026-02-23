@@ -14,7 +14,9 @@ const Canvas = ({ render }: Properties) => {
   useEffect(() => {
     const canvas = reference.current;
     const context = canvas?.getContext("2d");
-    if (!canvas || !context) return undefined;
+    if (!canvas || !context) {
+      return undefined;
+    }
 
     const resize = () => {
       canvas.width = window.innerWidth;
@@ -30,7 +32,9 @@ const Canvas = ({ render }: Properties) => {
   useEffect(() => {
     const canvas = reference.current;
     const context = canvas?.getContext("2d");
-    if (!canvas || !context) return undefined;
+    if (!canvas || !context) {
+      return undefined;
+    }
 
     let frame: number;
 

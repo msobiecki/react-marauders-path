@@ -1,10 +1,11 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { renderHook } from "@testing-library/react";
-import useKey, { useKeyOnce } from "./use-key";
+import useKey from "./use-key";
 
 const dispatchKeyboardEvent = (
   type: "keydown" | "keyup",
   key: string,
+  target: EventTarget = globalThis,
   options: Partial<KeyboardEventInit> = {},
 ) => {
   const event = new KeyboardEvent(type, {
@@ -14,7 +15,7 @@ const dispatchKeyboardEvent = (
     cancelable: true,
     ...options,
   });
-  globalThis.dispatchEvent(event);
+  target.dispatchEvent(event);
   return event;
 };
 
@@ -1360,55 +1361,162 @@ describe("useKey hook", () => {
   });
 
   describe("hook options", () => {
-    it("should respect eventRepeat option - false", () => {
-      const callback = vi.fn();
-      renderHook(() =>
-        useKey("a", callback, { eventType: "keyup", eventRepeat: false }),
-      );
+    describe("eventRepeat option", () => {
+      it("should respect eventRepeat option - false", () => {
+        const callback = vi.fn();
+        renderHook(() =>
+          useKey("a", callback, { eventType: "keyup", eventRepeat: false }),
+        );
 
-      const event = new KeyboardEvent("keyup", {
-        key: "a",
-        repeat: true,
-        bubbles: true,
+        const event = new KeyboardEvent("keyup", {
+          key: "a",
+          repeat: true,
+          bubbles: true,
+        });
+        globalThis.dispatchEvent(event);
+
+        expect(callback).not.toHaveBeenCalledTimes(1);
+        expect(callback).not.toHaveBeenCalledWith(
+          expect.any(KeyboardEvent),
+          "a",
+        );
       });
-      globalThis.dispatchEvent(event);
 
-      expect(callback).not.toHaveBeenCalledTimes(1);
-      expect(callback).not.toHaveBeenCalledWith(expect.any(KeyboardEvent), "a");
+      it("should respect eventRepeat option - true", () => {
+        const callback = vi.fn();
+        renderHook(() =>
+          useKey("a", callback, { eventType: "keyup", eventRepeat: true }),
+        );
+
+        const event = new KeyboardEvent("keyup", {
+          key: "a",
+          repeat: true,
+          bubbles: true,
+        });
+        globalThis.dispatchEvent(event);
+
+        expect(callback).toHaveBeenCalledTimes(1);
+        expect(callback).toHaveBeenCalledWith(expect.any(KeyboardEvent), "a");
+      });
     });
 
-    it("should respect eventRepeat option - true", () => {
-      const callback = vi.fn();
-      renderHook(() =>
-        useKey("a", callback, { eventType: "keyup", eventRepeat: true }),
-      );
+    describe("eventOnce option", () => {
+      it("should respect eventOnce option - true", () => {
+        const callback = vi.fn();
+        renderHook(() =>
+          useKey("a", callback, { eventType: "keyup", eventOnce: true }),
+        );
 
-      const event = new KeyboardEvent("keyup", {
-        key: "a",
-        repeat: true,
-        bubbles: true,
+        dispatchKeyboardEvent("keyup", "a");
+
+        expect(callback).toHaveBeenCalledTimes(1);
+        expect(callback).toHaveBeenCalledWith(expect.any(KeyboardEvent), "a");
+
+        dispatchKeyboardEvent("keyup", "a");
+
+        expect(callback).toHaveBeenCalledTimes(1);
+        expect(callback).toHaveBeenCalledWith(expect.any(KeyboardEvent), "a");
       });
-      globalThis.dispatchEvent(event);
 
-      expect(callback).toHaveBeenCalledTimes(1);
-      expect(callback).toHaveBeenCalledWith(expect.any(KeyboardEvent), "a");
+      it("should respect eventOnce option - false", () => {
+        const callback = vi.fn();
+        renderHook(() =>
+          useKey("a", callback, { eventType: "keyup", eventOnce: false }),
+        );
+
+        dispatchKeyboardEvent("keyup", "a");
+
+        expect(callback).toHaveBeenCalledTimes(1);
+        expect(callback).toHaveBeenCalledWith(expect.any(KeyboardEvent), "a");
+
+        dispatchKeyboardEvent("keyup", "a");
+
+        expect(callback).toHaveBeenCalledTimes(2);
+        expect(callback).toHaveBeenCalledWith(expect.any(KeyboardEvent), "a");
+      });
     });
 
-    it("should respect eventOnce option", () => {
-      const callback = vi.fn();
-      renderHook(() =>
-        useKey("a", callback, { eventType: "keyup", eventOnce: true }),
-      );
+    describe("eventCapture option", () => {
+      it("should respect eventCapture option - true", () => {
+        const callback = vi.fn();
 
-      dispatchKeyboardEvent("keyup", "a");
+        renderHook(() =>
+          useKey("a", callback, { eventType: "keyup", eventCapture: true }),
+        );
 
-      expect(callback).toHaveBeenCalledTimes(1);
-      expect(callback).toHaveBeenCalledWith(expect.any(KeyboardEvent), "a");
+        dispatchKeyboardEvent("keyup", "a");
 
-      dispatchKeyboardEvent("keyup", "a");
+        expect(callback).toHaveBeenCalledTimes(1);
+        expect(callback).toHaveBeenCalledWith(expect.any(KeyboardEvent), "a");
+      });
 
-      expect(callback).toHaveBeenCalledTimes(1);
-      expect(callback).toHaveBeenCalledWith(expect.any(KeyboardEvent), "a");
+      it("should respect eventCapture option - false", () => {
+        const callback = vi.fn();
+
+        renderHook(() =>
+          useKey("a", callback, { eventType: "keyup", eventCapture: false }),
+        );
+
+        dispatchKeyboardEvent("keyup", "a");
+
+        expect(callback).toHaveBeenCalledTimes(1);
+        expect(callback).toHaveBeenCalledWith(expect.any(KeyboardEvent), "a");
+      });
+    });
+
+    describe("eventStopImmediatePropagation option", () => {
+      it("should respect eventStopImmediatePropagation option - true", () => {
+        const callback1 = vi.fn();
+        const callback2 = vi.fn();
+
+        renderHook(() =>
+          useKey("a", callback1, {
+            eventType: "keyup",
+            eventStopImmediatePropagation: true,
+          }),
+        );
+
+        renderHook(() =>
+          useKey("a", callback2, {
+            eventType: "keyup",
+          }),
+        );
+
+        dispatchKeyboardEvent("keyup", "a");
+
+        expect(callback1).toHaveBeenCalledTimes(1);
+        expect(callback1).toHaveBeenCalledWith(expect.any(KeyboardEvent), "a");
+        expect(callback2).not.toHaveBeenCalledTimes(1);
+        expect(callback2).not.toHaveBeenCalledWith(
+          expect.any(KeyboardEvent),
+          "a",
+        );
+      });
+
+      it("should respect eventStopImmediatePropagation option - false", () => {
+        const callback1 = vi.fn();
+        const callback2 = vi.fn();
+
+        renderHook(() =>
+          useKey("a", callback1, {
+            eventType: "keyup",
+            eventStopImmediatePropagation: false,
+          }),
+        );
+
+        renderHook(() =>
+          useKey("a", callback2, {
+            eventType: "keyup",
+          }),
+        );
+
+        dispatchKeyboardEvent("keyup", "a");
+
+        expect(callback1).toHaveBeenCalledTimes(1);
+        expect(callback1).toHaveBeenCalledWith(expect.any(KeyboardEvent), "a");
+        expect(callback2).toHaveBeenCalledTimes(1);
+        expect(callback2).toHaveBeenCalledWith(expect.any(KeyboardEvent), "a");
+      });
     });
 
     describe("sequenceThreshold option", () => {
@@ -1604,6 +1712,79 @@ describe("useKey hook", () => {
         );
       });
     });
+
+    describe("combinationThreshold option", () => {
+      it("should invoke callback when combination keys are pressed within threshold", () => {
+        const callback = vi.fn();
+        renderHook(() =>
+          useKey("ctrl+shift+a", callback, {
+            eventType: "keyup",
+            combinationThreshold: 400,
+          }),
+        );
+
+        dispatchKeyboardEvent("keydown", "Control");
+        vi.advanceTimersByTime(100);
+        dispatchKeyboardEvent("keydown", "Shift");
+        vi.advanceTimersByTime(100);
+        dispatchKeyboardEvent("keydown", "a");
+        vi.advanceTimersByTime(100);
+
+        dispatchKeyboardEvent("keyup", "Control");
+        vi.advanceTimersByTime(100);
+        dispatchKeyboardEvent("keyup", "Shift");
+        vi.advanceTimersByTime(300);
+        dispatchKeyboardEvent("keyup", "a");
+
+        expect(callback).toHaveBeenCalledTimes(1);
+        expect(callback).toHaveBeenCalledWith(
+          expect.any(KeyboardEvent),
+          "Control+Shift+a",
+        );
+      });
+
+      it("should not invoke callback if combination keys are pressed with long delay", () => {
+        const callback = vi.fn();
+        renderHook(() =>
+          useKey("ctrl+shift+a", callback, {
+            eventType: "keyup",
+            combinationThreshold: 300,
+          }),
+        );
+
+        dispatchKeyboardEvent("keydown", "Control");
+        vi.advanceTimersByTime(100);
+        dispatchKeyboardEvent("keydown", "Shift");
+        vi.advanceTimersByTime(100);
+        dispatchKeyboardEvent("keydown", "a");
+        vi.advanceTimersByTime(100);
+
+        dispatchKeyboardEvent("keyup", "Control");
+        vi.advanceTimersByTime(100);
+        dispatchKeyboardEvent("keyup", "Shift");
+        vi.advanceTimersByTime(400);
+        dispatchKeyboardEvent("keyup", "a");
+
+        expect(callback).not.toHaveBeenCalledTimes(1);
+        expect(callback).not.toHaveBeenCalledWith(
+          expect.any(KeyboardEvent),
+          "Control+Shift+a",
+        );
+      });
+    });
+
+    describe("container option", () => {
+      it("should attach listener to custom container", () => {
+        const callback = vi.fn();
+        const container = { current: document.createElement("div") };
+
+        renderHook(() => useKey("a", callback, { container }));
+
+        dispatchKeyboardEvent("keyup", "a", container.current);
+
+        expect(callback).toHaveBeenCalledTimes(1);
+      });
+    });
   });
 
   describe("lifecycle", () => {
@@ -1643,164 +1824,5 @@ describe("useKey hook", () => {
       expect(callback).toHaveBeenCalledTimes(2);
       expect(callback).toHaveBeenCalledWith(expect.any(KeyboardEvent), "b");
     });
-  });
-});
-
-describe("useKeyOnce hook", () => {
-  beforeEach(() => {
-    vi.useFakeTimers();
-  });
-
-  afterEach(() => {
-    vi.runOnlyPendingTimers();
-    vi.useRealTimers();
-  });
-
-  it("should invoke callback once on key press", () => {
-    const callback = vi.fn();
-    renderHook(() => useKeyOnce("a", callback));
-
-    dispatchKeyboardEvent("keyup", "a");
-
-    expect(callback).toHaveBeenCalledTimes(1);
-    expect(callback).toHaveBeenCalledWith(expect.any(KeyboardEvent), "a");
-
-    dispatchKeyboardEvent("keyup", "a");
-
-    expect(callback).toHaveBeenCalledTimes(1);
-    expect(callback).toHaveBeenCalledWith(expect.any(KeyboardEvent), "a");
-  });
-
-  it("should invoke callback with keydown event type", () => {
-    const callback = vi.fn();
-    renderHook(() => useKeyOnce("a", callback, { eventType: "keydown" }));
-
-    dispatchKeyboardEvent("keydown", "a");
-
-    expect(callback).toHaveBeenCalledTimes(1);
-    expect(callback).toHaveBeenCalledWith(expect.any(KeyboardEvent), "a");
-  });
-
-  it("should not invoke callback for non-matching keys", () => {
-    const callback = vi.fn();
-    renderHook(() => useKeyOnce("a", callback));
-
-    dispatchKeyboardEvent("keyup", "b");
-
-    expect(callback).not.toHaveBeenCalledTimes(1);
-    expect(callback).not.toHaveBeenCalledWith(expect.any(KeyboardEvent), "b");
-  });
-
-  it("should handle multiple pattern", () => {
-    const callback = vi.fn();
-    renderHook(() => useKeyOnce(["a", "b", "c"], callback));
-
-    dispatchKeyboardEvent("keyup", "b");
-
-    expect(callback).toHaveBeenCalledTimes(1);
-    expect(callback).toHaveBeenCalledWith(expect.any(KeyboardEvent), "b");
-
-    dispatchKeyboardEvent("keyup", "b");
-
-    expect(callback).toHaveBeenCalledTimes(1);
-    expect(callback).toHaveBeenCalledWith(expect.any(KeyboardEvent), "b");
-  });
-
-  it("should handle special keys", () => {
-    const callback = vi.fn();
-    renderHook(() => useKeyOnce("Enter", callback));
-
-    dispatchKeyboardEvent("keyup", "Enter");
-
-    expect(callback).toHaveBeenCalledTimes(1);
-    expect(callback).toHaveBeenCalledWith(expect.any(KeyboardEvent), "Enter");
-  });
-
-  it("should cleanup on unmount", () => {
-    const callback = vi.fn();
-    const { unmount } = renderHook(() => useKeyOnce("a", callback));
-
-    unmount();
-    dispatchKeyboardEvent("keyup", "a");
-
-    expect(callback).not.toHaveBeenCalledTimes(1);
-    expect(callback).not.toHaveBeenCalledWith(expect.any(KeyboardEvent), "a");
-  });
-
-  it("should update pattern when rerendered", () => {
-    const callback = vi.fn();
-    let pattern = "a";
-    const { rerender } = renderHook(() => useKeyOnce(pattern, callback));
-
-    dispatchKeyboardEvent("keyup", "a");
-
-    expect(callback).toHaveBeenCalledTimes(1);
-    expect(callback).toHaveBeenCalledWith(expect.any(KeyboardEvent), "a");
-
-    pattern = "b";
-    rerender();
-
-    const newCallback = vi.fn();
-    renderHook(({ key, cb }) => useKeyOnce(key, cb), {
-      initialProps: { key: pattern, cb: newCallback },
-    });
-
-    dispatchKeyboardEvent("keyup", "b");
-
-    expect(newCallback).toHaveBeenCalledTimes(1);
-    expect(newCallback).toHaveBeenCalledWith(expect.any(KeyboardEvent), "b");
-  });
-
-  it("should handle arrow keys", () => {
-    const callback = vi.fn();
-    renderHook(() => useKeyOnce("ArrowDown", callback));
-
-    dispatchKeyboardEvent("keyup", "ArrowDown");
-
-    expect(callback).toHaveBeenCalledTimes(1);
-    expect(callback).toHaveBeenCalledWith(
-      expect.any(KeyboardEvent),
-      "ArrowDown",
-    );
-  });
-
-  it("should pass correct event object to callback", () => {
-    const callback = vi.fn();
-    renderHook(() => useKeyOnce("a", callback));
-
-    dispatchKeyboardEvent("keyup", "a");
-
-    expect(callback).toHaveBeenCalledTimes(1);
-    expect(callback).toHaveBeenCalledWith(expect.any(KeyboardEvent), "a");
-  });
-
-  it("should handle function keys", () => {
-    const callback = vi.fn();
-    renderHook(() => useKeyOnce("F5", callback));
-
-    dispatchKeyboardEvent("keyup", "F5");
-
-    expect(callback).toHaveBeenCalledTimes(1);
-    expect(callback).toHaveBeenCalledWith(expect.any(KeyboardEvent), "F5");
-
-    dispatchKeyboardEvent("keyup", "F5");
-
-    expect(callback).toHaveBeenCalledTimes(1);
-    expect(callback).toHaveBeenCalledWith(expect.any(KeyboardEvent), "F5");
-  });
-
-  it("should respect eventRepeat false option", () => {
-    const callback = vi.fn();
-    renderHook(() => useKeyOnce("a", callback, { eventRepeat: false }));
-
-    const event = new KeyboardEvent("keyup", {
-      key: "a",
-      repeat: true,
-      bubbles: true,
-    });
-    globalThis.dispatchEvent(event);
-
-    expect(callback).not.toHaveBeenCalledTimes(1);
-    expect(callback).not.toHaveBeenCalledWith(expect.any(KeyboardEvent), "a");
   });
 });

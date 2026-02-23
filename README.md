@@ -119,12 +119,6 @@ interface UseKeyOptions {
 }
 ```
 
-### `useKeyOnce(keyEvent, callback, options?)`
-
-One-time keyboard event listener. Automatically removes after first trigger.
-
-**Parameters:** Same as `useKey`
-
 ### `useWheel(callback, options?)`
 
 Hook for handling mouse wheel events with support for different delta modes and options.

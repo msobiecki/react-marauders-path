@@ -8,6 +8,7 @@ const dispatchWheelEvent = (
   deltaY = 0,
   deltaZ = 0,
   deltaMode = 0,
+  target: EventTarget = globalThis,
   options: Partial<WheelEventInit> = {},
 ) => {
   const event = new WheelEvent("wheel", {
@@ -19,7 +20,7 @@ const dispatchWheelEvent = (
     cancelable: true,
     ...options,
   });
-  globalThis.dispatchEvent(event);
+  target.dispatchEvent(event);
   return event;
 };
 
@@ -174,166 +175,140 @@ describe("useWheel hook", () => {
     });
   });
 
-  describe("eventPassive option", () => {
-    it("should respect eventPassive true option", () => {
-      const callback = vi.fn();
-      renderHook(() => useWheel(callback, { eventPassive: true }));
+  describe("hook options", () => {
+    describe("eventPassive option", () => {
+      it("should respect eventPassive option - true", () => {
+        const callback = vi.fn();
+        renderHook(() => useWheel(callback, { eventPassive: true }));
 
-      dispatchWheelEvent(10, 20);
+        dispatchWheelEvent(10, 20);
 
-      expect(callback).toHaveBeenCalledTimes(1);
-    });
-
-    it("should respect eventPassive false option", () => {
-      const callback = vi.fn();
-      renderHook(() => useWheel(callback, { eventPassive: false }));
-
-      dispatchWheelEvent(10, 20);
-
-      expect(callback).toHaveBeenCalledTimes(1);
-    });
-  });
-
-  describe("eventCapture option", () => {
-    it("should respect eventCapture true option", () => {
-      const callback = vi.fn();
-      renderHook(() => useWheel(callback, { eventCapture: true }));
-
-      dispatchWheelEvent(10, 20);
-
-      expect(callback).toHaveBeenCalledTimes(1);
-    });
-
-    it("should respect eventCapture false option", () => {
-      const callback = vi.fn();
-      renderHook(() => useWheel(callback, { eventCapture: false }));
-
-      dispatchWheelEvent(10, 20);
-
-      expect(callback).toHaveBeenCalledTimes(1);
-    });
-  });
-
-  describe("eventOnce option", () => {
-    it("should invoke callback once when eventOnce is true", () => {
-      const callback = vi.fn();
-      renderHook(() => useWheel(callback, { eventOnce: true }));
-
-      dispatchWheelEvent(10, 20);
-
-      expect(callback).toHaveBeenCalledTimes(1);
-
-      dispatchWheelEvent(10, 20);
-
-      expect(callback).toHaveBeenCalledTimes(1);
-    });
-
-    it("should invoke callback multiple times when eventOnce is false", () => {
-      const callback = vi.fn();
-      renderHook(() => useWheel(callback, { eventOnce: false }));
-
-      dispatchWheelEvent(10, 20);
-      dispatchWheelEvent(10, 20);
-      dispatchWheelEvent(10, 20);
-
-      expect(callback).toHaveBeenCalledTimes(3);
-    });
-
-    it("should not invoke callback after eventOnce fires", () => {
-      const callback = vi.fn();
-      renderHook(() => useWheel(callback, { eventOnce: true }));
-
-      dispatchWheelEvent(10, 20);
-      expect(callback).toHaveBeenCalledTimes(1);
-
-      dispatchWheelEvent(5, 15);
-      dispatchWheelEvent(1, 2);
-
-      expect(callback).toHaveBeenCalledTimes(1);
-    });
-  });
-
-  describe("eventStopImmediatePropagation option", () => {
-    it("should respect eventStopImmediatePropagation option", () => {
-      const callback = vi.fn();
-      renderHook(() =>
-        useWheel(callback, { eventStopImmediatePropagation: true }),
-      );
-
-      dispatchWheelEvent(10, 20);
-      expect(callback).toHaveBeenCalled();
-    });
-  });
-
-  describe("container option", () => {
-    it("should attach listener to custom container", () => {
-      const callback = vi.fn();
-      const container = { current: document.createElement("div") };
-
-      renderHook(() => useWheel(callback, { container }));
-
-      const event = new WheelEvent("wheel", {
-        deltaX: 10,
-        deltaY: 20,
-        bubbles: true,
+        expect(callback).toHaveBeenCalledTimes(1);
       });
-      container.current?.dispatchEvent(event);
 
-      expect(callback).toHaveBeenCalledTimes(1);
-    });
-  });
+      it("should respect eventPassive option - false", () => {
+        const callback = vi.fn();
+        renderHook(() => useWheel(callback, { eventPassive: false }));
 
-  describe("raf option", () => {
-    it("should accept raf option", () => {
-      const callback = vi.fn();
-      renderHook(() => useWheel(callback, { raf: true }));
+        dispatchWheelEvent(10, 20);
 
-      expect(callback).toBeDefined();
-    });
-  });
-
-  describe("callback behavior", () => {
-    it("should accept callback function", () => {
-      const callback = vi.fn();
-      renderHook(() => useWheel(callback));
-
-      expect(callback).toBeDefined();
-    });
-  });
-
-  describe("combined options", () => {
-    it("should handle multiple options together", () => {
-      const callback = vi.fn();
-      const container = { current: document.createElement("div") };
-
-      renderHook(() =>
-        useWheel(callback, {
-          eventPassive: false,
-          eventCapture: true,
-          eventOnce: true,
-          eventStopImmediatePropagation: true,
-          container,
-          raf: false,
-        }),
-      );
-
-      const event = new WheelEvent("wheel", {
-        deltaX: 10,
-        deltaY: 20,
-        bubbles: true,
+        expect(callback).toHaveBeenCalledTimes(1);
       });
-      container.current?.dispatchEvent(event);
+    });
 
-      expect(callback).toHaveBeenCalledTimes(1);
+    describe("eventCapture option", () => {
+      it("should respect eventCapture option - true", () => {
+        const callback = vi.fn();
+        renderHook(() => useWheel(callback, { eventCapture: true }));
 
-      const event2 = new WheelEvent("wheel", {
-        deltaX: 5,
-        deltaY: 15,
-        bubbles: true,
+        dispatchWheelEvent(10, 20);
+
+        expect(callback).toHaveBeenCalledTimes(1);
       });
-      container.current?.dispatchEvent(event2);
 
-      expect(callback).toHaveBeenCalledTimes(1);
+      it("should respect eventCapture option - false", () => {
+        const callback = vi.fn();
+        renderHook(() => useWheel(callback, { eventCapture: false }));
+
+        dispatchWheelEvent(10, 20);
+
+        expect(callback).toHaveBeenCalledTimes(1);
+      });
+    });
+
+    describe("eventOnce option", () => {
+      it("should respect eventOnce option - true", () => {
+        const callback = vi.fn();
+        renderHook(() => useWheel(callback, { eventOnce: true }));
+
+        dispatchWheelEvent(10, 20);
+
+        expect(callback).toHaveBeenCalledTimes(1);
+
+        dispatchWheelEvent(10, 20);
+
+        expect(callback).toHaveBeenCalledTimes(1);
+      });
+
+      it("should respect eventOnce option - false", () => {
+        const callback = vi.fn();
+        renderHook(() => useWheel(callback, { eventOnce: false }));
+
+        dispatchWheelEvent(10, 20);
+        dispatchWheelEvent(10, 20);
+        dispatchWheelEvent(10, 20);
+
+        expect(callback).toHaveBeenCalledTimes(3);
+      });
+    });
+
+    describe("eventStopImmediatePropagation option", () => {
+      it("should respect eventStopImmediatePropagation option - true", () => {
+        const callback = vi.fn();
+        const otherCallback = vi.fn();
+        renderHook(() =>
+          useWheel(callback, { eventStopImmediatePropagation: true }),
+        );
+
+        globalThis.addEventListener("wheel", otherCallback);
+
+        dispatchWheelEvent(10, 20);
+
+        expect(callback).toHaveBeenCalledTimes(1);
+        expect(otherCallback).not.toHaveBeenCalled();
+      });
+
+      it("should respect eventStopImmediatePropagation option - false", () => {
+        const callback = vi.fn();
+        const otherCallback = vi.fn();
+        renderHook(() =>
+          useWheel(callback, { eventStopImmediatePropagation: false }),
+        );
+
+        globalThis.addEventListener("wheel", otherCallback);
+
+        dispatchWheelEvent(10, 20);
+
+        expect(callback).toHaveBeenCalledTimes(1);
+        expect(otherCallback).toHaveBeenCalledTimes(1);
+      });
+    });
+
+    describe("container option", () => {
+      it("should attach listener to custom container", () => {
+        const callback = vi.fn();
+        const container = { current: document.createElement("div") };
+
+        renderHook(() => useWheel(callback, { container }));
+
+        dispatchWheelEvent(10, 20, 0, 0, container.current);
+
+        expect(callback).toHaveBeenCalledTimes(1);
+      });
+    });
+
+    describe("raf option", () => {
+      it("should accept raf option", () => {
+        const callback = vi.fn();
+        renderHook(() => useWheel(callback, { raf: true }));
+
+        expect(callback).toBeDefined();
+      });
+    });
+  });
+
+  describe("lifecycle", () => {
+    it("should cleanup listeners on unmount", () => {
+      const callback = vi.fn();
+      const { unmount } = renderHook(() => useWheel(callback));
+
+      unmount();
+
+      dispatchWheelEvent(0, 0);
+      vi.advanceTimersByTime(100);
+      dispatchWheelEvent(100, 0);
+
+      expect(callback).not.toHaveBeenCalled();
     });
   });
 

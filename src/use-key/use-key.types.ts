@@ -4,13 +4,15 @@ export type Key = string;
 
 export type KeyEvent = Key | Key[];
 
-export enum EventType {
-  KeyUp = "keyup",
-  KeyDown = "keydown",
-}
+export const EventTypes = {
+  KeyUp: "keyup",
+  KeyDown: "keydown",
+} as const;
+
+export type EventType = (typeof EventTypes)[keyof typeof EventTypes];
 
 export interface KeyOptions {
-  eventType: EventType | "keyup" | "keydown";
+  eventType: EventType;
   eventRepeat: boolean;
   eventCapture: boolean;
   eventOnce: boolean;
