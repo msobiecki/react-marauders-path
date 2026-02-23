@@ -2,7 +2,7 @@
 
 [![License](https://img.shields.io/badge/license-%20%20GNU%20GPLv3%20-green.svg)](https://github.com/msobiecki/react-marauders-path/blob/master/LICENSE)
 
-A lightweight, type-safe React library for handling keyboard events. Perfect for games, interactive applications, and keyboard-driven interfaces.
+A lightweight, type-safe React library for handling keyboard, wheel, and swipe events. Perfect for games, interactive applications, and input-driven interfaces.
 
 ![react-marauders-path](./docs/images/logotype.png)
 
@@ -10,6 +10,7 @@ A lightweight, type-safe React library for handling keyboard events. Perfect for
 
 - 🎮 **Keyboard Event Handling** - Simple API for detecting single keys, key combinations, and sequences
 - 🎡 **Wheel Event Handling** - Mouse wheel scrolling with delta tracking and batching support
+- 🖐️ **Swipe Gesture Handling** - Touch swipe detection with distance and velocity thresholds
 
 ## Installation
 
@@ -92,6 +93,20 @@ function MyComponent() {
 }
 ```
 
+### Swipe Event Hook
+
+```typescript
+import { useSwipe } from '@msobiecki/react-marauders-path';
+
+function MyComponent() {
+  useSwipe('left' (event, swipe) => {
+    console.log(`Swiped ${swipe.direction} with velocity ${swipe.velocity}`);
+  });
+
+  return <div>Swipe left</div>;
+}
+```
+
 ## API
 
 ### `useKey(keyEvent, callback, options?)`
@@ -100,7 +115,7 @@ Main hook for keyboard event handling.
 
 **Parameters:**
 
-- `keyEvent: string | string[]` - Single key, combination, or sequence to listen for
+- `keyEvent: string | string[]` - Single key, combination, or sequence to listen
 - `callback: (event: KeyboardEvent, key: string) => void | boolean` - Called when key event occurs
 - `options?: UseKeyOptions` - Optional configuration
 
@@ -149,6 +164,41 @@ interface WheelData {
   y: number; // Delta Y value
   z: number; // Delta Z value
   deltaMode: number; // Delta mode value
+}
+```
+
+### `useSwipe(swipe, callback, options?)`
+
+Hook for handling touch swipe gestures with configurable distance and velocity thresholds.
+
+**Parameters:**
+
+- `swipe: left | right | up | down | horizontal | vertical | both` - Allowed directions to listen
+- `callback: (event: TouchEvent, data: SwipeData) => void | boolean` - Called when a swipe event occurs
+- `options?: UseSwipeOptions` - Optional configuration
+
+**Options:**
+
+```typescript
+interface UseSwipeOptions {
+  eventCapture?: boolean; // Default: false
+  eventOnce?: boolean; // Default: false
+  eventStopImmediatePropagation?: boolean; // Default: false
+  threshold?: number; // Default: 50 (px) - Minimum travel distance
+  velocity?: number; // Default: 0.3 (px/ms) - Minimum average speed
+  container?: RefObject<HTMLElement>; // Default: window
+}
+```
+
+**Swipe Data:**
+
+```typescript
+interface SwipeData {
+  direction: SwipeDirection; // Resolved direction
+  deltaX: number; // Horizontal travel
+  deltaY: number; // Vertical travel
+  velocity: number; // Average speed (distance / duration)
+  duration: number; // Swipe duration in ms
 }
 ```
 
