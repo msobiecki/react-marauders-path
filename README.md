@@ -300,14 +300,37 @@ npm lint
 
 ## Project Status
 
-Hooks
+### High-level Gesture Hook
 
-- 🚧 `useMouse` – Mouse interaction handling
-- 🚧 `useMouse` – Unit test coverage
-- 🚧 `useTouch` – Touch interaction handling
-- 🚧 `useTouch` – Unit test coverage
-- 🚧 `useInteraction` – Unified mouse, touch, and keyboard interaction handling
-- 🚧 `useInteraction` – Unit test coverage
+- 🚧 **`useGesture`** – high-level API for gesture handling  
+  Supported gestures:
+  - `tap` – single tap / click
+  - `doubleTap` – quick double tap
+  - `press` / `longPress` – press and hold
+  - `swipe` – directional swipe
+  - `drag` / `pan` – track movement of finger or mouse
+  - `pinch` / `zoom` – two-finger pinch / zoom
+
+### Low-level Gesture Hooks
+
+- 🚧 **`useTap`** – single tap / click
+- 🚧 **`useDoubleTap`** – quick double tap
+- 🚧 **`usePress`** – press and hold (longPress)
+- 🚧 **`useDrag`** – dragging elements (MouseEvent / PointerEvent / TouchEvent)
+- 🚧 **`usePinch`** – two-finger pinch / zoom
+
+### Pointer / Mouse Hooks (Unified)
+
+- 🚧 **`usePointer`** – unified hook for MouseEvent, PointerEvent, and TouchEvent  
+  Supported events:
+  - `pointerdown`, `pointermove`, `pointerup`, `pointerenter`, `pointerleave`, `pointercancel`  
+    Filter by pointer type: `mouse` | `touch` | `pen`  
+    Callback returns unified data e.g.: `x`, `y`, `button`, `type`, `isPrimary`
+
+- 🚧 **`useMouse`** – alias for `usePointer` filtered to mouse only  
+  Supported events:
+  - `mousemove`, `mousedown`, `mouseup`, `click`, `dblclick`  
+    Buttons: `left`, `right`, `middle`
 
 ## License
 
