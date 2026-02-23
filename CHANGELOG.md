@@ -1,3 +1,11 @@
+# [1.15.0](https://github.com/msobiecki/react-marauders-path/compare/v1.14.0...v1.15.0) (2026-02-23)
+
+
+### Features
+
+* implement useSwipe logic ([842e32e](https://github.com/msobiecki/react-marauders-path/commit/842e32e85ee92069b16bd0af1cdf262ebfe1e027))
+* implement useSwipe logic ([11e5331](https://github.com/msobiecki/react-marauders-path/commit/11e5331c2624cb041bf7eb52d9c7f37406322260))
+
 # [1.14.0](https://github.com/msobiecki/react-marauders-path/compare/v1.13.0...v1.14.0) (2026-02-22)
 
 
