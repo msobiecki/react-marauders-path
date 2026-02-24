@@ -1,3 +1,10 @@
+# [1.21.0](https://github.com/msobiecki/react-marauders-path/compare/v1.20.0...v1.21.0) (2026-02-24)
+
+
+### Features
+
+* update hooks ([1db64dc](https://github.com/msobiecki/react-marauders-path/commit/1db64dcb37580d6b3f207d7bb01e9120a53549d4))
+
 # [1.20.0](https://github.com/msobiecki/react-marauders-path/compare/v1.19.0...v1.20.0) (2026-02-24)
 
 
