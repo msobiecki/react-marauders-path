@@ -196,6 +196,7 @@ Hook for handling touch swipe gestures with configurable distance and velocity t
 
 ```typescript
 interface UseSwipeOptions {
+  eventPointerTypes?: Array<"touch" | "mouse" | "pen">; // Default: ["touch", "mouse", "pen"]
   eventCapture?: boolean; // Default: false
   eventOnce?: boolean; // Default: false
   eventStopImmediatePropagation?: boolean; // Default: false
