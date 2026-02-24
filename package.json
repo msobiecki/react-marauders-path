@@ -1,6 +1,6 @@
 {
   "name": "@msobiecki/react-marauders-path",
-  "version": "1.18.0",
+  "version": "1.19.0",
   "type": "module",
   "engines": {
     "node": ">=22.17.1"
