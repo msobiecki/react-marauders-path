@@ -3,6 +3,7 @@
     "prettier --write"
   ],
   "**/*.ts": [
-    "eslint --fix"
+    "eslint --fix",
+    "vitest --run --findRelatedTests"
   ]
 }
