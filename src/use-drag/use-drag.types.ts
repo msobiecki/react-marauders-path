@@ -35,6 +35,7 @@ export interface DragOptions {
   eventStopImmediatePropagation: boolean;
   threshold: number;
   container: { current: HTMLElement | null };
+  raf: boolean;
 }
 
 export type UseDragCallback =

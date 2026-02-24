@@ -171,7 +171,7 @@ interface UseWheelOptions {
 }
 ```
 
-**Delta Data:**
+**Wheel Data:**
 
 ```typescript
 interface WheelData {
@@ -235,6 +235,7 @@ interface UseDragOptions {
   eventStopImmediatePropagation?: boolean; // Default: false
   threshold?: number; // Default: 0 (px) - Minimum drag distance
   container?: RefObject<HTMLElement>; // Default: window
+  raf?: boolean; // Default: false - Use requestAnimationFrame for batching
 }
 ```
 

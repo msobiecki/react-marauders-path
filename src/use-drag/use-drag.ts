@@ -16,6 +16,7 @@ const defaultOptions: DragOptions = {
   eventStopImmediatePropagation: false,
   threshold: 0,
   container: { current: null },
+  raf: false,
 };
 
 const useDrag = (
@@ -29,11 +30,16 @@ const useDrag = (
     eventStopImmediatePropagation,
     threshold,
     container,
+    raf,
   } = { ...defaultOptions, ...options };
 
   const targetReference = useRef<EventTarget | null>(null);
   const abortControllerReference = useRef<AbortController | null>(null);
   const firedOnceReference = useRef(false);
+
+  const frameReference = useRef<number | null>(null);
+  const pendingDataReference = useRef<DragData | null>(null);
+  const pendingEventReference = useRef<PointerEvent | null>(null);
 
   const dragStateReference = useRef<DragState>({
     startX: 0,
@@ -47,6 +53,27 @@ const useDrag = (
   const destroyListener = useCallback(() => {
     abortControllerReference.current?.abort();
   }, []);
+
+  const flushFrame = useCallback(() => {
+    frameReference.current = null;
+
+    const data = pendingDataReference.current;
+    const event = pendingEventReference.current;
+
+    if (!data || !event) return;
+
+    invokeDragAction(event, data, dragCallback, {
+      stopImmediate: eventStopImmediatePropagation,
+      once: eventOnce,
+      onOnce: () => {
+        firedOnceReference.current = true;
+        destroyListener();
+      },
+    });
+
+    pendingDataReference.current = null;
+    pendingEventReference.current = null;
+  }, [dragCallback, eventStopImmediatePropagation, eventOnce, destroyListener]);
 
   const handlePointerDown = useCallback(
     (event: PointerEvent) => {
@@ -109,22 +136,34 @@ const useDrag = (
       state.lastX = event.clientX;
       state.lastY = event.clientY;
 
-      invokeDragAction(event, data, dragCallback, {
-        stopImmediate: eventStopImmediatePropagation,
-        once: eventOnce,
-        onOnce: () => {
-          firedOnceReference.current = true;
-          destroyListener();
-        },
-      });
+      if (!raf) {
+        invokeDragAction(event, data, dragCallback, {
+          stopImmediate: eventStopImmediatePropagation,
+          once: eventOnce,
+          onOnce: () => {
+            firedOnceReference.current = true;
+            destroyListener();
+          },
+        });
+        return;
+      }
+
+      pendingDataReference.current = data;
+      pendingEventReference.current = event;
+
+      if (frameReference.current === null) {
+        frameReference.current = requestAnimationFrame(flushFrame);
+      }
     },
     [
-      dragCallback,
-      eventOnce,
       eventPointerTypes,
-      eventStopImmediatePropagation,
       threshold,
+      raf,
+      dragCallback,
+      eventStopImmediatePropagation,
+      eventOnce,
       destroyListener,
+      flushFrame,
     ],
   );
 
@@ -197,6 +236,10 @@ const useDrag = (
     return () => {
       abortControllerReference.current?.abort();
       dragStateReference.current.active = false;
+
+      if (frameReference.current !== null) {
+        cancelAnimationFrame(frameReference.current);
+      }
     };
   }, [
     container,

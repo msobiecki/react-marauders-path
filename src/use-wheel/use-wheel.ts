@@ -17,8 +17,6 @@ const defaultOptions: WheelOptions = {
   raf: false,
 };
 
-const eventType = "wheel";
-
 const useWheel = (
   wheelCallback: UseWheelCallback,
   options: UseWheelOptions = defaultOptions,
@@ -35,13 +33,13 @@ const useWheel = (
   const targetReference = useRef<EventTarget | null>(null);
   const abortControllerReference = useRef<AbortController | null>(null);
   const firedOnceReference = useRef(false);
+
   const frameReference = useRef<number | null>(null);
-  const lastEventReference = useRef<WheelEvent | null>(null);
+  const pendingDataReference = useRef<WheelData | null>(null);
+  const pendingEventReference = useRef<WheelEvent | null>(null);
 
   const destroyListener = useCallback(() => {
-    if (abortControllerReference.current) {
-      abortControllerReference.current.abort();
-    }
+    abortControllerReference.current?.abort();
   }, []);
 
   const shouldProcessEvent = useCallback(() => {
@@ -50,6 +48,32 @@ const useWheel = (
       firedOnce: firedOnceReference.current,
     });
   }, [eventOnce]);
+
+  const flushFrame = useCallback(() => {
+    frameReference.current = null;
+
+    const data = pendingDataReference.current;
+    const event = pendingEventReference.current;
+
+    if (!data || !event) return;
+
+    invokeWheelAction(event, data, wheelCallback, {
+      stopImmediate: eventStopImmediatePropagation,
+      once: eventOnce,
+      onOnce: () => {
+        firedOnceReference.current = true;
+        destroyListener();
+      },
+    });
+
+    pendingDataReference.current = null;
+    pendingEventReference.current = null;
+  }, [
+    wheelCallback,
+    eventStopImmediatePropagation,
+    eventOnce,
+    destroyListener,
+  ]);
 
   const handleEventListener = useCallback(
     (event: WheelEvent) => {
@@ -76,35 +100,21 @@ const useWheel = (
         return;
       }
 
-      lastEventReference.current = event;
+      pendingDataReference.current = delta;
+      pendingEventReference.current = event;
+
       if (frameReference.current === null) {
-        frameReference.current = requestAnimationFrame(() => {
-          if (lastEventReference.current) {
-            invokeWheelAction(
-              lastEventReference.current,
-              delta,
-              wheelCallback,
-              {
-                stopImmediate: eventStopImmediatePropagation,
-                once: eventOnce,
-                onOnce: () => {
-                  firedOnceReference.current = true;
-                  destroyListener();
-                },
-              },
-            );
-          }
-          frameReference.current = null;
-        });
+        frameReference.current = requestAnimationFrame(flushFrame);
       }
     },
     [
-      eventOnce,
-      eventStopImmediatePropagation,
       raf,
       shouldProcessEvent,
       wheelCallback,
+      eventStopImmediatePropagation,
+      eventOnce,
       destroyListener,
+      flushFrame,
     ],
   );
 
@@ -112,11 +122,10 @@ const useWheel = (
     targetReference.current = container?.current ?? globalThis;
     abortControllerReference.current = new AbortController();
 
-    const eventListener = (event: Event) => {
+    const eventListener = (event: Event) =>
       handleEventListener(event as WheelEvent);
-    };
 
-    targetReference.current.addEventListener(eventType, eventListener, {
+    targetReference.current.addEventListener("wheel", eventListener, {
       passive: eventPassive,
       capture: eventCapture,
       signal: abortControllerReference.current.signal,
@@ -124,8 +133,12 @@ const useWheel = (
 
     return () => {
       abortControllerReference.current?.abort();
+
+      if (frameReference.current !== null) {
+        cancelAnimationFrame(frameReference.current);
+      }
     };
-  }, [eventPassive, eventCapture, container, handleEventListener]);
+  }, [container, eventPassive, eventCapture, handleEventListener]);
 };
 
 export default useWheel;

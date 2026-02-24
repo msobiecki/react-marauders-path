@@ -339,6 +339,15 @@ describe("useDrag hook", () => {
         expect(callback).toHaveBeenCalledTimes(1);
       });
     });
+
+    describe("raf option", () => {
+      it("should accept raf option", () => {
+        const callback = vi.fn();
+        renderHook(() => useDrag(callback, { raf: true }));
+
+        expect(callback).toBeDefined();
+      });
+    });
   });
 
   describe("event guards", () => {
