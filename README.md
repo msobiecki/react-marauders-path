@@ -8,10 +8,10 @@ A lightweight, type-safe React library for handling keyboard, wheel, swipe, and 
 
 ## Features
 
-- 🎮 **Keyboard Event Handling** - Simple API for detecting single keys, key combinations, and sequences
-- 🎡 **Wheel Event Handling** - Mouse wheel scrolling with delta tracking and batching support
-- 🖐️ **Swipe Gesture Handling** - Touch swipe detection with distance and velocity thresholds
-- 🖱️ **Drag Event Handling** - Pointer drag tracking with movement and delta data
+- 🎮 **Keyboard Event Handling** - Detect single keys, key combinations and sequences with configurable timing thresholds
+- 🎡 **Wheel Event Handling** - Track wheel, delta values with optional `requestAnimationFrame` batching for smoother updates
+- 🖐️ **Swipe Gesture Handling** - Detect directional swipes with configurable distance and velocity with pointer type filtering
+- 🖱️ **Drag Event Handling** - Track movement, delta values, duration, start/end positions with pointer type filtering and optional `requestAnimationFrame` batching for smoother updates
 
 ## Installation
 
@@ -23,7 +23,7 @@ npm install @msobiecki/react-marauders-path
 
 ### Key Event Hook
 
-#### Single Key Schema
+#### Single Key Pattern
 
 ```typescript
 import { useKey } from '@msobiecki/react-marauders-path';
@@ -37,7 +37,7 @@ function MyComponent() {
 }
 ```
 
-#### Multiple Patterns of Single Key Schema
+#### Multiple Single Key Patterns
 
 ```typescript
 useKey(["a", "b", "c"], (event, key) => {
@@ -45,7 +45,7 @@ useKey(["a", "b", "c"], (event, key) => {
 });
 ```
 
-#### Combination Key Schema
+#### Key Combination Pattern
 
 ```typescript
 useKey("a+b", (event, key) => {
@@ -53,7 +53,7 @@ useKey("a+b", (event, key) => {
 });
 ```
 
-#### Multiple Patterns of Combination Key Schema
+#### Multiple Key Combination Patterns
 
 ```typescript
 useKey(["a+b", "c+d"], (event, key) => {
@@ -61,7 +61,7 @@ useKey(["a+b", "c+d"], (event, key) => {
 });
 ```
 
-#### Sequential Key Schema
+#### Key Sequence Pattern
 
 ```typescript
 useKey("ArrowUp ArrowUp ArrowDown ArrowDown", (event, key) => {
@@ -69,7 +69,7 @@ useKey("ArrowUp ArrowUp ArrowDown ArrowDown", (event, key) => {
 });
 ```
 
-#### Multiple Patterns of Sequential Key Schema
+#### Multiple Key Sequence Patterns
 
 ```typescript
 useKey(
@@ -100,7 +100,7 @@ function MyComponent() {
 import { useSwipe } from '@msobiecki/react-marauders-path';
 
 function MyComponent() {
-  useSwipe('left' (event, direction, data) => {
+  useSwipe('left', (event, direction, data) => {
     console.log(`Swiped ${direction} with velocity ${data.velocity}`);
   });
 
@@ -349,7 +349,7 @@ npm run dev
 ### Lint
 
 ```bash
-npm lint
+npm run lint
 ```
 
 ## Project Status
