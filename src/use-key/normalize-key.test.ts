@@ -19,12 +19,8 @@ describe("normalizeKey", () => {
 
     describe("space key pattern normalization", () => {
       it("should normalize space pattern", () => {
-        expect(normalizeKey("space")).toBe(" ");
-        expect(normalizeKey("SPACE")).toBe(" ");
-      });
-
-      it("should normalize ' ' (space)", () => {
-        expect(normalizeKey(" ")).toBe(" ");
+        expect(normalizeKey("space")).toBe("Space");
+        expect(normalizeKey("SPACE")).toBe("Space");
       });
     });
 
@@ -133,7 +129,7 @@ describe("normalizeKey", () => {
     });
 
     it("should handle strings with leading/trailing spaces", () => {
-      expect(normalizeKey("  space  ")).toBe(" ");
+      expect(normalizeKey("  space  ")).toBe("Space");
       expect(normalizeKey("  a  ")).toBe("a");
     });
 
@@ -203,23 +199,21 @@ describe("normalizeKeySequence", () => {
     expect(normalizeKeySequence("a+shift+control")).toBe("a+Shift+Control");
   });
 
-  describe("space key pattern normalization", () => {
-    it("should normalize 'space. ' to '   '", () => {
-      expect(normalizeKeySequence("space  ")).toBe("   ");
-    });
-
-    it("should normalize '   ' (space) to '   '", () => {
-      expect(normalizeKeySequence("   ")).toBe("   ");
-    });
-
-    it("should normalize 'a  ' (space) to 'a  '", () => {
-      expect(normalizeKeySequence("a  ")).toBe("a  ");
-    });
-  });
-
   describe("special case pattern", () => {
-    it("should preserve multiple spaces in sequence", () => {
-      expect(normalizeKeySequence("a  b")).toBe("a  b");
+    it("should normalize 'space. ' to 'Space'", () => {
+      expect(normalizeKeySequence("space  ")).toBe("Space");
+    });
+
+    it("should normalize '   ' (space) to ''", () => {
+      expect(normalizeKeySequence("   ")).toBe("");
+    });
+
+    it("should normalize 'a  ' (space) to 'a'", () => {
+      expect(normalizeKeySequence("a  ")).toBe("a");
+    });
+
+    it("should normalize multiple spaces in sequence", () => {
+      expect(normalizeKeySequence("a  b")).toBe("a b");
     });
   });
 });

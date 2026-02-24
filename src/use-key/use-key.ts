@@ -139,13 +139,18 @@ const useKey = (
   );
 
   const registerKeyDown = useCallback((event: KeyboardEvent) => {
-    combinationReference.current.activeKeys.set(event.key, {
+    const normalizedEventKey =
+      event.key === " " ? SPECIAL_KEYS.SPACE : event.key;
+    combinationReference.current.activeKeys.set(normalizedEventKey, {
       pressedAt: Date.now(),
     });
   }, []);
 
   const registerKeyUp = useCallback((event: KeyboardEvent) => {
-    const state = combinationReference.current.activeKeys.get(event.key);
+    const normalizedEventKey =
+      event.key === " " ? SPECIAL_KEYS.SPACE : event.key;
+    const state =
+      combinationReference.current.activeKeys.get(normalizedEventKey);
     if (state) state.releasedAt = Date.now();
   }, []);
 
@@ -247,7 +252,12 @@ const useKey = (
         return;
       }
 
-      if (expectedKey !== SPECIAL_KEYS.ANY && expectedKey !== event.key) {
+      const normalizedEventKey =
+        event.key === " " ? SPECIAL_KEYS.SPACE : event.key;
+      if (
+        expectedKey !== SPECIAL_KEYS.ANY &&
+        expectedKey !== normalizedEventKey
+      ) {
         return;
       }
 
@@ -304,7 +314,12 @@ const useKey = (
         return;
       }
 
-      if (expectedKey !== SPECIAL_KEYS.ANY && expectedKey !== event.key) {
+      const normalizedEventKey =
+        event.key === " " ? SPECIAL_KEYS.SPACE : event.key;
+      if (
+        expectedKey !== SPECIAL_KEYS.ANY &&
+        expectedKey !== normalizedEventKey
+      ) {
         resetSequence(sequence);
         return;
       }

@@ -2,17 +2,16 @@
  * Map of special key names to their normalized values.
  * Supports various aliases for the same key (e.g., ESC and ESCAPE both map to Escape).
  *
- * @type {Record<string, string>}
  * @example
  * SPECIAL_KEYS['ENTER'] // 'Enter'
  * SPECIAL_KEYS['ESC']   // 'Escape'
  * SPECIAL_KEYS['CTRL']  // 'Control'
  */
-export const SPECIAL_KEYS: Record<string, string> = {
+export const SPECIAL_KEYS = {
   ENTER: "Enter",
   ESC: "Escape",
   ESCAPE: "Escape",
-  SPACE: " ",
+  SPACE: "Space",
   TAB: "Tab",
   SHIFT: "Shift",
   CONTROL: "Control",
@@ -36,7 +35,9 @@ export const SPECIAL_KEYS: Record<string, string> = {
   NUMLOCK: "NumLock",
   SCROLLLOCK: "ScrollLock",
   ANY: "Any", // Special key to match any key in sequences
-};
+} as const;
+
+type SpecialKey = keyof typeof SPECIAL_KEYS;
 
 /**
  * Normalizes a single key string to its standard representation.
@@ -59,15 +60,11 @@ export const normalizeKey = (key: string): string => {
     return key;
   }
 
-  if (key === " ") {
-    return " ";
-  }
-
   const trimmed = key.trim();
 
   const upper = trimmed.toUpperCase();
-  if (SPECIAL_KEYS[upper]) {
-    return SPECIAL_KEYS[upper];
+  if (upper in SPECIAL_KEYS) {
+    return SPECIAL_KEYS[upper as SpecialKey];
   }
 
   if (trimmed.length === 1) {
@@ -93,21 +90,14 @@ export const normalizeKey = (key: string): string => {
  * normalizeKeySequence('Shift+A Enter')  // 'Shift+a Enter'
  */
 export const normalizeKeySequence = (sequence: string): string => {
-  // Split by whitespace while preserving the whitespace structure
-  const parts = sequence.split(/(\s+)/);
-
-  return parts
-    .map((part) => {
-      // If it's whitespace, preserve it as-is
-      if (/^\s+$/.test(part)) {
-        return part;
-      }
-
-      // Otherwise, normalize the key/combination
-      return part
+  return sequence
+    .split(" ")
+    .filter(Boolean)
+    .map((part) =>
+      part
         .split("+")
         .map((key) => normalizeKey(key))
-        .join("+");
-    })
-    .join("");
+        .join("+"),
+    )
+    .join(" ");
 };

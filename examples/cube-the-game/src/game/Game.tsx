@@ -25,7 +25,7 @@ const Game = () => {
   });
 
   useKey(
-    "ArrowUp",
+    ["W", "ArrowUp"],
     () => {
       inputReference.current.up = true;
       return true;
@@ -34,7 +34,7 @@ const Game = () => {
   );
 
   useKey(
-    "ArrowDown",
+    ["S", "ArrowDown"],
     () => {
       inputReference.current.down = true;
       return true;
@@ -43,7 +43,7 @@ const Game = () => {
   );
 
   useKey(
-    "ArrowLeft",
+    ["A", "ArrowLeft"],
     () => {
       inputReference.current.left = true;
       return true;
@@ -52,7 +52,7 @@ const Game = () => {
   );
 
   useKey(
-    "ArrowRight",
+    ["D", "ArrowRight"],
     () => {
       inputReference.current.right = true;
       return true;
@@ -61,7 +61,7 @@ const Game = () => {
   );
 
   useKey(
-    "ArrowUp",
+    ["W", "ArrowUp"],
     () => {
       inputReference.current.up = false;
       return true;
@@ -70,7 +70,7 @@ const Game = () => {
   );
 
   useKey(
-    "ArrowDown",
+    ["S", "ArrowDown"],
     () => {
       inputReference.current.down = false;
       return true;
@@ -79,7 +79,7 @@ const Game = () => {
   );
 
   useKey(
-    "ArrowLeft",
+    ["A", "ArrowLeft"],
     () => {
       inputReference.current.left = false;
       return true;
@@ -88,7 +88,7 @@ const Game = () => {
   );
 
   useKey(
-    "ArrowRight",
+    ["D", "ArrowRight"],
     () => {
       inputReference.current.right = false;
       return true;
@@ -97,7 +97,7 @@ const Game = () => {
   );
 
   useKey(
-    "Enter",
+    ["Space", "Enter"],
     () => {
       inputReference.current.enter = true;
       return true;
@@ -106,7 +106,7 @@ const Game = () => {
   );
 
   useKey(
-    "Enter",
+    ["Space", "Enter"],
     () => {
       inputReference.current.enter = false;
       return true;
@@ -114,9 +114,9 @@ const Game = () => {
     { eventType: "keyup" },
   );
 
-  useWheel((event, delta) => {
+  useWheel((event, data) => {
     event.preventDefault();
-    scene.camera.addZoom(-delta.y * 0.001);
+    scene.camera.addZoom(-data.deltaY * 0.001);
   });
 
   useGameLoop((delta) => {

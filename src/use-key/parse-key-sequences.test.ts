@@ -232,7 +232,7 @@ describe("parseKeySequences", () => {
       expect(result[0].chord).toHaveLength(10);
     });
 
-    it("should preserve multiple spaces in sequence", () => {
+    it("should handle multiple spaces in sequence", () => {
       const result = parseKeySequences("a  b");
       expect(result[0].chord).toHaveLength(2);
     });

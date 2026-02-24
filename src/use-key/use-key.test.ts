@@ -225,6 +225,21 @@ describe("useKey hook", () => {
               "Delete",
             );
           });
+
+          it("should invoke callback for Space key", () => {
+            const callback = vi.fn();
+            renderHook(() => useKey("Space", callback, { eventType: "keyup" }));
+
+            dispatchKeyboardEvent("keydown", " ");
+            vi.advanceTimersByTime(100);
+            dispatchKeyboardEvent("keyup", " ");
+
+            expect(callback).toHaveBeenCalledTimes(1);
+            expect(callback).toHaveBeenCalledWith(
+              expect.any(KeyboardEvent),
+              "Space",
+            );
+          });
         });
       });
 
