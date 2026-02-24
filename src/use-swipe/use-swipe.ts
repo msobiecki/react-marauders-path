@@ -200,7 +200,6 @@ const useSwipe = (
 
   useEffect(() => {
     targetReference.current = container?.current ?? globalThis;
-
     abortControllerReference.current = new AbortController();
 
     const pointerDownListener = (event: Event) =>

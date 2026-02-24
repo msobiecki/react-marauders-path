@@ -1,8 +1,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { renderHook } from "@testing-library/react";
 
-import useSwipe from "./use-swipe";
-import { SwipeDirections } from "./use-swipe.types";
+import useDrag from "./use-drag";
 
 const dispatchPointerEvent = (
   type: string,
@@ -39,115 +38,166 @@ afterEach(() => {
   vi.restoreAllMocks();
 });
 
-describe("useSwipe hook", () => {
-  describe("basic swipe handling", () => {
-    it("should invoke callback for right swipe above threshold and velocity", () => {
+describe("useDrag hook", () => {
+  describe("basic drag handling", () => {
+    it("should invoke callback on pointer move after pointer down", () => {
       const callback = vi.fn();
-      renderHook(() => useSwipe(SwipeDirections.Right, callback));
+      renderHook(() => useDrag(callback));
 
       dispatchPointerEvent("pointerdown", 0, 0);
       vi.advanceTimersByTime(100);
-      dispatchPointerEvent("pointerup", 100, 0);
+      dispatchPointerEvent("pointermove", 100, 40);
 
       expect(callback).toHaveBeenCalledTimes(1);
       expect(callback).toHaveBeenCalledWith(
         expect.any(Event),
-        SwipeDirections.Right,
         expect.objectContaining({
           deltaX: 100,
-          deltaY: 0,
+          deltaY: 40,
+          movementX: 100,
+          movementY: 40,
+          startX: 0,
+          startY: 0,
+          endX: 100,
+          endY: 40,
         }),
       );
     });
 
-    it("should ignore swipe below threshold", () => {
+    it("should invoke callback on subsequent pointer moves", () => {
       const callback = vi.fn();
-      renderHook(() => useSwipe(SwipeDirections.Right, callback));
+      renderHook(() => useDrag(callback));
 
-      dispatchPointerEvent("pointerdown", 0, 0);
-      vi.advanceTimersByTime(100);
-      dispatchPointerEvent("pointerup", 20, 0);
+      dispatchPointerEvent("pointerdown", 10, 10);
+      vi.advanceTimersByTime(20);
+      dispatchPointerEvent("pointermove", 20, 25);
+      vi.advanceTimersByTime(20);
+      dispatchPointerEvent("pointermove", 35, 40);
 
-      expect(callback).not.toHaveBeenCalled();
-    });
-
-    it("should ignore swipe below velocity requirement", () => {
-      const callback = vi.fn();
-      renderHook(() =>
-        useSwipe(SwipeDirections.Right, callback, {
-          velocity: 2,
-          threshold: 10,
+      expect(callback).toHaveBeenCalledTimes(2);
+      expect(callback.mock.lastCall?.[1]).toEqual(
+        expect.objectContaining({
+          deltaX: 25,
+          deltaY: 30,
+          movementX: 15,
+          movementY: 15,
+          startX: 10,
+          startY: 10,
+          endX: 35,
+          endY: 40,
         }),
       );
+    });
 
-      dispatchPointerEvent("pointerdown", 0, 0);
-      vi.advanceTimersByTime(1000);
-      dispatchPointerEvent("pointerup", 20, 0);
+    it("should ignore pointer move without active drag", () => {
+      const callback = vi.fn();
+      renderHook(() => useDrag(callback));
+
+      dispatchPointerEvent("pointermove", 100, 0);
 
       expect(callback).not.toHaveBeenCalled();
     });
 
-    it("should ignore zero-duration swipe", () => {
+    it("should stop dragging after pointer up", () => {
       const callback = vi.fn();
-      renderHook(() => useSwipe(SwipeDirections.Right, callback));
+      renderHook(() => useDrag(callback));
 
       dispatchPointerEvent("pointerdown", 0, 0);
-      dispatchPointerEvent("pointerup", 100, 0);
-
-      expect(callback).not.toHaveBeenCalled();
-    });
-
-    it("should ignore multi-touch events", () => {
-      const callback = vi.fn();
-      renderHook(() => useSwipe(SwipeDirections.Right, callback));
-
-      dispatchPointerEvent("pointerdown", 0, 0);
-      dispatchPointerEvent("pointerdown", 50, 0);
-
-      expect(callback).not.toHaveBeenCalled();
-    });
-  });
-
-  describe("schema handling", () => {
-    it("should respect multiple allowed directions", () => {
-      const callback = vi.fn();
-      renderHook(() =>
-        useSwipe([SwipeDirections.Left, SwipeDirections.Right], callback),
-      );
-
-      dispatchPointerEvent("pointerdown", 50, 0);
-      vi.advanceTimersByTime(100);
-      dispatchPointerEvent("pointerup", -50, 0);
+      dispatchPointerEvent("pointermove", 10, 0);
+      dispatchPointerEvent("pointerup", 10, 0);
+      dispatchPointerEvent("pointermove", 20, 0);
 
       expect(callback).toHaveBeenCalledTimes(1);
-      expect(callback.mock.lastCall?.[1]).toBe(SwipeDirections.Left);
-    });
-
-    it("should reject swipe not matching schema", () => {
-      const callback = vi.fn();
-      renderHook(() => useSwipe(SwipeDirections.Horizontal, callback));
-
-      dispatchPointerEvent("pointerdown", 0, 0);
-      vi.advanceTimersByTime(100);
-      dispatchPointerEvent("pointerup", 0, 100);
-
-      expect(callback).not.toHaveBeenCalled();
     });
   });
 
   describe("hook options", () => {
+    describe("threshold option", () => {
+      it("should ignore movement below threshold", () => {
+        const callback = vi.fn();
+        renderHook(() =>
+          useDrag(callback, {
+            threshold: 50,
+          }),
+        );
+
+        dispatchPointerEvent("pointerdown", 0, 0);
+        dispatchPointerEvent("pointermove", 20, 0);
+
+        expect(callback).not.toHaveBeenCalled();
+      });
+
+      it("should invoke callback when movement reaches threshold", () => {
+        const callback = vi.fn();
+        renderHook(() =>
+          useDrag(callback, {
+            threshold: 50,
+          }),
+        );
+
+        dispatchPointerEvent("pointerdown", 0, 0);
+        dispatchPointerEvent("pointermove", 50, 0);
+
+        expect(callback).toHaveBeenCalledTimes(1);
+      });
+    });
+
+    describe("eventPointerTypes option", () => {
+      it("should ignore pointer types not included in eventPointerTypes", () => {
+        const callback = vi.fn();
+        renderHook(() =>
+          useDrag(callback, {
+            eventPointerTypes: ["mouse"],
+          }),
+        );
+
+        dispatchPointerEvent("pointerdown", 0, 0, globalThis, {
+          pointerType: "touch",
+        });
+        dispatchPointerEvent("pointermove", 60, 0, globalThis, {
+          pointerType: "touch",
+        });
+
+        expect(callback).not.toHaveBeenCalled();
+      });
+
+      it("should handle pointer types included in eventPointerTypes", () => {
+        const callback = vi.fn();
+        renderHook(() =>
+          useDrag(callback, {
+            eventPointerTypes: ["mouse"],
+          }),
+        );
+
+        dispatchPointerEvent("pointerdown", 0, 0, globalThis, {
+          pointerType: "mouse",
+        });
+        dispatchPointerEvent("pointermove", 60, 0, globalThis, {
+          pointerType: "mouse",
+        });
+
+        expect(callback).toHaveBeenCalledTimes(1);
+      });
+    });
+
     describe("eventCapture option", () => {
       it("should attach listeners with capture when true", () => {
         const spy = vi.spyOn(globalThis, "addEventListener");
 
         renderHook(() =>
-          useSwipe(SwipeDirections.Right, vi.fn(), {
+          useDrag(vi.fn(), {
             eventCapture: true,
           }),
         );
 
         expect(spy).toHaveBeenCalledWith(
           "pointerdown",
+          expect.any(Function),
+          expect.objectContaining({ capture: true }),
+        );
+
+        expect(spy).toHaveBeenCalledWith(
+          "pointermove",
           expect.any(Function),
           expect.objectContaining({ capture: true }),
         );
@@ -163,13 +213,19 @@ describe("useSwipe hook", () => {
         const spy = vi.spyOn(globalThis, "addEventListener");
 
         renderHook(() =>
-          useSwipe(SwipeDirections.Right, vi.fn(), {
+          useDrag(vi.fn(), {
             eventCapture: false,
           }),
         );
 
         expect(spy).toHaveBeenCalledWith(
           "pointerdown",
+          expect.any(Function),
+          expect.objectContaining({ capture: false }),
+        );
+
+        expect(spy).toHaveBeenCalledWith(
+          "pointermove",
           expect.any(Function),
           expect.objectContaining({ capture: false }),
         );
@@ -186,18 +242,16 @@ describe("useSwipe hook", () => {
       it("should respect eventOnce option - true", () => {
         const callback = vi.fn();
         renderHook(() =>
-          useSwipe(SwipeDirections.Right, callback, {
+          useDrag(callback, {
             eventOnce: true,
           }),
         );
 
         dispatchPointerEvent("pointerdown", 0, 0);
-        vi.advanceTimersByTime(100);
-        dispatchPointerEvent("pointerup", 100, 0);
+        dispatchPointerEvent("pointermove", 60, 0);
 
         dispatchPointerEvent("pointerdown", 0, 0);
-        vi.advanceTimersByTime(100);
-        dispatchPointerEvent("pointerup", 100, 0);
+        dispatchPointerEvent("pointermove", 120, 0);
 
         expect(callback).toHaveBeenCalledTimes(1);
       });
@@ -205,18 +259,18 @@ describe("useSwipe hook", () => {
       it("should respect eventOnce option - false", () => {
         const callback = vi.fn();
         renderHook(() =>
-          useSwipe(SwipeDirections.Right, callback, {
+          useDrag(callback, {
             eventOnce: false,
           }),
         );
 
         dispatchPointerEvent("pointerdown", 0, 0);
-        vi.advanceTimersByTime(100);
-        dispatchPointerEvent("pointerup", 100, 0);
+        dispatchPointerEvent("pointermove", 60, 0);
+
+        dispatchPointerEvent("pointerup", 60, 0);
 
         dispatchPointerEvent("pointerdown", 0, 0);
-        vi.advanceTimersByTime(100);
-        dispatchPointerEvent("pointerup", 100, 0);
+        dispatchPointerEvent("pointermove", 120, 0);
 
         expect(callback).toHaveBeenCalledTimes(2);
       });
@@ -227,19 +281,17 @@ describe("useSwipe hook", () => {
         const callback = vi.fn();
         const otherCallback = vi.fn();
         const { unmount } = renderHook(() =>
-          useSwipe(SwipeDirections.Right, callback, {
+          useDrag(callback, {
             eventStopImmediatePropagation: true,
           }),
         );
 
-        globalThis.addEventListener("pointerup", otherCallback);
+        globalThis.addEventListener("pointermove", otherCallback);
 
         dispatchPointerEvent("pointerdown", 0, 0);
-        vi.advanceTimersByTime(50);
-        const endEvent = dispatchPointerEvent("pointerup", 80, 0);
-        const stopSpy = vi.spyOn(endEvent, "stopImmediatePropagation");
+        const moveEvent = dispatchPointerEvent("pointermove", 80, 0);
 
-        expect(stopSpy).toHaveBeenCalledTimes(1);
+        expect(moveEvent.stopImmediatePropagation).toHaveBeenCalledTimes(1);
         expect(callback).toHaveBeenCalledTimes(1);
         expect(otherCallback).not.toHaveBeenCalled();
 
@@ -250,19 +302,17 @@ describe("useSwipe hook", () => {
         const callback = vi.fn();
         const otherCallback = vi.fn();
         const { unmount } = renderHook(() =>
-          useSwipe(SwipeDirections.Right, callback, {
+          useDrag(callback, {
             eventStopImmediatePropagation: false,
           }),
         );
 
-        globalThis.addEventListener("pointerup", otherCallback);
+        globalThis.addEventListener("pointermove", otherCallback);
 
         dispatchPointerEvent("pointerdown", 0, 0);
-        vi.advanceTimersByTime(50);
-        const endEvent = dispatchPointerEvent("pointerup", 80, 0);
-        const stopSpy = vi.spyOn(endEvent, "stopImmediatePropagation");
+        const moveEvent = dispatchPointerEvent("pointermove", 80, 0);
 
-        expect(stopSpy).not.toHaveBeenCalled();
+        expect(moveEvent.stopImmediatePropagation).not.toHaveBeenCalled();
         expect(callback).toHaveBeenCalledTimes(1);
         expect(otherCallback).toHaveBeenCalledTimes(1);
 
@@ -271,21 +321,20 @@ describe("useSwipe hook", () => {
     });
 
     describe("container option", () => {
-      it("should attach listener to custom container", () => {
+      it("should attach listeners to custom container", () => {
         const callback = vi.fn();
         const container = {
           current: document.createElement("div"),
         };
 
         renderHook(() =>
-          useSwipe(SwipeDirections.Right, callback, {
+          useDrag(callback, {
             container,
           }),
         );
 
         dispatchPointerEvent("pointerdown", 0, 0, container.current);
-        vi.advanceTimersByTime(100);
-        dispatchPointerEvent("pointerup", 100, 0, container.current);
+        dispatchPointerEvent("pointermove", 100, 0, container.current);
 
         expect(callback).toHaveBeenCalledTimes(1);
       });
@@ -295,13 +344,12 @@ describe("useSwipe hook", () => {
   describe("event guards", () => {
     it("should ignore non-primary pointer events", () => {
       const callback = vi.fn();
-      renderHook(() => useSwipe(SwipeDirections.Right, callback));
+      renderHook(() => useDrag(callback));
 
       dispatchPointerEvent("pointerdown", 0, 0, globalThis, {
         isPrimary: false,
       });
-      vi.advanceTimersByTime(100);
-      dispatchPointerEvent("pointerup", 100, 0, globalThis, {
+      dispatchPointerEvent("pointermove", 100, 0, globalThis, {
         isPrimary: false,
       });
 
@@ -312,15 +360,12 @@ describe("useSwipe hook", () => {
   describe("lifecycle", () => {
     it("should cleanup listeners on unmount", () => {
       const callback = vi.fn();
-      const { unmount } = renderHook(() =>
-        useSwipe(SwipeDirections.Right, callback),
-      );
+      const { unmount } = renderHook(() => useDrag(callback));
 
       unmount();
 
       dispatchPointerEvent("pointerdown", 0, 0);
-      vi.advanceTimersByTime(100);
-      dispatchPointerEvent("pointerup", 100, 0);
+      dispatchPointerEvent("pointermove", 100, 0);
 
       expect(callback).not.toHaveBeenCalled();
     });
