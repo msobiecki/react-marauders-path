@@ -15,6 +15,7 @@ const dispatchKeyboardEvent = (
     cancelable: true,
     ...options,
   });
+
   if ("stopImmediatePropagation" in event) {
     vi.spyOn(event, "stopImmediatePropagation");
   }

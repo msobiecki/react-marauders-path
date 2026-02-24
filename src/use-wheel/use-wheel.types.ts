@@ -8,9 +8,9 @@ export interface WheelOptions {
 }
 
 export interface WheelData {
-  x: number;
-  y: number;
-  z: number;
+  deltaX: number;
+  deltaY: number;
+  deltaZ: number;
   deltaMode: number;
 }
 

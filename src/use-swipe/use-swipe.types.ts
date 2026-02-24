@@ -18,7 +18,17 @@ export interface SwipeState {
   active: boolean;
 }
 
+export const SwipeEventPointerTypes = {
+  Touch: "touch",
+  Mouse: "mouse",
+  Pen: "pen",
+} as const;
+
+export type SwipeEventPointerType =
+  (typeof SwipeEventPointerTypes)[keyof typeof SwipeEventPointerTypes];
+
 export interface SwipeOptions {
+  eventPointerTypes: SwipeEventPointerType[];
   eventCapture: boolean;
   eventOnce: boolean;
   eventStopImmediatePropagation: boolean;
@@ -28,7 +38,6 @@ export interface SwipeOptions {
 }
 
 export interface SwipeData {
-  direction: SwipeDirection;
   deltaX: number;
   deltaY: number;
   velocity: number;
@@ -38,7 +47,17 @@ export interface SwipeData {
 export type UseSwipeSchema = SwipeDirection | SwipeDirection[];
 
 export type UseSwipeCallback =
-  | ((event: TouchEvent, data: SwipeData, ...properties: unknown[]) => boolean)
-  | ((event: TouchEvent, data: SwipeData, ...properties: unknown[]) => void);
+  | ((
+      event: PointerEvent,
+      direction: SwipeDirection,
+      data: SwipeData,
+      ...properties: unknown[]
+    ) => boolean)
+  | ((
+      event: PointerEvent,
+      direction: SwipeDirection,
+      data: SwipeData,
+      ...properties: unknown[]
+    ) => void);
 
 export type UseSwipeOptions = Partial<SwipeOptions>;

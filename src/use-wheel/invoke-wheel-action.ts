@@ -22,10 +22,10 @@ import { WheelData } from "./use-wheel.types";
  */
 export const invokeWheelAction = (
   event: WheelEvent,
-  delta: WheelData,
+  data: WheelData,
   callback:
-    | ((event: WheelEvent, delta: WheelData) => boolean)
-    | ((event: WheelEvent, delta: WheelData) => void),
+    | ((event: WheelEvent, data: WheelData) => boolean)
+    | ((event: WheelEvent, data: WheelData) => void),
   options: {
     stopImmediate?: boolean;
     once?: boolean;
@@ -36,7 +36,7 @@ export const invokeWheelAction = (
     event.stopImmediatePropagation();
   }
 
-  const shouldPrevent = callback(event, delta);
+  const shouldPrevent = callback(event, data);
   if (shouldPrevent) {
     event.preventDefault();
   }

@@ -4,15 +4,15 @@ export type Key = string;
 
 export type KeyEvent = Key | Key[];
 
-export const EventTypes = {
+export const KeyEventTypes = {
   KeyUp: "keyup",
   KeyDown: "keydown",
 } as const;
 
-export type EventType = (typeof EventTypes)[keyof typeof EventTypes];
+export type KeyEventType = (typeof KeyEventTypes)[keyof typeof KeyEventTypes];
 
 export interface KeyOptions {
-  eventType: EventType;
+  eventType: KeyEventType;
   eventRepeat: boolean;
   eventCapture: boolean;
   eventOnce: boolean;

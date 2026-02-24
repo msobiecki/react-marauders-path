@@ -7,7 +7,7 @@ import {
   UseKeyCallback,
   UseKeyOptions,
   CombinationState,
-  EventTypes,
+  KeyEventTypes,
 } from "./use-key.types";
 import { parseKeySequences } from "./parse-key-sequences";
 import { advanceSequenceState, resetSequenceState } from "./sequence-state";
@@ -16,7 +16,7 @@ import { shouldHandleKeyboardEvent } from "./event-guards";
 import { SPECIAL_KEYS } from "./normalize-key";
 
 const defaultOptions: KeyOptions = {
-  eventType: EventTypes.KeyUp,
+  eventType: KeyEventTypes.KeyUp,
   eventRepeat: false,
   eventCapture: false,
   eventOnce: false,
@@ -36,7 +36,7 @@ const defaultOptions: KeyOptions = {
  * @param {UseKeySchema} key - Single key, combination, sequence, or array of patterns to listen for
  * @param {UseKeyCallback} keyCallback - Callback function invoked when key pattern matches
  * @param {UseKeyOptions} [options] - Configuration options for the hook
- * @param {EventType} [options.eventType=EventType.KeyUp] - Type of keyboard event ('keydown' or 'keyup')
+ * @param {KeyEventType} [options.eventType=KeyEventTypes.KeyUp] - Type of keyboard event ('keydown' or 'keyup')
  * @param {boolean} [options.eventRepeat=false] - Allow repeated key presses to trigger callback
  * @param {boolean} [options.eventCapture=false] - Use event capture phase instead of bubbling
  * @param {boolean} [options.eventOnce=false] - Trigger callback only once
@@ -80,7 +80,7 @@ const defaultOptions: KeyOptions = {
  * @example
  * // Using options to listen for a key on keydown event and stop propagation
  * useKey('Any', handleSubmit, {
- *   eventType: 'keydown',
+ *   eventType: KeyEventTypes.KeyDown,
  *   eventStopImmediatePropagation: true,
  *   container: inputRef
  * });
@@ -154,7 +154,7 @@ const useKey = (
     const combo = combinationReference.current;
 
     [...combo.activeKeys.entries()].forEach(([key, state]) => {
-      if (eventType === EventTypes.KeyDown) {
+      if (eventType === KeyEventTypes.KeyDown) {
         if (state.releasedAt) {
           combo.activeKeys.delete(key);
         }
@@ -172,7 +172,7 @@ const useKey = (
       expectedKey: string[],
       activeKeys: Map<string, { pressedAt: number; releasedAt?: number }>,
     ): boolean => {
-      if (eventType === EventTypes.KeyDown) {
+      if (eventType === KeyEventTypes.KeyDown) {
         return (
           activeKeys.size === expectedKey.length &&
           expectedKey.every((key) => {
@@ -183,7 +183,7 @@ const useKey = (
           })
         );
       }
-      if (eventType === EventTypes.KeyUp) {
+      if (eventType === KeyEventTypes.KeyUp) {
         const keyStates = expectedKey.map((key) => {
           if (key === SPECIAL_KEYS.ANY) {
             const entries = [...activeKeys.entries()];

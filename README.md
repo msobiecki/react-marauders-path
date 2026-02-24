@@ -85,8 +85,8 @@ useKey(
 import { useWheel } from '@msobiecki/react-marauders-path';
 
 function MyComponent() {
-  useWheel((event, delta) => {
-    console.log(`Scrolled - X: ${delta.x}, Y: ${delta.y}`);
+  useWheel((event, data) => {
+    console.log(`Scrolled - X: ${data.deltaX}, Y: ${data.deltaY}`);
   });
 
   return <div>Scroll to interact</div>;
@@ -99,8 +99,8 @@ function MyComponent() {
 import { useSwipe } from '@msobiecki/react-marauders-path';
 
 function MyComponent() {
-  useSwipe('left' (event, swipe) => {
-    console.log(`Swiped ${swipe.direction} with velocity ${swipe.velocity}`);
+  useSwipe('left' (event, direction, data) => {
+    console.log(`Swiped ${direction} with velocity ${data.velocity}`);
   });
 
   return <div>Swipe left</div>;
@@ -140,7 +140,7 @@ Hook for handling mouse wheel events with support for different delta modes and 
 
 **Parameters:**
 
-- `callback: (event: WheelEvent, delta: WheelData) => void | boolean` - Called when wheel event occurs
+- `callback: (event: WheelEvent, data: WheelData) => void | boolean` - Called when wheel event occurs
 - `options?: UseWheelOptions` - Optional configuration
 
 **Options:**
@@ -160,9 +160,9 @@ interface UseWheelOptions {
 
 ```typescript
 interface WheelData {
-  x: number; // Delta X value
-  y: number; // Delta Y value
-  z: number; // Delta Z value
+  deltaX: number; // Delta X value
+  deltaY: number; // Delta Y value
+  deltaZ: number; // Delta Z value
   deltaMode: number; // Delta mode value
 }
 ```
@@ -174,7 +174,7 @@ Hook for handling touch swipe gestures with configurable distance and velocity t
 **Parameters:**
 
 - `swipe: left | right | up | down | horizontal | vertical | both` - Allowed directions to listen
-- `callback: (event: TouchEvent, data: SwipeData) => void | boolean` - Called when a swipe event occurs
+- `callback: (event: PointerEvent, direction: SwipeDirection, data: SwipeData) => void | boolean` - Called when a swipe event occurs
 - `options?: UseSwipeOptions` - Optional configuration
 
 **Options:**
@@ -194,7 +194,6 @@ interface UseSwipeOptions {
 
 ```typescript
 interface SwipeData {
-  direction: SwipeDirection; // Resolved direction
   deltaX: number; // Horizontal travel
   deltaY: number; // Vertical travel
   velocity: number; // Average speed (distance / duration)

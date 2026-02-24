@@ -44,6 +44,16 @@ describe("parseKeySequences", () => {
         sequenceTimeout: null,
       });
     });
+
+    it("should parse special key schema", () => {
+      const result = parseKeySequences("SPACE");
+      expect(result[0]).toEqual({
+        key: "Space",
+        chord: ["Space"],
+        index: 0,
+        sequenceTimeout: null,
+      });
+    });
   });
 
   describe("combination key schema", () => {

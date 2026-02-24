@@ -58,9 +58,9 @@ const useWheel = (
       }
 
       const delta: WheelData = {
-        x: event.deltaX,
-        y: event.deltaY,
-        z: event.deltaZ,
+        deltaX: event.deltaX,
+        deltaY: event.deltaY,
+        deltaZ: event.deltaZ,
         deltaMode: event.deltaMode,
       };
 

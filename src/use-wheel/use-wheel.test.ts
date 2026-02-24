@@ -4,10 +4,10 @@ import { renderHook } from "@testing-library/react";
 import useWheel from "./use-wheel";
 
 const dispatchWheelEvent = (
-  deltaX = 0,
-  deltaY = 0,
-  deltaZ = 0,
-  deltaMode = 0,
+  deltaX: number,
+  deltaY: number,
+  deltaZ: number,
+  deltaMode: number,
   target: EventTarget = globalThis,
   options: Partial<WheelEventInit> = {},
 ) => {
@@ -20,6 +20,7 @@ const dispatchWheelEvent = (
     cancelable: true,
     ...options,
   });
+
   if ("stopImmediatePropagation" in event) {
     vi.spyOn(event, "stopImmediatePropagation");
   }
@@ -43,15 +44,15 @@ describe("useWheel hook", () => {
       const callback = vi.fn();
       renderHook(() => useWheel(callback));
 
-      dispatchWheelEvent(10, 20, 0);
+      dispatchWheelEvent(10, 20, 0, 0);
 
       expect(callback).toHaveBeenCalledTimes(1);
       expect(callback).toHaveBeenCalledWith(
         expect.any(WheelEvent),
         expect.objectContaining({
-          x: 10,
-          y: 20,
-          z: 0,
+          deltaX: 10,
+          deltaY: 20,
+          deltaZ: 0,
           deltaMode: 0,
         }),
       );
@@ -66,9 +67,9 @@ describe("useWheel hook", () => {
       expect(callback).toHaveBeenCalledWith(
         expect.any(WheelEvent),
         expect.objectContaining({
-          x: 5,
-          y: 15,
-          z: 2,
+          deltaX: 5,
+          deltaY: 15,
+          deltaZ: 2,
           deltaMode: 1,
         }),
       );
@@ -78,9 +79,9 @@ describe("useWheel hook", () => {
       const callback = vi.fn();
       renderHook(() => useWheel(callback));
 
-      dispatchWheelEvent(10, 20);
-      dispatchWheelEvent(5, 15);
-      dispatchWheelEvent(1, 2);
+      dispatchWheelEvent(10, 20, 0, 0);
+      dispatchWheelEvent(5, 15, 0, 0);
+      dispatchWheelEvent(1, 2, 0, 0);
 
       expect(callback).toHaveBeenCalledTimes(3);
     });
@@ -89,15 +90,15 @@ describe("useWheel hook", () => {
       const callback = vi.fn();
       renderHook(() => useWheel(callback));
 
-      dispatchWheelEvent(0, 0, 0);
+      dispatchWheelEvent(0, 0, 0, 0);
 
       expect(callback).toHaveBeenCalledTimes(1);
       expect(callback).toHaveBeenCalledWith(
         expect.any(WheelEvent),
         expect.objectContaining({
-          x: 0,
-          y: 0,
-          z: 0,
+          deltaX: 0,
+          deltaY: 0,
+          deltaZ: 0,
         }),
       );
     });
@@ -106,14 +107,14 @@ describe("useWheel hook", () => {
       const callback = vi.fn();
       renderHook(() => useWheel(callback));
 
-      dispatchWheelEvent(-10, -20, -5);
+      dispatchWheelEvent(-10, -20, -5, 0);
 
       expect(callback).toHaveBeenCalledWith(
         expect.any(WheelEvent),
         expect.objectContaining({
-          x: -10,
-          y: -20,
-          z: -5,
+          deltaX: -10,
+          deltaY: -20,
+          deltaZ: -5,
         }),
       );
     });
@@ -122,14 +123,14 @@ describe("useWheel hook", () => {
       const callback = vi.fn();
       renderHook(() => useWheel(callback));
 
-      dispatchWheelEvent(1000, 2000, 3000);
+      dispatchWheelEvent(1000, 2000, 3000, 0);
 
       expect(callback).toHaveBeenCalledWith(
         expect.any(WheelEvent),
         expect.objectContaining({
-          x: 1000,
-          y: 2000,
-          z: 3000,
+          deltaX: 1000,
+          deltaY: 2000,
+          deltaZ: 3000,
         }),
       );
     });
@@ -185,7 +186,7 @@ describe("useWheel hook", () => {
         const callback = vi.fn();
         renderHook(() => useWheel(callback, { eventPassive: true }));
 
-        dispatchWheelEvent(10, 20);
+        dispatchWheelEvent(10, 20, 0, 0);
 
         expect(callback).toHaveBeenCalledTimes(1);
       });
@@ -194,7 +195,7 @@ describe("useWheel hook", () => {
         const callback = vi.fn();
         renderHook(() => useWheel(callback, { eventPassive: false }));
 
-        dispatchWheelEvent(10, 20);
+        dispatchWheelEvent(10, 20, 0, 0);
 
         expect(callback).toHaveBeenCalledTimes(1);
       });
@@ -205,7 +206,7 @@ describe("useWheel hook", () => {
         const callback = vi.fn();
         renderHook(() => useWheel(callback, { eventCapture: true }));
 
-        dispatchWheelEvent(10, 20);
+        dispatchWheelEvent(10, 20, 0, 0);
 
         expect(callback).toHaveBeenCalledTimes(1);
       });
@@ -214,7 +215,7 @@ describe("useWheel hook", () => {
         const callback = vi.fn();
         renderHook(() => useWheel(callback, { eventCapture: false }));
 
-        dispatchWheelEvent(10, 20);
+        dispatchWheelEvent(10, 20, 0, 0);
 
         expect(callback).toHaveBeenCalledTimes(1);
       });
@@ -225,11 +226,11 @@ describe("useWheel hook", () => {
         const callback = vi.fn();
         renderHook(() => useWheel(callback, { eventOnce: true }));
 
-        dispatchWheelEvent(10, 20);
+        dispatchWheelEvent(10, 20, 0, 0);
 
         expect(callback).toHaveBeenCalledTimes(1);
 
-        dispatchWheelEvent(10, 20);
+        dispatchWheelEvent(10, 20, 0, 0);
 
         expect(callback).toHaveBeenCalledTimes(1);
       });
@@ -238,9 +239,9 @@ describe("useWheel hook", () => {
         const callback = vi.fn();
         renderHook(() => useWheel(callback, { eventOnce: false }));
 
-        dispatchWheelEvent(10, 20);
-        dispatchWheelEvent(10, 20);
-        dispatchWheelEvent(10, 20);
+        dispatchWheelEvent(10, 20, 0, 0);
+        dispatchWheelEvent(10, 20, 0, 0);
+        dispatchWheelEvent(10, 20, 0, 0);
 
         expect(callback).toHaveBeenCalledTimes(3);
       });
@@ -256,7 +257,7 @@ describe("useWheel hook", () => {
         );
 
         globalThis.addEventListener("wheel", otherCallback);
-        const wheelEvent = dispatchWheelEvent(10, 20);
+        const wheelEvent = dispatchWheelEvent(10, 20, 0, 0);
         const wheelEventSpy = vi.spyOn(wheelEvent, "stopImmediatePropagation");
 
         expect(wheelEventSpy).toHaveBeenCalledTimes(1);
@@ -275,7 +276,7 @@ describe("useWheel hook", () => {
         );
 
         globalThis.addEventListener("wheel", otherCallback);
-        const wheelEvent = dispatchWheelEvent(10, 20);
+        const wheelEvent = dispatchWheelEvent(10, 20, 0, 0);
 
         const wheelEventSpy = vi.spyOn(wheelEvent, "stopImmediatePropagation");
 
@@ -317,9 +318,9 @@ describe("useWheel hook", () => {
 
       unmount();
 
-      dispatchWheelEvent(0, 0);
+      dispatchWheelEvent(0, 0, 0, 0);
       vi.advanceTimersByTime(100);
-      dispatchWheelEvent(100, 0);
+      dispatchWheelEvent(100, 0, 0, 0);
 
       expect(callback).not.toHaveBeenCalled();
     });
@@ -330,7 +331,7 @@ describe("useWheel hook", () => {
       const callback = vi.fn();
       renderHook(() => useWheel(callback));
 
-      dispatchWheelEvent(-10, -20);
+      dispatchWheelEvent(-10, -20, 0, 0);
 
       expect(callback).toBeDefined();
     });

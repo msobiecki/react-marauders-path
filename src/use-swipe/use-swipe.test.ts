@@ -4,25 +4,22 @@ import { renderHook } from "@testing-library/react";
 import useSwipe from "./use-swipe";
 import { SwipeDirections } from "./use-swipe.types";
 
-const dispatchTouchEvent = (
+const dispatchPointerEvent = (
   type: string,
-  x: number,
-  y: number,
+  clientX: number,
+  clientY: number,
   target: EventTarget = globalThis,
-  touches: { clientX: number; clientY: number }[] = [
-    { clientX: x, clientY: y },
-  ],
+  options: Partial<PointerEventInit> = {},
 ) => {
-  let event: Event;
-
-  if (typeof TouchEvent === "undefined") {
-    event = new Event(type, { bubbles: true, cancelable: true });
-  } else {
-    event = new TouchEvent(type, { bubbles: true, cancelable: true });
-    Object.defineProperty(event, "changedTouches", {
-      value: touches,
-    });
-  }
+  const event = new PointerEvent(type, {
+    clientX,
+    clientY,
+    bubbles: true,
+    cancelable: true,
+    isPrimary: true,
+    pointerType: "touch",
+    ...options,
+  });
 
   if ("stopImmediatePropagation" in event) {
     vi.spyOn(event, "stopImmediatePropagation");
@@ -48,15 +45,15 @@ describe("useSwipe hook", () => {
       const callback = vi.fn();
       renderHook(() => useSwipe(SwipeDirections.Right, callback));
 
-      dispatchTouchEvent("touchstart", 0, 0);
+      dispatchPointerEvent("pointerdown", 0, 0);
       vi.advanceTimersByTime(100);
-      dispatchTouchEvent("touchend", 100, 0);
+      dispatchPointerEvent("pointerup", 100, 0);
 
       expect(callback).toHaveBeenCalledTimes(1);
       expect(callback).toHaveBeenCalledWith(
         expect.any(Event),
+        SwipeDirections.Right,
         expect.objectContaining({
-          direction: SwipeDirections.Right,
           deltaX: 100,
           deltaY: 0,
         }),
@@ -67,9 +64,9 @@ describe("useSwipe hook", () => {
       const callback = vi.fn();
       renderHook(() => useSwipe(SwipeDirections.Right, callback));
 
-      dispatchTouchEvent("touchstart", 0, 0);
+      dispatchPointerEvent("pointerdown", 0, 0);
       vi.advanceTimersByTime(100);
-      dispatchTouchEvent("touchend", 20, 0);
+      dispatchPointerEvent("pointerup", 20, 0);
 
       expect(callback).not.toHaveBeenCalled();
     });
@@ -83,31 +80,29 @@ describe("useSwipe hook", () => {
         }),
       );
 
-      dispatchTouchEvent("touchstart", 0, 0);
+      dispatchPointerEvent("pointerdown", 0, 0);
       vi.advanceTimersByTime(1000);
-      dispatchTouchEvent("touchend", 20, 0);
+      dispatchPointerEvent("pointerup", 20, 0);
 
       expect(callback).not.toHaveBeenCalled();
     });
 
-    it("should handle zero-duration swipe safely", () => {
+    it("should ignore zero-duration swipe", () => {
       const callback = vi.fn();
       renderHook(() => useSwipe(SwipeDirections.Right, callback));
 
-      dispatchTouchEvent("touchstart", 0, 0);
-      dispatchTouchEvent("touchend", 100, 0);
+      dispatchPointerEvent("pointerdown", 0, 0);
+      dispatchPointerEvent("pointerup", 100, 0);
 
-      expect(callback).toHaveBeenCalledTimes(1);
+      expect(callback).not.toHaveBeenCalled();
     });
 
     it("should ignore multi-touch events", () => {
       const callback = vi.fn();
       renderHook(() => useSwipe(SwipeDirections.Right, callback));
 
-      dispatchTouchEvent("touchstart", 0, 0, globalThis, [
-        { clientX: 0, clientY: 0 },
-        { clientX: 50, clientY: 0 },
-      ]);
+      dispatchPointerEvent("pointerdown", 0, 0);
+      dispatchPointerEvent("pointerdown", 50, 0);
 
       expect(callback).not.toHaveBeenCalled();
     });
@@ -120,21 +115,21 @@ describe("useSwipe hook", () => {
         useSwipe([SwipeDirections.Left, SwipeDirections.Right], callback),
       );
 
-      dispatchTouchEvent("touchstart", 50, 0);
+      dispatchPointerEvent("pointerdown", 50, 0);
       vi.advanceTimersByTime(100);
-      dispatchTouchEvent("touchend", -50, 0);
+      dispatchPointerEvent("pointerup", -50, 0);
 
       expect(callback).toHaveBeenCalledTimes(1);
-      expect(callback.mock.lastCall?.[1].direction).toBe(SwipeDirections.Left);
+      expect(callback.mock.lastCall?.[1]).toBe(SwipeDirections.Left);
     });
 
     it("should reject swipe not matching schema", () => {
       const callback = vi.fn();
       renderHook(() => useSwipe(SwipeDirections.Horizontal, callback));
 
-      dispatchTouchEvent("touchstart", 0, 0);
+      dispatchPointerEvent("pointerdown", 0, 0);
       vi.advanceTimersByTime(100);
-      dispatchTouchEvent("touchend", 0, 100);
+      dispatchPointerEvent("pointerup", 0, 100);
 
       expect(callback).not.toHaveBeenCalled();
     });
@@ -152,13 +147,13 @@ describe("useSwipe hook", () => {
         );
 
         expect(spy).toHaveBeenCalledWith(
-          "touchstart",
+          "pointerdown",
           expect.any(Function),
           expect.objectContaining({ capture: true }),
         );
 
         expect(spy).toHaveBeenCalledWith(
-          "touchend",
+          "pointerup",
           expect.any(Function),
           expect.objectContaining({ capture: true }),
         );
@@ -174,13 +169,13 @@ describe("useSwipe hook", () => {
         );
 
         expect(spy).toHaveBeenCalledWith(
-          "touchstart",
+          "pointerdown",
           expect.any(Function),
           expect.objectContaining({ capture: false }),
         );
 
         expect(spy).toHaveBeenCalledWith(
-          "touchend",
+          "pointerup",
           expect.any(Function),
           expect.objectContaining({ capture: false }),
         );
@@ -196,13 +191,13 @@ describe("useSwipe hook", () => {
           }),
         );
 
-        dispatchTouchEvent("touchstart", 0, 0);
+        dispatchPointerEvent("pointerdown", 0, 0);
         vi.advanceTimersByTime(100);
-        dispatchTouchEvent("touchend", 100, 0);
+        dispatchPointerEvent("pointerup", 100, 0);
 
-        dispatchTouchEvent("touchstart", 0, 0);
+        dispatchPointerEvent("pointerdown", 0, 0);
         vi.advanceTimersByTime(100);
-        dispatchTouchEvent("touchend", 100, 0);
+        dispatchPointerEvent("pointerup", 100, 0);
 
         expect(callback).toHaveBeenCalledTimes(1);
       });
@@ -215,13 +210,13 @@ describe("useSwipe hook", () => {
           }),
         );
 
-        dispatchTouchEvent("touchstart", 0, 0);
+        dispatchPointerEvent("pointerdown", 0, 0);
         vi.advanceTimersByTime(100);
-        dispatchTouchEvent("touchend", 100, 0);
+        dispatchPointerEvent("pointerup", 100, 0);
 
-        dispatchTouchEvent("touchstart", 0, 0);
+        dispatchPointerEvent("pointerdown", 0, 0);
         vi.advanceTimersByTime(100);
-        dispatchTouchEvent("touchend", 100, 0);
+        dispatchPointerEvent("pointerup", 100, 0);
 
         expect(callback).toHaveBeenCalledTimes(2);
       });
@@ -237,11 +232,11 @@ describe("useSwipe hook", () => {
           }),
         );
 
-        globalThis.addEventListener("touchend", otherCallback);
+        globalThis.addEventListener("pointerup", otherCallback);
 
-        dispatchTouchEvent("touchstart", 0, 0);
+        dispatchPointerEvent("pointerdown", 0, 0);
         vi.advanceTimersByTime(50);
-        const endEvent = dispatchTouchEvent("touchend", 80, 0);
+        const endEvent = dispatchPointerEvent("pointerup", 80, 0);
         const stopSpy = vi.spyOn(endEvent, "stopImmediatePropagation");
 
         expect(stopSpy).toHaveBeenCalledTimes(1);
@@ -260,11 +255,11 @@ describe("useSwipe hook", () => {
           }),
         );
 
-        globalThis.addEventListener("touchend", otherCallback);
+        globalThis.addEventListener("pointerup", otherCallback);
 
-        dispatchTouchEvent("touchstart", 0, 0);
+        dispatchPointerEvent("pointerdown", 0, 0);
         vi.advanceTimersByTime(50);
-        const endEvent = dispatchTouchEvent("touchend", 80, 0);
+        const endEvent = dispatchPointerEvent("pointerup", 80, 0);
         const stopSpy = vi.spyOn(endEvent, "stopImmediatePropagation");
 
         expect(stopSpy).not.toHaveBeenCalled();
@@ -288,11 +283,9 @@ describe("useSwipe hook", () => {
           }),
         );
 
-        dispatchTouchEvent("touchstart", 0, 0, container.current);
-
+        dispatchPointerEvent("pointerdown", 0, 0, container.current);
         vi.advanceTimersByTime(100);
-
-        dispatchTouchEvent("touchend", 100, 0, container.current);
+        dispatchPointerEvent("pointerup", 100, 0, container.current);
 
         expect(callback).toHaveBeenCalledTimes(1);
       });
@@ -308,9 +301,9 @@ describe("useSwipe hook", () => {
 
       unmount();
 
-      dispatchTouchEvent("touchstart", 0, 0);
+      dispatchPointerEvent("pointerdown", 0, 0);
       vi.advanceTimersByTime(100);
-      dispatchTouchEvent("touchend", 100, 0);
+      dispatchPointerEvent("pointerup", 100, 0);
 
       expect(callback).not.toHaveBeenCalled();
     });

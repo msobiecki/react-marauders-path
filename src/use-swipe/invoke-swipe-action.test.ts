@@ -1,45 +1,63 @@
 import { describe, it, expect, vi, beforeEach, Mock } from "vitest";
 
-import { invokeKeyAction } from "./invoke-key-action";
+import { invokeSwipeAction } from "./invoke-swipe-action";
+import { SwipeData, SwipeDirection } from "./use-swipe.types";
 
-describe("invokeKeyAction", () => {
-  let mockEvent: KeyboardEvent;
+describe("invokeSwipeAction", () => {
+  let mockEvent: PointerEvent;
+  let mockDirection: SwipeDirection;
+  let mockData: SwipeData;
   let mockCallback: Mock<
-    | ((...arguments_: [KeyboardEvent, string]) => boolean)
-    | ((...arguments_: [KeyboardEvent, string]) => void)
+    | ((...arguments_: [PointerEvent, SwipeDirection, SwipeData]) => boolean)
+    | ((...arguments_: [PointerEvent, SwipeDirection, SwipeData]) => void)
   >;
 
   beforeEach(() => {
-    mockEvent = new KeyboardEvent("keydown", { key: "a" });
+    mockEvent = new PointerEvent("pointerdown", { pointerType: "touch" });
+    mockDirection = "right";
+    mockData = { deltaX: 0, deltaY: 0, velocity: 0, duration: 0 };
     mockEvent.preventDefault = vi.fn();
     mockEvent.stopImmediatePropagation = vi.fn();
     mockCallback = vi.fn();
   });
 
   describe("callback invocation", () => {
-    it("should invoke the callback with event and key", () => {
-      invokeKeyAction(mockEvent, "a", mockCallback, {});
+    it("should invoke the callback with event direction and data", () => {
+      invokeSwipeAction(mockEvent, mockDirection, mockData, mockCallback, {});
       expect(mockCallback).toHaveBeenCalledTimes(1);
-      expect(mockCallback).toHaveBeenCalledWith(mockEvent, "a");
+      expect(mockCallback).toHaveBeenCalledWith(
+        mockEvent,
+        mockDirection,
+        mockData,
+      );
+    });
+
+    it("should pass correct parameters to callback", () => {
+      invokeSwipeAction(mockEvent, mockDirection, mockData, mockCallback, {});
+      expect(mockCallback).toHaveBeenCalledWith(
+        mockEvent,
+        mockDirection,
+        mockData,
+      );
     });
   });
 
   describe("preventDefault behavior", () => {
     it("should call preventDefault when callback returns true", () => {
       mockCallback.mockReturnValue(true);
-      invokeKeyAction(mockEvent, "a", mockCallback, {});
+      invokeSwipeAction(mockEvent, mockDirection, mockData, mockCallback, {});
       expect(mockEvent.preventDefault).toHaveBeenCalled();
     });
 
     it("should not call preventDefault when callback returns false", () => {
       mockCallback.mockReturnValue(false);
-      invokeKeyAction(mockEvent, "a", mockCallback, {});
+      invokeSwipeAction(mockEvent, mockDirection, mockData, mockCallback, {});
       expect(mockEvent.preventDefault).not.toHaveBeenCalled();
     });
 
     it("should not call preventDefault when callback returns undefined", () => {
       mockCallback.mockReturnValue(undefined);
-      invokeKeyAction(mockEvent, "a", mockCallback, {});
+      invokeSwipeAction(mockEvent, mockDirection, mockData, mockCallback, {});
       expect(mockEvent.preventDefault).not.toHaveBeenCalled();
     });
 
@@ -47,28 +65,28 @@ describe("invokeKeyAction", () => {
       mockCallback.mockImplementation(() => {
         /* no return */
       });
-      invokeKeyAction(mockEvent, "a", mockCallback, {});
+      invokeSwipeAction(mockEvent, mockDirection, mockData, mockCallback, {});
       expect(mockEvent.preventDefault).not.toHaveBeenCalled();
     });
   });
 
   describe("stopImmediatePropagation behavior", () => {
     it("should call stopImmediatePropagation when option is true", () => {
-      invokeKeyAction(mockEvent, "a", mockCallback, {
+      invokeSwipeAction(mockEvent, mockDirection, mockData, mockCallback, {
         stopImmediate: true,
       });
       expect(mockEvent.stopImmediatePropagation).toHaveBeenCalled();
     });
 
     it("should not call stopImmediatePropagation when option is false", () => {
-      invokeKeyAction(mockEvent, "a", mockCallback, {
+      invokeSwipeAction(mockEvent, mockDirection, mockData, mockCallback, {
         stopImmediate: false,
       });
       expect(mockEvent.stopImmediatePropagation).not.toHaveBeenCalled();
     });
 
     it("should not call stopImmediatePropagation when option is undefined", () => {
-      invokeKeyAction(mockEvent, "a", mockCallback, {});
+      invokeSwipeAction(mockEvent, mockDirection, mockData, mockCallback, {});
       expect(mockEvent.stopImmediatePropagation).not.toHaveBeenCalled();
     });
   });
@@ -76,7 +94,7 @@ describe("invokeKeyAction", () => {
   describe("once option", () => {
     it("should invoke onOnce callback when once is true", () => {
       const onOnceMock = vi.fn();
-      invokeKeyAction(mockEvent, "a", mockCallback, {
+      invokeSwipeAction(mockEvent, mockDirection, mockData, mockCallback, {
         once: true,
         onOnce: onOnceMock,
       });
@@ -85,7 +103,7 @@ describe("invokeKeyAction", () => {
 
     it("should not invoke onOnce callback when once is false", () => {
       const onOnceMock = vi.fn();
-      invokeKeyAction(mockEvent, "a", mockCallback, {
+      invokeSwipeAction(mockEvent, mockDirection, mockData, mockCallback, {
         once: false,
         onOnce: onOnceMock,
       });
@@ -94,7 +112,7 @@ describe("invokeKeyAction", () => {
 
     it("should not invoke onOnce callback when option is undefined", () => {
       const onOnceMock = vi.fn();
-      invokeKeyAction(mockEvent, "a", mockCallback, {
+      invokeSwipeAction(mockEvent, mockDirection, mockData, mockCallback, {
         onOnce: onOnceMock,
       });
       expect(onOnceMock).not.toHaveBeenCalled();
@@ -102,7 +120,7 @@ describe("invokeKeyAction", () => {
 
     it("should not fail if onOnce is not provided", () => {
       expect(() => {
-        invokeKeyAction(mockEvent, "a", mockCallback, {
+        invokeSwipeAction(mockEvent, mockDirection, mockData, mockCallback, {
           once: true,
         });
       }).not.toThrow();
@@ -112,7 +130,7 @@ describe("invokeKeyAction", () => {
   describe("combined options", () => {
     it("should handle stopImmediate and preventDefault together", () => {
       mockCallback.mockReturnValue(true);
-      invokeKeyAction(mockEvent, "a", mockCallback, {
+      invokeSwipeAction(mockEvent, mockDirection, mockData, mockCallback, {
         stopImmediate: true,
       });
       expect(mockEvent.stopImmediatePropagation).toHaveBeenCalled();
@@ -122,7 +140,7 @@ describe("invokeKeyAction", () => {
     it("should handle all options together", () => {
       const onOnceMock = vi.fn();
       mockCallback.mockReturnValue(true);
-      invokeKeyAction(mockEvent, "a", mockCallback, {
+      invokeSwipeAction(mockEvent, mockDirection, mockData, mockCallback, {
         stopImmediate: true,
         once: true,
         onOnce: onOnceMock,
@@ -143,7 +161,7 @@ describe("invokeKeyAction", () => {
         callOrder.push("callback");
       });
 
-      invokeKeyAction(mockEvent, "a", mockCallback, {
+      invokeSwipeAction(mockEvent, mockDirection, mockData, mockCallback, {
         stopImmediate: true,
       });
 
@@ -160,7 +178,7 @@ describe("invokeKeyAction", () => {
         callOrder.push("preventDefault");
       });
 
-      invokeKeyAction(mockEvent, "a", mockCallback, {});
+      invokeSwipeAction(mockEvent, mockDirection, mockData, mockCallback, {});
 
       expect(callOrder).toEqual(["callback", "preventDefault"]);
     });
