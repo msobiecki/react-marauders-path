@@ -106,6 +106,24 @@ const Game = () => {
   );
 
   useKey(
+    "Control+=",
+    () => {
+      scene.camera.addZoom(0.1);
+      return true;
+    },
+    { eventType: "keydown" },
+  );
+
+  useKey(
+    "Control+-",
+    () => {
+      scene.camera.addZoom(-0.1);
+      return true;
+    },
+    { eventType: "keydown" },
+  );
+
+  useKey(
     ["Space", "Enter"],
     () => {
       inputReference.current.enter = false;
