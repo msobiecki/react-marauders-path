@@ -35,7 +35,6 @@ const useDrag = (
 
   const targetReference = useRef<EventTarget | null>(null);
   const abortControllerReference = useRef<AbortController | null>(null);
-  const firedOnceReference = useRef(false);
 
   const frameReference = useRef<number | null>(null);
   const pendingDataReference = useRef<DragData | null>(null);
@@ -66,7 +65,6 @@ const useDrag = (
       stopImmediate: eventStopImmediatePropagation,
       once: eventOnce,
       onOnce: () => {
-        firedOnceReference.current = true;
         destroyListener();
       },
     });
@@ -141,7 +139,6 @@ const useDrag = (
           stopImmediate: eventStopImmediatePropagation,
           once: eventOnce,
           onOnce: () => {
-            firedOnceReference.current = true;
             destroyListener();
           },
         });

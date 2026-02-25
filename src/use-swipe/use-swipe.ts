@@ -41,7 +41,6 @@ const useSwipe = (
   const allowedDirectionsReference = useRef<SwipeDirection[]>([]);
   const targetReference = useRef<EventTarget | null>(null);
   const abortControllerReference = useRef<AbortController | null>(null);
-  const firedOnceReference = useRef(false);
 
   const swipeStateReference = useRef<SwipeState>({
     startX: 0,
@@ -158,7 +157,6 @@ const useSwipe = (
         stopImmediate: eventStopImmediatePropagation,
         once: eventOnce,
         onOnce: () => {
-          firedOnceReference.current = true;
           destroyListener();
         },
       });

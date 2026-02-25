@@ -104,7 +104,7 @@ const useKey = (
 
   const targetReference = useRef<EventTarget | null>(null);
   const abortControllerReference = useRef<AbortController | null>(null);
-  const firedOnceReference = useRef(false);
+
   const combinationReference = useRef<CombinationState>({
     activeKeys: new Map(),
   });
@@ -130,12 +130,10 @@ const useKey = (
   const shouldProcessEvent = useCallback(
     (event: KeyboardEvent) => {
       return shouldHandleKeyboardEvent(event, {
-        once: eventOnce,
         repeat: eventRepeat,
-        firedOnce: firedOnceReference.current,
       });
     },
-    [eventOnce, eventRepeat],
+    [eventRepeat],
   );
 
   const registerKeyDown = useCallback((event: KeyboardEvent) => {
@@ -244,7 +242,6 @@ const useKey = (
           stopImmediate: eventStopImmediatePropagation,
           once: eventOnce,
           onOnce: () => {
-            firedOnceReference.current = true;
             destroyListener();
           },
         });
@@ -265,7 +262,6 @@ const useKey = (
         stopImmediate: eventStopImmediatePropagation,
         once: eventOnce,
         onOnce: () => {
-          firedOnceReference.current = true;
           destroyListener();
         },
       });
@@ -303,7 +299,6 @@ const useKey = (
             stopImmediate: eventStopImmediatePropagation,
             once: eventOnce,
             onOnce: () => {
-              firedOnceReference.current = true;
               destroyListener();
             },
           });
@@ -337,7 +332,6 @@ const useKey = (
           stopImmediate: eventStopImmediatePropagation,
           once: eventOnce,
           onOnce: () => {
-            firedOnceReference.current = true;
             destroyListener();
           },
         });

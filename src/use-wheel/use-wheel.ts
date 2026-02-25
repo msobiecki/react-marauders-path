@@ -5,7 +5,6 @@ import {
   WheelData,
   WheelOptions,
 } from "./use-wheel.types";
-import { shouldHandleWheelEvent } from "./event-guards";
 import { invokeWheelAction } from "./invoke-wheel-action";
 
 const defaultOptions: WheelOptions = {
@@ -32,7 +31,6 @@ const useWheel = (
 
   const targetReference = useRef<EventTarget | null>(null);
   const abortControllerReference = useRef<AbortController | null>(null);
-  const firedOnceReference = useRef(false);
 
   const frameReference = useRef<number | null>(null);
   const pendingDataReference = useRef<WheelData | null>(null);
@@ -41,13 +39,6 @@ const useWheel = (
   const destroyListener = useCallback(() => {
     abortControllerReference.current?.abort();
   }, []);
-
-  const shouldProcessEvent = useCallback(() => {
-    return shouldHandleWheelEvent({
-      once: eventOnce,
-      firedOnce: firedOnceReference.current,
-    });
-  }, [eventOnce]);
 
   const flushFrame = useCallback(() => {
     frameReference.current = null;
@@ -61,7 +52,6 @@ const useWheel = (
       stopImmediate: eventStopImmediatePropagation,
       once: eventOnce,
       onOnce: () => {
-        firedOnceReference.current = true;
         destroyListener();
       },
     });
@@ -77,10 +67,6 @@ const useWheel = (
 
   const handleEventListener = useCallback(
     (event: WheelEvent) => {
-      if (!shouldProcessEvent()) {
-        return;
-      }
-
       const delta: WheelData = {
         deltaX: event.deltaX,
         deltaY: event.deltaY,
@@ -93,7 +79,6 @@ const useWheel = (
           stopImmediate: eventStopImmediatePropagation,
           once: eventOnce,
           onOnce: () => {
-            firedOnceReference.current = true;
             destroyListener();
           },
         });
@@ -109,7 +94,6 @@ const useWheel = (
     },
     [
       raf,
-      shouldProcessEvent,
       wheelCallback,
       eventStopImmediatePropagation,
       eventOnce,
