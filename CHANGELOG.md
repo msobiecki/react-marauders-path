@@ -1,3 +1,10 @@
+# [1.23.0](https://github.com/msobiecki/react-marauders-path/compare/v1.22.0...v1.23.0) (2026-02-25)
+
+
+### Features
+
+* remove once reference ([17ecbb5](https://github.com/msobiecki/react-marauders-path/commit/17ecbb5d4b738ab523b833e3c27043b20344528e))
+
 # [1.22.0](https://github.com/msobiecki/react-marauders-path/compare/v1.21.0...v1.22.0) (2026-02-24)
 
 
