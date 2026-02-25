@@ -25,11 +25,17 @@ export default defineConfig({
     rollupOptions: {
       external: ["react", "react-dom"],
       output: {
+        preserveModules: true,
+        preserveModulesRoot: "src",
+        dir: "dist",
         globals: {
           react: "React",
           "react-dom": "ReactDOM",
         },
+        entryFileNames: "[name].js",
       },
     },
+    minify: true,
+    sourcemap: true,
   },
 });
