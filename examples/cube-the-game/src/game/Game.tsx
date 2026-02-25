@@ -1,6 +1,5 @@
-import { useEffect, useMemo, useRef } from "react";
+import { useMemo, useRef } from "react";
 import {
-  useDrag,
   useKey,
   usePinch,
   useWheel,
