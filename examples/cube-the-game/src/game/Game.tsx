@@ -1,9 +1,5 @@
 import { useMemo, useRef } from "react";
-import {
-  useKey,
-  usePinch,
-  useWheel,
-} from "@msobiecki/react-marauders-path";
+import { useKey, usePinch, useWheel } from "@msobiecki/react-marauders-path";
 
 import Canvas from "../engine/Canvas";
 import useGameLoop from "../engine/use-game-loop";
