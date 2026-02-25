@@ -1,3 +1,11 @@
+# [1.24.0](https://github.com/msobiecki/react-marauders-path/compare/v1.23.0...v1.24.0) (2026-02-25)
+
+
+### Features
+
+* implement usePinch ([9286d86](https://github.com/msobiecki/react-marauders-path/commit/9286d86e9f9901ceb3584425ddb269d021d6894c))
+* implement usePinch ([32e420a](https://github.com/msobiecki/react-marauders-path/commit/32e420ac58a6366cbb8c5e281abff568d89c69cc))
+
 # [1.23.0](https://github.com/msobiecki/react-marauders-path/compare/v1.22.0...v1.23.0) (2026-02-25)
 
 
