@@ -123,15 +123,17 @@ const useSwipe = (
 
       state.active = false;
 
-      const deltaX = event.clientX - state.startX;
-      const deltaY = event.clientY - state.startY;
       const duration = Date.now() - state.startTime;
 
       if (duration === 0) {
         return;
       }
 
+      const deltaX = event.clientX - state.startX;
+      const deltaY = event.clientY - state.startY;
+
       const distance = Math.hypot(deltaX, deltaY);
+
       const computedVelocity = distance / duration;
 
       if (distance < threshold) {

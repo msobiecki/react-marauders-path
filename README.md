@@ -2,7 +2,7 @@
 
 [![License](https://img.shields.io/badge/license-%20%20GNU%20GPLv3%20-green.svg)](https://github.com/msobiecki/react-marauders-path/blob/master/LICENSE)
 
-A lightweight, type-safe React library for handling keyboard, wheel, swipe, and drag events. Perfect for games, interactive applications, and input-driven interfaces.
+A lightweight, type-safe React library for handling keyboard, wheel, swipe, drag, and pinch events. Perfect for games, interactive applications, and input-driven interfaces.
 
 ![react-marauders-path](./docs/images/logotype.png)
 
@@ -12,6 +12,7 @@ A lightweight, type-safe React library for handling keyboard, wheel, swipe, and 
 - 🎡 **Wheel Event Handling** - Track wheel, delta values with optional `requestAnimationFrame` batching for smoother updates
 - 🖐️ **Swipe Gesture Handling** - Detect directional swipes with configurable distance and velocity with pointer type filtering
 - 🖱️ **Drag Event Handling** - Track movement, delta values, duration, start/end positions with pointer type filtering and optional `requestAnimationFrame` batching for smoother updates
+- 🤏 **Pinch Gesture Handling** - Track two-finger distance, delta, and scale with pointer type filtering and optional `requestAnimationFrame` batching for smoother updates
 
 ## Installation
 
@@ -122,11 +123,25 @@ function MyComponent() {
 }
 ```
 
+### Pinch Event Hook
+
+```typescript
+import { usePinch } from '@msobiecki/react-marauders-path';
+
+function MyComponent() {
+  usePinch((event, data) => {
+    console.log(`Pinch scale: ${data.scale}, delta: ${data.delta}`);
+  });
+
+  return <div>Pinch to zoom</div>;
+}
+```
+
 ## API
 
 ### `useKey(keyEvent, callback, options?)`
 
-Main hook for keyboard event handling.
+Hook for keyboard event handling with support for single keys, combinations, and sequences.
 
 **Parameters:**
 
@@ -256,6 +271,40 @@ interface DragData {
 }
 ```
 
+### `usePinch(callback, options?)`
+
+Hook for handling two-pointer pinch gestures with distance and scale tracking.
+
+**Parameters:**
+
+- `callback: (event: PointerEvent, data: PinchData) => void | boolean` - Called when pinch event occurs
+- `options?: UsePinchOptions` - Optional configuration
+
+**Options:**
+
+```typescript
+interface UsePinchOptions {
+  eventPointerTypes?: Array<"touch" | "mouse" | "pen">; // Default: ["touch"]
+  eventCapture?: boolean; // Default: false
+  eventOnce?: boolean; // Default: false
+  eventStopImmediatePropagation?: boolean; // Default: false
+  threshold?: number; // Default: 0 (px) - Minimum pinch distance change
+  container?: RefObject<HTMLElement>; // Default: window
+  raf?: boolean; // Default: false - Use requestAnimationFrame for batching
+}
+```
+
+**Pinch Data:**
+
+```typescript
+interface PinchData {
+  distance: number; // Current distance between active pointers
+  delta: number; // Distance change since previous pinch update
+  totalDelta: number; // Distance change since pinch start
+  scale: number; // Current scale ratio (distance / startDistance)
+}
+```
+
 ## Advanced Examples
 
 ### Using Options for Event Type and Propagation Control
@@ -370,7 +419,6 @@ npm run lint
 - 🚧 **`useTap`** – single tap / click
 - 🚧 **`useDoubleTap`** – quick double tap
 - 🚧 **`usePress`** – press and hold (longPress)
-- 🚧 **`usePinch`** – two-finger pinch / zoom
 
 ### Pointer / Mouse Hooks (Unified)
 

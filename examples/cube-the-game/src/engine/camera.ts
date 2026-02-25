@@ -33,4 +33,21 @@ export class Camera {
   addZoom(delta: number) {
     this.setZoom(this.zoom + delta);
   }
+
+  multiplyZoom(scale: number, anchorX?: number, anchorY?: number) {
+    const oldZoom = this.zoom;
+    const newZoom = Math.max(0.5, Math.min(3, oldZoom * scale));
+
+    if (anchorX !== undefined && anchorY !== undefined) {
+      const worldPosX = this.x + anchorX / oldZoom;
+      const worldPosY = this.y + anchorY / oldZoom;
+
+      this.zoom = newZoom;
+
+      this.x = worldPosX - anchorX / newZoom;
+      this.y = worldPosY - anchorY / newZoom;
+    } else {
+      this.zoom = newZoom;
+    }
+  }
 }

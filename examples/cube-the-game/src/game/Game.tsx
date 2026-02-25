@@ -1,5 +1,10 @@
-import { useMemo, useRef } from "react";
-import { useKey, useWheel } from "@msobiecki/react-marauders-path";
+import { useEffect, useMemo, useRef } from "react";
+import {
+  useDrag,
+  useKey,
+  usePinch,
+  useWheel,
+} from "@msobiecki/react-marauders-path";
 
 import Canvas from "../engine/Canvas";
 import useGameLoop from "../engine/use-game-loop";
@@ -133,8 +138,17 @@ const Game = () => {
   );
 
   useWheel((event, data) => {
-    event.preventDefault();
-    scene.camera.addZoom(-data.deltaY * 0.001);
+    const scale = Math.exp(-data.deltaY * 0.0015);
+
+    scene.camera.multiplyZoom(scale, event.clientX, event.clientY);
+    return true;
+  });
+
+  usePinch((event, data) => {
+    const scale = Math.exp(-data.delta * 0.0025);
+
+    scene.camera.multiplyZoom(scale, event.clientX, event.clientY);
+    return true;
   });
 
   useGameLoop((delta) => {
