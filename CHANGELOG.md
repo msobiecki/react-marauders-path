@@ -1,3 +1,10 @@
+# [1.26.0](https://github.com/msobiecki/react-marauders-path/compare/v1.25.0...v1.26.0) (2026-02-28)
+
+
+### Features
+
+* implement useTap, usePress and useDoubleTapreadme ([ccf0ed0](https://github.com/msobiecki/react-marauders-path/commit/ccf0ed016d4774394011bbed32358854135f9cb1))
+
 # [1.25.0](https://github.com/msobiecki/react-marauders-path/compare/v1.24.3...v1.25.0) (2026-02-28)
 
 
