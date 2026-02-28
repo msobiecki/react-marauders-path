@@ -1,6 +1,27 @@
 {
   "name": "@msobiecki/react-marauders-path",
   "version": "1.24.1",
+  "private": false,
+  "description": "A lightweight, type-safe React library for handling keyboard, wheel, swipe, drag, and pinch events. Perfect for games, interactive applications, and input-driven interfaces.",
+  "keywords": [
+    "react",
+    "pointer",
+    "mouse",
+    "touch",
+    "keyboard",
+    "events",
+    "hotkeys",
+    "shortcuts"
+  ],
+  "homepage": "https://github.com/msobiecki/react-marauders-path",
+  "bugs": {
+    "url": "https://github.com/msobiecki/react-marauders-path/issues"
+  },
+  "repository": {
+    "url": "git://git@github.com/msobiecki/react-marauders-path.git"
+  },
+  "license": "GPL-3.0-or-later",
+  "author": "Michał Sobiecki <kontakt@codeshaker.pl>",
   "type": "module",
   "engines": {
     "node": ">=22.17.1"
