@@ -1,6 +1,6 @@
 {
   "name": "@msobiecki/react-marauders-path",
-  "version": "1.24.2",
+  "version": "1.24.3",
   "private": false,
   "description": "A lightweight, type-safe React library for handling keyboard, wheel, swipe, drag, and pinch events. Perfect for games, interactive applications, and input-driven interfaces.",
   "keywords": [

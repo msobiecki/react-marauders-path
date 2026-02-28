@@ -1,3 +1,11 @@
+## [1.24.3](https://github.com/msobiecki/react-marauders-path/compare/v1.24.2...v1.24.3) (2026-02-28)
+
+
+### Bug Fixes
+
+* release publish ([e26ec3f](https://github.com/msobiecki/react-marauders-path/commit/e26ec3f3f4dc30dea0f0230b70d46c82a43e7189))
+* release publish ([f10972d](https://github.com/msobiecki/react-marauders-path/commit/f10972d9be24239c68809adac3052232c12dc636))
+
 ## [1.24.2](https://github.com/msobiecki/react-marauders-path/compare/v1.24.1...v1.24.2) (2026-02-25)
 
 ### Bug Fixes
