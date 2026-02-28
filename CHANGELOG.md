@@ -1,3 +1,11 @@
+# [1.25.0](https://github.com/msobiecki/react-marauders-path/compare/v1.24.3...v1.25.0) (2026-02-28)
+
+
+### Features
+
+* implement useTap, usePress and useDoubleTap ([b36bce6](https://github.com/msobiecki/react-marauders-path/commit/b36bce67b085d8f17d59fba1391a248ca17502cd))
+* implement useTap, usePress and useDoubleTap ([73c57dd](https://github.com/msobiecki/react-marauders-path/commit/73c57dd6388ab993bc09dd44977b568084cf259d))
+
 ## [1.24.3](https://github.com/msobiecki/react-marauders-path/compare/v1.24.2...v1.24.3) (2026-02-28)
 
 
