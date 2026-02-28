@@ -8,14 +8,14 @@ A lightweight, type-safe React library for handling keyboard, wheel, tap, double
 
 ## Features
 
-- 🎮 **Keyboard Event Handling** - Detect single keys, key combinations and sequences with configurable timing thresholds
-- 🎡 **Wheel Event Handling** - Track wheel, delta values with optional `requestAnimationFrame` batching for smoother updates
-- 👆 **Tap Gesture Handling** - Detect quick taps/clicks with configurable movement and duration thresholds
-- 👆👆 **Double-Tap Gesture Handling** - Detect fast consecutive taps with configurable timing and position thresholds
-- ✋ **Press Gesture Handling** - Detect press-and-hold interactions with configurable delay and movement threshold
-- 🖐️ **Swipe Gesture Handling** - Detect directional swipes with configurable distance and velocity with pointer type filtering
-- 🖱️ **Drag Event Handling** - Track movement, delta values, duration, start/end positions with pointer type filtering and optional `requestAnimationFrame` batching for smoother updates
-- 🤏 **Pinch Gesture Handling** - Track two-finger distance, delta, and scale with pointer type filtering and optional `requestAnimationFrame` batching for smoother updates
+- 🎮 **Keyboard Event Handling** - Detect single keys, key combinations, and sequences with configurable timing thresholds
+- 🎡 **Wheel Event Handling** - Detect wheel delta values with optional `requestAnimationFrame` batching for smoother updates
+- 👆 **Tap Gesture Handling** - Detect single taps/clicks with configurable movement and duration thresholds
+- 👆👆 **Double-Tap Gesture Handling** - Detect consecutive taps/clicks with configurable timing and position thresholds
+- ✋ **Press Gesture Handling** - Detect press-and-hold interactions with configurable delay and movement thresholds
+- 🖐️ **Swipe Gesture Handling** - Detect directional swipes with configurable distance, velocity, and pointer type filtering
+- ✊ **Drag Gesture Handling** - Detect movement, deltas, duration, and start/end positions with pointer type filtering and optional `requestAnimationFrame` batching
+- 🤏 **Pinch Gesture Handling** - Detect two-finger distance, delta, and scale with pointer type filtering and optional `requestAnimationFrame` batching
 
 ## Installation
 
