@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { renderHook } from "@testing-library/react";
+import { cleanup, renderHook } from "@testing-library/react";
 
 import useSwipe from "./use-swipe";
 import { SwipeDirections } from "./use-swipe.types";
@@ -30,13 +30,16 @@ const dispatchPointerEvent = (
 };
 
 beforeEach(() => {
+  vi.resetModules();
   vi.useFakeTimers();
 });
 
 afterEach(() => {
+  cleanup();
+  vi.clearAllMocks();
+  vi.restoreAllMocks();
   vi.runOnlyPendingTimers();
   vi.useRealTimers();
-  vi.restoreAllMocks();
 });
 
 describe("useSwipe hook", () => {
@@ -226,47 +229,63 @@ describe("useSwipe hook", () => {
       it("should respect eventStopImmediatePropagation option - true", () => {
         const callback = vi.fn();
         const otherCallback = vi.fn();
-        const { unmount } = renderHook(() =>
+        const container = { current: document.createElement("div") };
+
+        renderHook(() =>
           useSwipe(SwipeDirections.Right, callback, {
             eventStopImmediatePropagation: true,
+            container,
           }),
         );
 
-        globalThis.addEventListener("pointerup", otherCallback);
+        container.current.addEventListener("pointerup", otherCallback);
 
-        dispatchPointerEvent("pointerdown", 0, 0);
+        dispatchPointerEvent("pointerdown", 0, 0, container.current);
         vi.advanceTimersByTime(50);
-        const endEvent = dispatchPointerEvent("pointerup", 80, 0);
+        const endEvent = dispatchPointerEvent(
+          "pointerup",
+          80,
+          0,
+          container.current,
+        );
         const stopSpy = vi.spyOn(endEvent, "stopImmediatePropagation");
 
         expect(stopSpy).toHaveBeenCalledTimes(1);
         expect(callback).toHaveBeenCalledTimes(1);
         expect(otherCallback).not.toHaveBeenCalled();
 
-        unmount();
+        container.current.removeEventListener("pointerup", otherCallback);
       });
 
       it("should respect eventStopImmediatePropagation option - false", () => {
         const callback = vi.fn();
         const otherCallback = vi.fn();
-        const { unmount } = renderHook(() =>
+        const container = { current: document.createElement("div") };
+
+        renderHook(() =>
           useSwipe(SwipeDirections.Right, callback, {
             eventStopImmediatePropagation: false,
+            container,
           }),
         );
 
-        globalThis.addEventListener("pointerup", otherCallback);
+        container.current.addEventListener("pointerup", otherCallback);
 
-        dispatchPointerEvent("pointerdown", 0, 0);
+        dispatchPointerEvent("pointerdown", 0, 0, container.current);
         vi.advanceTimersByTime(50);
-        const endEvent = dispatchPointerEvent("pointerup", 80, 0);
+        const endEvent = dispatchPointerEvent(
+          "pointerup",
+          80,
+          0,
+          container.current,
+        );
         const stopSpy = vi.spyOn(endEvent, "stopImmediatePropagation");
 
         expect(stopSpy).not.toHaveBeenCalled();
         expect(callback).toHaveBeenCalledTimes(1);
         expect(otherCallback).toHaveBeenCalledTimes(1);
 
-        unmount();
+        container.current.removeEventListener("pointerup", otherCallback);
       });
     });
 

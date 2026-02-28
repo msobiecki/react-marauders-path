@@ -110,12 +110,6 @@ const useKey = (
   });
   const sequenceReference = useRef<SequenceState[]>([]);
 
-  const destroyListener = useCallback(() => {
-    if (abortControllerReference.current) {
-      abortControllerReference.current.abort();
-    }
-  }, []);
-
   const resetCombination = useCallback(() => {
     combinationReference.current.activeKeys.clear();
   }, []);
@@ -242,7 +236,7 @@ const useKey = (
           stopImmediate: eventStopImmediatePropagation,
           once: eventOnce,
           onOnce: () => {
-            destroyListener();
+            abortControllerReference.current?.abort();
           },
         });
 
@@ -262,7 +256,7 @@ const useKey = (
         stopImmediate: eventStopImmediatePropagation,
         once: eventOnce,
         onOnce: () => {
-          destroyListener();
+          abortControllerReference.current?.abort();
         },
       });
     },
@@ -271,7 +265,6 @@ const useKey = (
       eventOnce,
       keyCallback,
       validateCombination,
-      destroyListener,
     ],
   );
 
@@ -299,7 +292,7 @@ const useKey = (
             stopImmediate: eventStopImmediatePropagation,
             once: eventOnce,
             onOnce: () => {
-              destroyListener();
+              abortControllerReference.current?.abort();
             },
           });
 
@@ -332,7 +325,7 @@ const useKey = (
           stopImmediate: eventStopImmediatePropagation,
           once: eventOnce,
           onOnce: () => {
-            destroyListener();
+            abortControllerReference.current?.abort();
           },
         });
 
@@ -346,7 +339,6 @@ const useKey = (
       keyCallback,
       resetSequence,
       validateCombination,
-      destroyListener,
     ],
   );
 
@@ -382,27 +374,30 @@ const useKey = (
   useEffect(() => {
     targetReference.current = container?.current ?? globalThis;
     abortControllerReference.current = new AbortController();
+    const { signal } = abortControllerReference.current;
 
     const keyDownListener = (event: Event) =>
       registerKeyDown(event as KeyboardEvent);
-    targetReference.current.addEventListener("keydown", keyDownListener, {
-      capture: eventCapture,
-      signal: abortControllerReference.current.signal,
-    });
 
     const keyUpListener = (event: Event) =>
       registerKeyUp(event as KeyboardEvent);
-    targetReference.current.addEventListener("keyup", keyUpListener, {
-      capture: eventCapture,
-      signal: abortControllerReference.current.signal,
-    });
 
     const eventListener = (event: Event) =>
       handleEventListener(event as KeyboardEvent);
 
+    targetReference.current.addEventListener("keydown", keyDownListener, {
+      capture: eventCapture,
+      signal,
+    });
+
+    targetReference.current.addEventListener("keyup", keyUpListener, {
+      capture: eventCapture,
+      signal,
+    });
+
     targetReference.current.addEventListener(eventType, eventListener, {
       capture: eventCapture,
-      signal: abortControllerReference.current.signal,
+      signal,
     });
 
     return () => {

@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { renderHook } from "@testing-library/react";
+import { cleanup, renderHook } from "@testing-library/react";
 
 import usePinch from "./use-pinch";
 
@@ -31,13 +31,16 @@ const dispatchPointerEvent = (
 };
 
 beforeEach(() => {
+  vi.resetModules();
   vi.useFakeTimers();
 });
 
 afterEach(() => {
+  cleanup();
+  vi.clearAllMocks();
+  vi.restoreAllMocks();
   vi.runOnlyPendingTimers();
   vi.useRealTimers();
-  vi.restoreAllMocks();
 });
 
 describe("usePinch hook", () => {
@@ -310,45 +313,63 @@ describe("usePinch hook", () => {
       it("should respect eventStopImmediatePropagation option - true", () => {
         const callback = vi.fn();
         const otherCallback = vi.fn();
-        const { unmount } = renderHook(() =>
+        const container = { current: document.createElement("div") };
+
+        renderHook(() =>
           usePinch(callback, {
             eventStopImmediatePropagation: true,
+            container,
           }),
         );
 
-        globalThis.addEventListener("pointermove", otherCallback);
+        container.current.addEventListener("pointermove", otherCallback);
 
-        dispatchPointerEvent("pointerdown", 1, 0, 0);
-        dispatchPointerEvent("pointerdown", 2, 100, 0);
-        const moveEvent = dispatchPointerEvent("pointermove", 2, 140, 0);
+        dispatchPointerEvent("pointerdown", 1, 0, 0, container.current);
+        dispatchPointerEvent("pointerdown", 2, 100, 0, container.current);
+        const moveEvent = dispatchPointerEvent(
+          "pointermove",
+          2,
+          140,
+          0,
+          container.current,
+        );
 
         expect(moveEvent.stopImmediatePropagation).toHaveBeenCalledTimes(1);
         expect(callback).toHaveBeenCalledTimes(1);
         expect(otherCallback).not.toHaveBeenCalled();
 
-        unmount();
+        container.current.removeEventListener("pointermove", otherCallback);
       });
 
       it("should respect eventStopImmediatePropagation option - false", () => {
         const callback = vi.fn();
         const otherCallback = vi.fn();
-        const { unmount } = renderHook(() =>
+        const container = { current: document.createElement("div") };
+
+        renderHook(() =>
           usePinch(callback, {
             eventStopImmediatePropagation: false,
+            container,
           }),
         );
 
-        globalThis.addEventListener("pointermove", otherCallback);
+        container.current.addEventListener("pointermove", otherCallback);
 
-        dispatchPointerEvent("pointerdown", 1, 0, 0);
-        dispatchPointerEvent("pointerdown", 2, 100, 0);
-        const moveEvent = dispatchPointerEvent("pointermove", 2, 140, 0);
+        dispatchPointerEvent("pointerdown", 1, 0, 0, container.current);
+        dispatchPointerEvent("pointerdown", 2, 100, 0, container.current);
+        const moveEvent = dispatchPointerEvent(
+          "pointermove",
+          2,
+          140,
+          0,
+          container.current,
+        );
 
         expect(moveEvent.stopImmediatePropagation).not.toHaveBeenCalled();
         expect(callback).toHaveBeenCalledTimes(1);
         expect(otherCallback).toHaveBeenCalledTimes(1);
 
-        unmount();
+        container.current.removeEventListener("pointermove", otherCallback);
       });
     });
 

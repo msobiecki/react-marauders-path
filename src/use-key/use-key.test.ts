@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { renderHook } from "@testing-library/react";
+import { cleanup, renderHook } from "@testing-library/react";
 import useKey from "./use-key";
 
 const dispatchKeyboardEvent = (
@@ -24,16 +24,20 @@ const dispatchKeyboardEvent = (
   return event;
 };
 
+beforeEach(() => {
+  vi.resetModules();
+  vi.useFakeTimers();
+});
+
+afterEach(() => {
+  cleanup();
+  vi.clearAllMocks();
+  vi.restoreAllMocks();
+  vi.runOnlyPendingTimers();
+  vi.useRealTimers();
+});
+
 describe("useKey hook", () => {
-  beforeEach(() => {
-    vi.useFakeTimers();
-  });
-
-  afterEach(() => {
-    vi.runOnlyPendingTimers();
-    vi.useRealTimers();
-  });
-
   describe("single key schema", () => {
     describe("single string", () => {
       describe("literal keys", () => {
@@ -1488,17 +1492,19 @@ describe("useKey hook", () => {
       it("should respect eventStopImmediatePropagation option - true", () => {
         const callback = vi.fn();
         const otherCallback = vi.fn();
+        const container = { current: document.createElement("div") };
 
-        const { unmount } = renderHook(() =>
+        renderHook(() =>
           useKey("a", callback, {
             eventType: "keyup",
             eventStopImmediatePropagation: true,
+            container,
           }),
         );
 
-        globalThis.addEventListener("keyup", otherCallback);
+        container.current.addEventListener("keyup", otherCallback);
 
-        const keyEvent = dispatchKeyboardEvent("keyup", "a");
+        const keyEvent = dispatchKeyboardEvent("keyup", "a", container.current);
         const keyEventSpy = vi.spyOn(keyEvent, "stopImmediatePropagation");
 
         expect(keyEventSpy).toHaveBeenCalledTimes(1);
@@ -1506,23 +1512,25 @@ describe("useKey hook", () => {
         expect(callback).toHaveBeenCalledWith(expect.any(KeyboardEvent), "a");
         expect(otherCallback).not.toHaveBeenCalled();
 
-        unmount();
+        container.current.removeEventListener("keyup", otherCallback);
       });
 
       it("should respect eventStopImmediatePropagation option - false", () => {
         const callback = vi.fn();
         const otherCallback = vi.fn();
+        const container = { current: document.createElement("div") };
 
-        const { unmount } = renderHook(() =>
+        renderHook(() =>
           useKey("a", callback, {
             eventType: "keyup",
             eventStopImmediatePropagation: false,
+            container,
           }),
         );
 
-        globalThis.addEventListener("keyup", otherCallback);
+        container.current.addEventListener("keyup", otherCallback);
 
-        const keyEvent = dispatchKeyboardEvent("keyup", "a");
+        const keyEvent = dispatchKeyboardEvent("keyup", "a", container.current);
         const keyEventSpy = vi.spyOn(keyEvent, "stopImmediatePropagation");
 
         expect(keyEventSpy).not.toHaveBeenCalled();
@@ -1531,7 +1539,7 @@ describe("useKey hook", () => {
         expect(otherCallback).toHaveBeenCalledTimes(1);
         expect(otherCallback).toHaveBeenCalledWith(expect.any(KeyboardEvent));
 
-        unmount();
+        container.current.removeEventListener("keyup", otherCallback);
       });
     });
 

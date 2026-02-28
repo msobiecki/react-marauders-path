@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { renderHook } from "@testing-library/react";
+import { cleanup, renderHook } from "@testing-library/react";
 
 import useWheel from "./use-wheel";
 
@@ -29,16 +29,20 @@ const dispatchWheelEvent = (
   return event;
 };
 
+beforeEach(() => {
+  vi.resetModules();
+  vi.useFakeTimers();
+});
+
+afterEach(() => {
+  cleanup();
+  vi.clearAllMocks();
+  vi.restoreAllMocks();
+  vi.runOnlyPendingTimers();
+  vi.useRealTimers();
+});
+
 describe("useWheel hook", () => {
-  beforeEach(() => {
-    vi.useFakeTimers({ shouldAdvanceTime: true });
-  });
-
-  afterEach(() => {
-    vi.runOnlyPendingTimers();
-    vi.useRealTimers();
-  });
-
   describe("basic wheel event handling", () => {
     it("should invoke callback on wheel event", () => {
       const callback = vi.fn();
@@ -251,40 +255,49 @@ describe("useWheel hook", () => {
       it("should respect eventStopImmediatePropagation option - true", () => {
         const callback = vi.fn();
         const otherCallback = vi.fn();
+        const container = { current: document.createElement("div") };
 
-        const { unmount } = renderHook(() =>
-          useWheel(callback, { eventStopImmediatePropagation: true }),
+        renderHook(() =>
+          useWheel(callback, {
+            eventStopImmediatePropagation: true,
+            container,
+          }),
         );
 
-        globalThis.addEventListener("wheel", otherCallback);
-        const wheelEvent = dispatchWheelEvent(10, 20, 0, 0);
+        container.current.addEventListener("wheel", otherCallback);
+
+        const wheelEvent = dispatchWheelEvent(10, 20, 0, 0, container.current);
         const wheelEventSpy = vi.spyOn(wheelEvent, "stopImmediatePropagation");
 
         expect(wheelEventSpy).toHaveBeenCalledTimes(1);
         expect(callback).toHaveBeenCalledTimes(1);
         expect(otherCallback).not.toHaveBeenCalled();
 
-        unmount();
+        container.current.removeEventListener("wheel", otherCallback);
       });
 
       it("should respect eventStopImmediatePropagation option - false", () => {
         const callback = vi.fn();
         const otherCallback = vi.fn();
+        const container = { current: document.createElement("div") };
 
-        const { unmount } = renderHook(() =>
-          useWheel(callback, { eventStopImmediatePropagation: false }),
+        renderHook(() =>
+          useWheel(callback, {
+            eventStopImmediatePropagation: false,
+            container,
+          }),
         );
 
-        globalThis.addEventListener("wheel", otherCallback);
-        const wheelEvent = dispatchWheelEvent(10, 20, 0, 0);
+        container.current.addEventListener("wheel", otherCallback);
 
+        const wheelEvent = dispatchWheelEvent(10, 20, 0, 0, container.current);
         const wheelEventSpy = vi.spyOn(wheelEvent, "stopImmediatePropagation");
 
         expect(wheelEventSpy).not.toHaveBeenCalledTimes(1);
         expect(callback).toHaveBeenCalledTimes(1);
         expect(otherCallback).toHaveBeenCalledTimes(1);
 
-        unmount();
+        container.current.removeEventListener("wheel", otherCallback);
       });
     });
 

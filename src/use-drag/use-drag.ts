@@ -49,33 +49,33 @@ const useDrag = (
     active: false,
   });
 
-  const destroyListener = useCallback(() => {
-    abortControllerReference.current?.abort();
-  }, []);
-
   const flushFrame = useCallback(() => {
     frameReference.current = null;
 
     const data = pendingDataReference.current;
     const event = pendingEventReference.current;
 
-    if (!data || !event) return;
+    if (!data || !event) {
+      return;
+    }
 
     invokeDragAction(event, data, dragCallback, {
       stopImmediate: eventStopImmediatePropagation,
       once: eventOnce,
       onOnce: () => {
-        destroyListener();
+        abortControllerReference.current?.abort();
       },
     });
 
     pendingDataReference.current = null;
     pendingEventReference.current = null;
-  }, [dragCallback, eventStopImmediatePropagation, eventOnce, destroyListener]);
+  }, [dragCallback, eventStopImmediatePropagation, eventOnce]);
 
   const handlePointerDown = useCallback(
     (event: PointerEvent) => {
-      if (!event.isPrimary) return;
+      if (!event.isPrimary) {
+        return;
+      }
 
       if (
         !eventPointerTypes.includes(event.pointerType as DragEventPointerType)
@@ -98,8 +98,12 @@ const useDrag = (
   const handlePointerMove = useCallback(
     (event: PointerEvent) => {
       const state = dragStateReference.current;
-      if (!state.active) return;
-      if (!event.isPrimary) return;
+      if (!state.active) {
+        return;
+      }
+      if (!event.isPrimary) {
+        return;
+      }
 
       if (
         !eventPointerTypes.includes(event.pointerType as DragEventPointerType)
@@ -115,7 +119,9 @@ const useDrag = (
 
       const distance = Math.hypot(deltaX, deltaY);
 
-      if (distance < threshold) return;
+      if (distance < threshold) {
+        return;
+      }
 
       const duration = Date.now() - state.startTime;
 
@@ -139,7 +145,7 @@ const useDrag = (
           stopImmediate: eventStopImmediatePropagation,
           once: eventOnce,
           onOnce: () => {
-            destroyListener();
+            abortControllerReference.current?.abort();
           },
         });
         return;
@@ -159,14 +165,15 @@ const useDrag = (
       dragCallback,
       eventStopImmediatePropagation,
       eventOnce,
-      destroyListener,
       flushFrame,
     ],
   );
 
   const handlePointerUp = useCallback(
     (event: PointerEvent) => {
-      if (!event.isPrimary) return;
+      if (!event.isPrimary) {
+        return;
+      }
 
       if (
         !eventPointerTypes.includes(event.pointerType as DragEventPointerType)
@@ -186,15 +193,16 @@ const useDrag = (
   useEffect(() => {
     targetReference.current = container?.current ?? globalThis;
     abortControllerReference.current = new AbortController();
+    const { signal } = abortControllerReference.current;
 
     const pointerDownListener = (event: Event) =>
-      handlePointerDown(event as PointerEvent);
+      event instanceof PointerEvent && handlePointerDown(event);
 
     const pointerMoveListener = (event: Event) =>
-      handlePointerMove(event as PointerEvent);
+      event instanceof PointerEvent && handlePointerMove(event);
 
     const pointerUpListener = (event: Event) =>
-      handlePointerUp(event as PointerEvent);
+      event instanceof PointerEvent && handlePointerUp(event);
 
     const pointerCancelListener = () => handlePointerCancel();
 
@@ -203,7 +211,7 @@ const useDrag = (
       pointerDownListener,
       {
         capture: eventCapture,
-        signal: abortControllerReference.current.signal,
+        signal,
       },
     );
 
@@ -212,13 +220,13 @@ const useDrag = (
       pointerMoveListener,
       {
         capture: eventCapture,
-        signal: abortControllerReference.current.signal,
+        signal,
       },
     );
 
     targetReference.current.addEventListener("pointerup", pointerUpListener, {
       capture: eventCapture,
-      signal: abortControllerReference.current.signal,
+      signal,
     });
 
     targetReference.current.addEventListener(
@@ -226,12 +234,13 @@ const useDrag = (
       pointerCancelListener,
       {
         capture: eventCapture,
-        signal: abortControllerReference.current.signal,
+        signal,
       },
     );
 
     return () => {
       abortControllerReference.current?.abort();
+
       dragStateReference.current.active = false;
 
       if (frameReference.current !== null) {

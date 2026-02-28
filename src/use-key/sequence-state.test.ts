@@ -8,6 +8,7 @@ describe("resetSequenceState", () => {
   let mockSequences: SequenceState[];
 
   beforeEach(() => {
+    vi.resetModules();
     vi.useFakeTimers();
     mockSequences = [
       { key: "a", chord: ["a"], index: 1, sequenceTimeout: null },
@@ -17,6 +18,8 @@ describe("resetSequenceState", () => {
   });
 
   afterEach(() => {
+    vi.clearAllMocks();
+    vi.restoreAllMocks();
     vi.runOnlyPendingTimers();
     vi.useRealTimers();
   });
@@ -93,6 +96,7 @@ describe("advanceSequenceState", () => {
   let mockOnTimeout: (sequence: SequenceState) => void;
 
   beforeEach(() => {
+    vi.resetModules();
     vi.useFakeTimers();
     mockOnTimeout = vi.fn();
     mockSequences = [
@@ -103,6 +107,8 @@ describe("advanceSequenceState", () => {
   });
 
   afterEach(() => {
+    vi.clearAllMocks();
+    vi.restoreAllMocks();
     vi.runOnlyPendingTimers();
     vi.useRealTimers();
   });

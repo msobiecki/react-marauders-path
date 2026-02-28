@@ -36,34 +36,27 @@ const useWheel = (
   const pendingDataReference = useRef<WheelData | null>(null);
   const pendingEventReference = useRef<WheelEvent | null>(null);
 
-  const destroyListener = useCallback(() => {
-    abortControllerReference.current?.abort();
-  }, []);
-
   const flushFrame = useCallback(() => {
     frameReference.current = null;
 
     const data = pendingDataReference.current;
     const event = pendingEventReference.current;
 
-    if (!data || !event) return;
+    if (!data || !event) {
+      return;
+    }
 
     invokeWheelAction(event, data, wheelCallback, {
       stopImmediate: eventStopImmediatePropagation,
       once: eventOnce,
       onOnce: () => {
-        destroyListener();
+        abortControllerReference.current?.abort();
       },
     });
 
     pendingDataReference.current = null;
     pendingEventReference.current = null;
-  }, [
-    wheelCallback,
-    eventStopImmediatePropagation,
-    eventOnce,
-    destroyListener,
-  ]);
+  }, [wheelCallback, eventStopImmediatePropagation, eventOnce]);
 
   const handleEventListener = useCallback(
     (event: WheelEvent) => {
@@ -79,7 +72,7 @@ const useWheel = (
           stopImmediate: eventStopImmediatePropagation,
           once: eventOnce,
           onOnce: () => {
-            destroyListener();
+            abortControllerReference.current?.abort();
           },
         });
         return;
@@ -92,19 +85,13 @@ const useWheel = (
         frameReference.current = requestAnimationFrame(flushFrame);
       }
     },
-    [
-      raf,
-      wheelCallback,
-      eventStopImmediatePropagation,
-      eventOnce,
-      destroyListener,
-      flushFrame,
-    ],
+    [raf, wheelCallback, eventStopImmediatePropagation, eventOnce, flushFrame],
   );
 
   useEffect(() => {
     targetReference.current = container?.current ?? globalThis;
     abortControllerReference.current = new AbortController();
+    const { signal } = abortControllerReference.current;
 
     const eventListener = (event: Event) =>
       handleEventListener(event as WheelEvent);
@@ -112,7 +99,7 @@ const useWheel = (
     targetReference.current.addEventListener("wheel", eventListener, {
       passive: eventPassive,
       capture: eventCapture,
-      signal: abortControllerReference.current.signal,
+      signal,
     });
 
     return () => {

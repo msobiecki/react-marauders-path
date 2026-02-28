@@ -2,7 +2,7 @@
 
 [![License](https://img.shields.io/badge/license-%20%20GNU%20GPLv3%20-green.svg)](https://github.com/msobiecki/react-marauders-path/blob/master/LICENSE)
 
-A lightweight, type-safe React library for handling keyboard, wheel, swipe, drag, and pinch events. Perfect for games, interactive applications, and input-driven interfaces.
+A lightweight, type-safe React library for handling keyboard, wheel, tap, double-tap, press, swipe, drag, and pinch events. Perfect for games, interactive applications, and input-driven interfaces.
 
 ![react-marauders-path](./docs/images/logotype.png)
 
@@ -10,6 +10,9 @@ A lightweight, type-safe React library for handling keyboard, wheel, swipe, drag
 
 - 🎮 **Keyboard Event Handling** - Detect single keys, key combinations and sequences with configurable timing thresholds
 - 🎡 **Wheel Event Handling** - Track wheel, delta values with optional `requestAnimationFrame` batching for smoother updates
+- 👆 **Tap Gesture Handling** - Detect quick taps/clicks with configurable movement and duration thresholds
+- 👆👆 **Double-Tap Gesture Handling** - Detect fast consecutive taps with configurable timing and position thresholds
+- ✋ **Press Gesture Handling** - Detect press-and-hold interactions with configurable delay and movement threshold
 - 🖐️ **Swipe Gesture Handling** - Detect directional swipes with configurable distance and velocity with pointer type filtering
 - 🖱️ **Drag Event Handling** - Track movement, delta values, duration, start/end positions with pointer type filtering and optional `requestAnimationFrame` batching for smoother updates
 - 🤏 **Pinch Gesture Handling** - Track two-finger distance, delta, and scale with pointer type filtering and optional `requestAnimationFrame` batching for smoother updates
@@ -92,6 +95,48 @@ function MyComponent() {
   });
 
   return <div>Scroll to interact</div>;
+}
+```
+
+### Tap Event Hook
+
+```typescript
+import { useTap } from '@msobiecki/react-marauders-path';
+
+function MyComponent() {
+  useTap((event, data) => {
+    console.log(`Tapped at X: ${data.x}, Y: ${data.y}`);
+  });
+
+  return <div>Tap to interact</div>;
+}
+```
+
+### Double Tap Event Hook
+
+```typescript
+import { useDoubleTap } from '@msobiecki/react-marauders-path';
+
+function MyComponent() {
+  useDoubleTap((event, data) => {
+    console.log(`Double tapped at X: ${data.x}, Y: ${data.y}`);
+  });
+
+  return <div>Double tap to interact</div>;
+}
+```
+
+### Press Event Hook
+
+```typescript
+import { usePress } from '@msobiecki/react-marauders-path';
+
+function MyComponent() {
+  usePress((event, data) => {
+    console.log(`Pressed at X: ${data.x}, Y: ${data.y}`);
+  });
+
+  return <div>Press and hold to interact</div>;
 }
 ```
 
@@ -194,6 +239,102 @@ interface WheelData {
   deltaY: number; // Delta Y value
   deltaZ: number; // Delta Z value
   deltaMode: number; // Delta mode value
+}
+```
+
+### `useTap(callback, options?)`
+
+Hook for handling single tap/click interactions.
+
+**Parameters:**
+
+- `callback: (event: PointerEvent, data: TapData) => void | boolean` - Called when tap gesture is recognized
+- `options?: UseTapOptions` - Optional configuration
+
+**Options:**
+
+```typescript
+interface UseTapOptions {
+  eventPointerTypes?: Array<"touch" | "mouse" | "pen">; // Default: ["touch", "mouse", "pen"]
+  eventCapture?: boolean; // Default: false
+  eventOnce?: boolean; // Default: false
+  eventStopImmediatePropagation?: boolean; // Default: false
+  threshold?: number; // Default: 8 (px) - Maximum movement allowed between pointerdown and pointerup
+  maxDuration?: number; // Default: 250 (ms) - Maximum tap duration
+  container?: RefObject<HTMLElement>; // Default: window
+}
+```
+
+**Tap Data:**
+
+```typescript
+interface TapData {
+  x: number; // Tap pointerup X
+  y: number; // Tap pointerup Y
+}
+```
+
+### `useDoubleTap(callback, options?)`
+
+Hook for handling double-tap / double-click interactions.
+
+**Parameters:**
+
+- `callback: (event: PointerEvent, data: DoubleTapData) => void | boolean` - Called when double tap is recognized
+- `options?: UseDoubleTapOptions` - Optional configuration
+
+**Options:**
+
+```typescript
+interface UseDoubleTapOptions {
+  eventPointerTypes?: Array<"touch" | "mouse" | "pen">; // Default: ["touch", "mouse", "pen"]
+  eventCapture?: boolean; // Default: false
+  eventOnce?: boolean; // Default: false
+  eventStopImmediatePropagation?: boolean; // Default: false
+  delay?: number; // Default: 300 (ms) - Maximum interval between taps
+  threshold?: number; // Default: 8 (px) - Maximum distance between two tap positions
+  container?: RefObject<HTMLElement>; // Default: window
+}
+```
+
+**Double Tap Data:**
+
+```typescript
+interface DoubleTapData {
+  x: number; // Tap pointerup X
+  y: number; // Tap pointerup Y
+}
+```
+
+### `usePress(callback, options?)`
+
+Hook for handling press-and-hold interactions.
+
+**Parameters:**
+
+- `callback: (event: PointerEvent, data: PressData) => void | boolean` - Called when press delay completes
+- `options?: UsePressOptions` - Optional configuration
+
+**Options:**
+
+```typescript
+interface UsePressOptions {
+  eventPointerTypes?: Array<"touch" | "mouse" | "pen">; // Default: ["touch", "mouse", "pen"]
+  eventCapture?: boolean; // Default: false
+  eventOnce?: boolean; // Default: false
+  eventStopImmediatePropagation?: boolean; // Default: false
+  delay?: number; // Default: 500 (ms) - Press-and-hold duration required
+  threshold?: number; // Default: 8 (px) - Maximum movement allowed while holding
+  container?: RefObject<HTMLElement>; // Default: window
+}
+```
+
+**Press Data:**
+
+```typescript
+interface PressData {
+  x: number; // Pointerdown X at press start
+  y: number; // Pointerdown Y at press start
 }
 ```
 
@@ -413,12 +554,6 @@ npm run lint
   - `swipe` – directional swipe
   - `drag` / `pan` – track movement of finger or mouse
   - `pinch` / `zoom` – two-finger pinch / zoom
-
-### Low-level Gesture Hooks
-
-- 🚧 **`useTap`** – single tap / click
-- 🚧 **`useDoubleTap`** – quick double tap
-- 🚧 **`usePress`** – press and hold (longPress)
 
 ### Pointer / Mouse Hooks (Unified)
 

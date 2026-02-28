@@ -49,10 +49,6 @@ const useSwipe = (
     active: false,
   });
 
-  const destroyListener = useCallback(() => {
-    abortControllerReference.current?.abort();
-  }, []);
-
   const resolveDirection = useCallback(
     (deltaX: number, deltaY: number): SwipeDirection => {
       const absX = Math.abs(deltaX);
@@ -159,7 +155,7 @@ const useSwipe = (
         stopImmediate: eventStopImmediatePropagation,
         once: eventOnce,
         onOnce: () => {
-          destroyListener();
+          abortControllerReference.current?.abort();
         },
       });
     },
@@ -171,7 +167,6 @@ const useSwipe = (
       swipeCallback,
       eventOnce,
       eventStopImmediatePropagation,
-      destroyListener,
     ],
   );
 
@@ -201,40 +196,42 @@ const useSwipe = (
   useEffect(() => {
     targetReference.current = container?.current ?? globalThis;
     abortControllerReference.current = new AbortController();
+    const { signal } = abortControllerReference.current;
 
     const pointerDownListener = (event: Event) =>
-      handlePointerDown(event as PointerEvent);
+      event instanceof PointerEvent && handlePointerDown(event);
+
+    const pointerUpListener = (event: Event) =>
+      event instanceof PointerEvent && handlePointerUp(event);
+
+    const pointerCancelListener = () => handlePointerCancel();
 
     targetReference.current.addEventListener(
       "pointerdown",
       pointerDownListener,
       {
         capture: eventCapture,
-        signal: abortControllerReference.current.signal,
+        signal,
       },
     );
 
-    const pointerUpListener = (event: Event) =>
-      handlePointerUp(event as PointerEvent);
-
     targetReference.current.addEventListener("pointerup", pointerUpListener, {
       capture: eventCapture,
-      signal: abortControllerReference.current.signal,
+      signal,
     });
-
-    const pointerCancelListener = () => handlePointerCancel();
 
     targetReference.current.addEventListener(
       "pointercancel",
       pointerCancelListener,
       {
         capture: eventCapture,
-        signal: abortControllerReference.current.signal,
+        signal,
       },
     );
 
     return () => {
       abortControllerReference.current?.abort();
+
       swipeStateReference.current.active = false;
     };
   }, [

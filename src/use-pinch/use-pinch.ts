@@ -47,32 +47,27 @@ const usePinch = (
     active: false,
   });
 
-  const destroyListener = useCallback(() => {
-    abortControllerReference.current?.abort();
-  }, []);
-
   const flushFrame = useCallback(() => {
     frameReference.current = null;
 
     const data = pendingDataReference.current;
     const event = pendingEventReference.current;
 
-    if (!data || !event) return;
+    if (!data || !event) {
+      return;
+    }
 
     invokePinchAction(event, data, pinchCallback, {
       stopImmediate: eventStopImmediatePropagation,
       once: eventOnce,
-      onOnce: () => destroyListener(),
+      onOnce: () => {
+        abortControllerReference.current?.abort();
+      },
     });
 
     pendingDataReference.current = null;
     pendingEventReference.current = null;
-  }, [
-    pinchCallback,
-    eventStopImmediatePropagation,
-    eventOnce,
-    destroyListener,
-  ]);
+  }, [pinchCallback, eventStopImmediatePropagation, eventOnce]);
 
   const handlePointerDown = useCallback(
     (event: PointerEvent) => {
@@ -105,13 +100,19 @@ const usePinch = (
   const handlePointerMove = useCallback(
     (event: PointerEvent) => {
       const state = pinchStateReference.current;
-      if (!state.active) return;
+      if (!state.active) {
+        return;
+      }
 
-      if (!state.pointers.has(event.pointerId)) return;
+      if (!state.pointers.has(event.pointerId)) {
+        return;
+      }
 
       state.pointers.set(event.pointerId, event);
 
-      if (state.pointers.size < 2) return;
+      if (state.pointers.size < 2) {
+        return;
+      }
 
       const [pointer1, pointer2] = [...state.pointers.values()];
 
@@ -123,7 +124,9 @@ const usePinch = (
       const delta = distance - state.lastDistance;
       const totalDelta = distance - state.startDistance;
 
-      if (Math.abs(totalDelta) < threshold) return;
+      if (Math.abs(totalDelta) < threshold) {
+        return;
+      }
 
       const scale = distance / state.startDistance;
 
@@ -140,7 +143,9 @@ const usePinch = (
         invokePinchAction(event, data, pinchCallback, {
           stopImmediate: eventStopImmediatePropagation,
           once: eventOnce,
-          onOnce: () => destroyListener(),
+          onOnce: () => {
+            abortControllerReference.current?.abort();
+          },
         });
         return;
       }
@@ -158,7 +163,6 @@ const usePinch = (
       pinchCallback,
       eventStopImmediatePropagation,
       eventOnce,
-      destroyListener,
       flushFrame,
     ],
   );
@@ -185,25 +189,26 @@ const usePinch = (
   useEffect(() => {
     targetReference.current = container?.current ?? globalThis;
     abortControllerReference.current = new AbortController();
+    const { signal } = abortControllerReference.current;
 
     const pointerDownListener = (event: Event) =>
-      handlePointerDown(event as PointerEvent);
+      event instanceof PointerEvent && handlePointerDown(event);
 
     const pointerMoveListener = (event: Event) =>
-      handlePointerMove(event as PointerEvent);
+      event instanceof PointerEvent && handlePointerMove(event);
 
     const pointerUpListener = (event: Event) =>
-      handlePointerUp(event as PointerEvent);
+      event instanceof PointerEvent && handlePointerUp(event);
 
     const pointerCancelListener = (event: Event) =>
-      handlePointerCancel(event as PointerEvent);
+      event instanceof PointerEvent && handlePointerCancel(event);
 
     targetReference.current.addEventListener(
       "pointerdown",
       pointerDownListener,
       {
         capture: eventCapture,
-        signal: abortControllerReference.current.signal,
+        signal,
       },
     );
 
@@ -212,13 +217,13 @@ const usePinch = (
       pointerMoveListener,
       {
         capture: eventCapture,
-        signal: abortControllerReference.current.signal,
+        signal,
       },
     );
 
     targetReference.current.addEventListener("pointerup", pointerUpListener, {
       capture: eventCapture,
-      signal: abortControllerReference.current.signal,
+      signal,
     });
 
     targetReference.current.addEventListener(
@@ -226,12 +231,13 @@ const usePinch = (
       pointerCancelListener,
       {
         capture: eventCapture,
-        signal: abortControllerReference.current.signal,
+        signal,
       },
     );
 
     return () => {
       abortControllerReference.current?.abort();
+
       pinchStateReference.current.active = false;
       pinchStateReference.current.pointers.clear();
 

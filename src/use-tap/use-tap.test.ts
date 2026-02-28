@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { cleanup, renderHook } from "@testing-library/react";
 
-import useDrag from "./use-drag";
+import useTap from "./use-tap";
 
 const dispatchPointerEvent = (
   type: string,
@@ -41,115 +41,76 @@ afterEach(() => {
   vi.useRealTimers();
 });
 
-describe("useDrag hook", () => {
-  describe("basic drag handling", () => {
-    it("should invoke callback on pointer move after pointer down", () => {
+describe("useTap hook", () => {
+  describe("basic tap handling", () => {
+    it("should invoke callback for a quick tap within threshold", () => {
       const callback = vi.fn();
-      renderHook(() => useDrag(callback));
+      renderHook(() => useTap(callback));
 
-      dispatchPointerEvent("pointerdown", 0, 0);
+      dispatchPointerEvent("pointerdown", 10, 20);
       vi.advanceTimersByTime(100);
-      dispatchPointerEvent("pointermove", 100, 40);
+      dispatchPointerEvent("pointerup", 14, 23);
 
       expect(callback).toHaveBeenCalledTimes(1);
       expect(callback).toHaveBeenCalledWith(
-        expect.any(Event),
+        expect.any(PointerEvent),
         expect.objectContaining({
-          deltaX: 100,
-          deltaY: 40,
-          movementX: 100,
-          movementY: 40,
-          startX: 0,
-          startY: 0,
-          endX: 100,
-          endY: 40,
+          x: 14,
+          y: 23,
         }),
       );
     });
 
-    it("should invoke callback on subsequent pointer moves", () => {
+    it("should ignore tap when movement exceeds threshold", () => {
       const callback = vi.fn();
-      renderHook(() => useDrag(callback));
+      renderHook(() => useTap(callback));
 
-      dispatchPointerEvent("pointerdown", 10, 10);
-      vi.advanceTimersByTime(20);
-      dispatchPointerEvent("pointermove", 20, 25);
-      vi.advanceTimersByTime(20);
-      dispatchPointerEvent("pointermove", 35, 40);
-
-      expect(callback).toHaveBeenCalledTimes(2);
-      expect(callback.mock.lastCall?.[1]).toEqual(
-        expect.objectContaining({
-          deltaX: 25,
-          deltaY: 30,
-          movementX: 15,
-          movementY: 15,
-          startX: 10,
-          startY: 10,
-          endX: 35,
-          endY: 40,
-        }),
-      );
-    });
-
-    it("should ignore pointer move without active drag", () => {
-      const callback = vi.fn();
-      renderHook(() => useDrag(callback));
-
-      dispatchPointerEvent("pointermove", 100, 0);
+      dispatchPointerEvent("pointerdown", 0, 0);
+      vi.advanceTimersByTime(100);
+      dispatchPointerEvent("pointerup", 20, 0);
 
       expect(callback).not.toHaveBeenCalled();
     });
 
-    it("should stop dragging after pointer up", () => {
+    it("should ignore tap when duration exceeds maxDuration", () => {
       const callback = vi.fn();
-      renderHook(() => useDrag(callback));
+      renderHook(() => useTap(callback, { maxDuration: 250 }));
 
       dispatchPointerEvent("pointerdown", 0, 0);
-      dispatchPointerEvent("pointermove", 10, 0);
-      dispatchPointerEvent("pointerup", 10, 0);
-      dispatchPointerEvent("pointermove", 20, 0);
+      vi.advanceTimersByTime(300);
+      dispatchPointerEvent("pointerup", 1, 1);
 
-      expect(callback).toHaveBeenCalledTimes(1);
+      expect(callback).not.toHaveBeenCalled();
+    });
+
+    it("should ignore pointer up without active tap", () => {
+      const callback = vi.fn();
+      renderHook(() => useTap(callback));
+
+      dispatchPointerEvent("pointerup", 0, 0);
+
+      expect(callback).not.toHaveBeenCalled();
+    });
+
+    it("should cancel active tap on pointer cancel", () => {
+      const callback = vi.fn();
+      renderHook(() => useTap(callback));
+
+      dispatchPointerEvent("pointerdown", 0, 0);
+      dispatchPointerEvent("pointercancel", 0, 0);
+      vi.advanceTimersByTime(100);
+      dispatchPointerEvent("pointerup", 0, 0);
+
+      expect(callback).not.toHaveBeenCalled();
     });
   });
 
   describe("hook options", () => {
-    describe("threshold option", () => {
-      it("should ignore movement below threshold", () => {
-        const callback = vi.fn();
-        renderHook(() =>
-          useDrag(callback, {
-            threshold: 50,
-          }),
-        );
-
-        dispatchPointerEvent("pointerdown", 0, 0);
-        dispatchPointerEvent("pointermove", 20, 0);
-
-        expect(callback).not.toHaveBeenCalled();
-      });
-
-      it("should invoke callback when movement reaches threshold", () => {
-        const callback = vi.fn();
-        renderHook(() =>
-          useDrag(callback, {
-            threshold: 50,
-          }),
-        );
-
-        dispatchPointerEvent("pointerdown", 0, 0);
-        dispatchPointerEvent("pointermove", 50, 0);
-
-        expect(callback).toHaveBeenCalledTimes(1);
-      });
-    });
-
     describe("eventPointerTypes option", () => {
       it("should ignore pointer types not included in eventPointerTypes", () => {
         const callback = vi.fn();
         renderHook(() =>
-          useDrag(callback, {
+          useTap(callback, {
             eventPointerTypes: ["mouse"],
           }),
         );
@@ -157,7 +118,8 @@ describe("useDrag hook", () => {
         dispatchPointerEvent("pointerdown", 0, 0, globalThis, {
           pointerType: "touch",
         });
-        dispatchPointerEvent("pointermove", 60, 0, globalThis, {
+        vi.advanceTimersByTime(50);
+        dispatchPointerEvent("pointerup", 0, 0, globalThis, {
           pointerType: "touch",
         });
 
@@ -167,7 +129,7 @@ describe("useDrag hook", () => {
       it("should handle pointer types included in eventPointerTypes", () => {
         const callback = vi.fn();
         renderHook(() =>
-          useDrag(callback, {
+          useTap(callback, {
             eventPointerTypes: ["mouse"],
           }),
         );
@@ -175,7 +137,8 @@ describe("useDrag hook", () => {
         dispatchPointerEvent("pointerdown", 0, 0, globalThis, {
           pointerType: "mouse",
         });
-        dispatchPointerEvent("pointermove", 60, 0, globalThis, {
+        vi.advanceTimersByTime(50);
+        dispatchPointerEvent("pointerup", 0, 0, globalThis, {
           pointerType: "mouse",
         });
 
@@ -188,7 +151,7 @@ describe("useDrag hook", () => {
         const spy = vi.spyOn(globalThis, "addEventListener");
 
         renderHook(() =>
-          useDrag(vi.fn(), {
+          useTap(vi.fn(), {
             eventCapture: true,
           }),
         );
@@ -200,13 +163,13 @@ describe("useDrag hook", () => {
         );
 
         expect(spy).toHaveBeenCalledWith(
-          "pointermove",
+          "pointerup",
           expect.any(Function),
           expect.objectContaining({ capture: true }),
         );
 
         expect(spy).toHaveBeenCalledWith(
-          "pointerup",
+          "pointercancel",
           expect.any(Function),
           expect.objectContaining({ capture: true }),
         );
@@ -216,7 +179,7 @@ describe("useDrag hook", () => {
         const spy = vi.spyOn(globalThis, "addEventListener");
 
         renderHook(() =>
-          useDrag(vi.fn(), {
+          useTap(vi.fn(), {
             eventCapture: false,
           }),
         );
@@ -228,13 +191,13 @@ describe("useDrag hook", () => {
         );
 
         expect(spy).toHaveBeenCalledWith(
-          "pointermove",
+          "pointerup",
           expect.any(Function),
           expect.objectContaining({ capture: false }),
         );
 
         expect(spy).toHaveBeenCalledWith(
-          "pointerup",
+          "pointercancel",
           expect.any(Function),
           expect.objectContaining({ capture: false }),
         );
@@ -245,16 +208,18 @@ describe("useDrag hook", () => {
       it("should respect eventOnce option - true", () => {
         const callback = vi.fn();
         renderHook(() =>
-          useDrag(callback, {
+          useTap(callback, {
             eventOnce: true,
           }),
         );
 
         dispatchPointerEvent("pointerdown", 0, 0);
-        dispatchPointerEvent("pointermove", 60, 0);
+        vi.advanceTimersByTime(50);
+        dispatchPointerEvent("pointerup", 0, 0);
 
         dispatchPointerEvent("pointerdown", 0, 0);
-        dispatchPointerEvent("pointermove", 120, 0);
+        vi.advanceTimersByTime(50);
+        dispatchPointerEvent("pointerup", 0, 0);
 
         expect(callback).toHaveBeenCalledTimes(1);
       });
@@ -262,18 +227,18 @@ describe("useDrag hook", () => {
       it("should respect eventOnce option - false", () => {
         const callback = vi.fn();
         renderHook(() =>
-          useDrag(callback, {
+          useTap(callback, {
             eventOnce: false,
           }),
         );
 
         dispatchPointerEvent("pointerdown", 0, 0);
-        dispatchPointerEvent("pointermove", 60, 0);
-
-        dispatchPointerEvent("pointerup", 60, 0);
+        vi.advanceTimersByTime(50);
+        dispatchPointerEvent("pointerup", 0, 0);
 
         dispatchPointerEvent("pointerdown", 0, 0);
-        dispatchPointerEvent("pointermove", 120, 0);
+        vi.advanceTimersByTime(50);
+        dispatchPointerEvent("pointerup", 0, 0);
 
         expect(callback).toHaveBeenCalledTimes(2);
       });
@@ -283,94 +248,80 @@ describe("useDrag hook", () => {
       it("should respect eventStopImmediatePropagation option - true", () => {
         const callback = vi.fn();
         const otherCallback = vi.fn();
-        const container = {
-          current: document.createElement("div"),
-        };
+        const container = { current: document.createElement("div") };
 
         renderHook(() =>
-          useDrag(callback, {
+          useTap(callback, {
             eventStopImmediatePropagation: true,
             container,
           }),
         );
 
+        container.current.addEventListener("pointerup", otherCallback);
+
         dispatchPointerEvent("pointerdown", 0, 0, container.current);
-
-        container.current.addEventListener("pointermove", otherCallback);
-
-        const moveEvent = dispatchPointerEvent(
-          "pointermove",
-          80,
+        const endEvent = dispatchPointerEvent(
+          "pointerup",
+          0,
           0,
           container.current,
         );
 
-        container.current.removeEventListener("pointermove", otherCallback);
-
-        expect(moveEvent.stopImmediatePropagation).toHaveBeenCalledTimes(1);
+        expect(endEvent.stopImmediatePropagation).toHaveBeenCalledTimes(1);
         expect(callback).toHaveBeenCalledTimes(1);
         expect(otherCallback).not.toHaveBeenCalled();
+
+        container.current.removeEventListener("pointerup", otherCallback);
       });
 
       it("should respect eventStopImmediatePropagation option - false", () => {
         const callback = vi.fn();
         const otherCallback = vi.fn();
-        const container = {
-          current: document.createElement("div"),
-        };
+        const container = { current: document.createElement("div") };
 
         renderHook(() =>
-          useDrag(callback, {
+          useTap(callback, {
             eventStopImmediatePropagation: false,
             container,
           }),
         );
 
+        container.current.addEventListener("pointerup", otherCallback);
+
         dispatchPointerEvent("pointerdown", 0, 0, container.current);
-
-        container.current.addEventListener("pointermove", otherCallback);
-
-        const moveEvent = dispatchPointerEvent(
-          "pointermove",
-          80,
+        const endEvent = dispatchPointerEvent(
+          "pointerup",
+          0,
           0,
           container.current,
         );
 
-        container.current.removeEventListener("pointermove", otherCallback);
-
-        expect(moveEvent.stopImmediatePropagation).not.toHaveBeenCalled();
+        expect(endEvent.stopImmediatePropagation).not.toHaveBeenCalled();
         expect(callback).toHaveBeenCalledTimes(1);
         expect(otherCallback).toHaveBeenCalledTimes(1);
+
+        container.current.removeEventListener("pointerup", otherCallback);
       });
     });
 
     describe("container option", () => {
-      it("should attach listeners to custom container", () => {
+      it("should attach listener to custom container", () => {
         const callback = vi.fn();
         const container = {
           current: document.createElement("div"),
         };
 
         renderHook(() =>
-          useDrag(callback, {
+          useTap(callback, {
             container,
           }),
         );
 
         dispatchPointerEvent("pointerdown", 0, 0, container.current);
-        dispatchPointerEvent("pointermove", 100, 0, container.current);
+        vi.advanceTimersByTime(50);
+        dispatchPointerEvent("pointerup", 0, 0, container.current);
 
         expect(callback).toHaveBeenCalledTimes(1);
-      });
-    });
-
-    describe("raf option", () => {
-      it("should accept raf option", () => {
-        const callback = vi.fn();
-        renderHook(() => useDrag(callback, { raf: true }));
-
-        expect(callback).toBeDefined();
       });
     });
   });
@@ -378,12 +329,13 @@ describe("useDrag hook", () => {
   describe("event guards", () => {
     it("should ignore non-primary pointer events", () => {
       const callback = vi.fn();
-      renderHook(() => useDrag(callback));
+      renderHook(() => useTap(callback));
 
       dispatchPointerEvent("pointerdown", 0, 0, globalThis, {
         isPrimary: false,
       });
-      dispatchPointerEvent("pointermove", 100, 0, globalThis, {
+      vi.advanceTimersByTime(50);
+      dispatchPointerEvent("pointerup", 0, 0, globalThis, {
         isPrimary: false,
       });
 
@@ -394,12 +346,13 @@ describe("useDrag hook", () => {
   describe("lifecycle", () => {
     it("should cleanup listeners on unmount", () => {
       const callback = vi.fn();
-      const { unmount } = renderHook(() => useDrag(callback));
+      const { unmount } = renderHook(() => useTap(callback));
 
       unmount();
 
       dispatchPointerEvent("pointerdown", 0, 0);
-      dispatchPointerEvent("pointermove", 100, 0);
+      vi.advanceTimersByTime(50);
+      dispatchPointerEvent("pointerup", 0, 0);
 
       expect(callback).not.toHaveBeenCalled();
     });
