@@ -1,3 +1,10 @@
+# [1.29.0](https://github.com/msobiecki/react-marauders-path/compare/v1.28.0...v1.29.0) (2026-03-01)
+
+
+### Features
+
+* implement useGesture hook ([5b5c902](https://github.com/msobiecki/react-marauders-path/commit/5b5c902d95ff1e09b3bbb2475834da495e626e00))
+
 # [1.28.0](https://github.com/msobiecki/react-marauders-path/compare/v1.27.0...v1.28.0) (2026-03-01)
 
 
