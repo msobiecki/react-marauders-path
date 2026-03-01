@@ -1,3 +1,12 @@
+# [1.30.0](https://github.com/msobiecki/react-marauders-path/compare/v1.29.0...v1.30.0) (2026-03-01)
+
+
+### Features
+
+* implement useMouse hook ([ffa942c](https://github.com/msobiecki/react-marauders-path/commit/ffa942ccfeadadc4f886d70a1da2f57c155608ac))
+* implement useMouse hook ([969d77a](https://github.com/msobiecki/react-marauders-path/commit/969d77a97c1ecf473c221d157d9830f67a0fcf61))
+* implement usePointer hook ([1072095](https://github.com/msobiecki/react-marauders-path/commit/10720955c9bcb3740b85a62757acc41e6c29ecb2))
+
 # [1.29.0](https://github.com/msobiecki/react-marauders-path/compare/v1.28.0...v1.29.0) (2026-03-01)
 
 
