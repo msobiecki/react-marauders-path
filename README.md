@@ -590,17 +590,6 @@ npm run lint
 
 ## Project Status
 
-### High-level Gesture Hook
-
-- ✅ **`useGesture`** – high-level API for gesture handling
-  Supported gestures:
-  - `tap` – single tap / click
-  - `doubletap` – quick double tap
-  - `press` – press and hold
-  - `swipe` – directional swipe
-  - `drag` – track movement of finger or mouse
-  - `pinch` – two-finger pinch / zoom
-
 ### Pointer / Mouse Hooks (Unified)
 
 - 🚧 **`usePointer`** – unified hook for MouseEvent, PointerEvent, and TouchEvent  
