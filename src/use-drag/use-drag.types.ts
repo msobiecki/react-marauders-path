@@ -34,7 +34,7 @@ export interface DragOptions {
   eventOnce: boolean;
   eventStopImmediatePropagation: boolean;
   threshold: number;
-  container: { current: HTMLElement | null };
+  container: { current: EventTarget | null };
   raf: boolean;
 }
 

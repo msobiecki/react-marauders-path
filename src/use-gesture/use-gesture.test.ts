@@ -57,7 +57,7 @@ describe("useGesture hook", () => {
     vi.clearAllMocks();
   });
 
-  it("delegates tap gesture to useTap", () => {
+  it("should delegate tap gesture to useTap", () => {
     const callback = vi.fn();
     const options = { threshold: 10 };
 
@@ -73,7 +73,7 @@ describe("useGesture hook", () => {
     expect(usePinchMock).not.toHaveBeenCalled();
   });
 
-  it("delegates doubletap gesture to useDoubleTap", () => {
+  it("should delegate doubletap gesture to useDoubleTap", () => {
     const callback = vi.fn();
     const options = { delay: 250 };
 
@@ -89,7 +89,7 @@ describe("useGesture hook", () => {
     expect(usePinchMock).not.toHaveBeenCalled();
   });
 
-  it("delegates press gesture to usePress", () => {
+  it("should delegate press gesture to usePress", () => {
     const callback = vi.fn();
     const options = { delay: 400, threshold: 16 };
 
@@ -105,7 +105,7 @@ describe("useGesture hook", () => {
     expect(usePinchMock).not.toHaveBeenCalled();
   });
 
-  it("delegates swipe gesture to useSwipe and uses default direction when missing", () => {
+  it("should delegate swipe gesture to useSwipe and use default direction when missing", () => {
     const callback = vi.fn();
     const options = { threshold: 123 };
 
@@ -115,7 +115,7 @@ describe("useGesture hook", () => {
     expect(useSwipeMock).toHaveBeenCalledWith("both", callback, options);
   });
 
-  it("delegates swipe gesture to useSwipe with explicit direction and strips it from swipe options", () => {
+  it("should delegate swipe gesture to useSwipe with explicit direction and strip it from swipe options", () => {
     const callback = vi.fn();
     const options = {
       direction: "left",
@@ -132,7 +132,7 @@ describe("useGesture hook", () => {
     });
   });
 
-  it("delegates drag gesture to useDrag", () => {
+  it("should delegate drag gesture to useDrag", () => {
     const callback = vi.fn();
     const options = { threshold: 5, raf: true };
 
@@ -148,7 +148,7 @@ describe("useGesture hook", () => {
     expect(usePinchMock).not.toHaveBeenCalled();
   });
 
-  it("delegates pinch gesture to usePinch", () => {
+  it("should delegate pinch gesture to usePinch", () => {
     const callback = vi.fn();
     const options = { threshold: 0.1, raf: true };
 
@@ -164,7 +164,7 @@ describe("useGesture hook", () => {
     expect(useDragMock).not.toHaveBeenCalled();
   });
 
-  it("throws when gesture changes between renders", () => {
+  it("should throw when gesture changes between renders", () => {
     const callback = vi.fn();
 
     const { rerender } = renderHook(

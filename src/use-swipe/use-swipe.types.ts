@@ -34,7 +34,7 @@ export interface SwipeOptions {
   eventStopImmediatePropagation: boolean;
   threshold: number;
   velocity: number;
-  container: { current: HTMLElement | null };
+  container: { current: EventTarget | null };
 }
 
 export interface SwipeData {

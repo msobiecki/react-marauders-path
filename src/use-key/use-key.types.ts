@@ -1,5 +1,3 @@
-import { RefObject } from "react";
-
 export type Key = string;
 
 export type KeyEvent = Key | Key[];
@@ -19,7 +17,7 @@ export interface KeyOptions {
   eventStopImmediatePropagation: boolean;
   sequenceThreshold: number;
   combinationThreshold: number;
-  container: RefObject<HTMLElement | null>;
+  container: { current: EventTarget | null };
 }
 
 export interface CombinationActiveKey {

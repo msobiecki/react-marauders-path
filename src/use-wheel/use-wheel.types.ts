@@ -3,7 +3,7 @@ export interface WheelOptions {
   eventCapture: boolean;
   eventOnce: boolean;
   eventStopImmediatePropagation: boolean;
-  container: { current: HTMLElement | null };
+  container: { current: EventTarget | null };
   raf: boolean;
 }
 
