@@ -109,8 +109,8 @@ function MyComponent() {
 import { useMouse, MouseEventTypes, MouseButtons } from '@msobiecki/react-marauders-path';
 
 function MyComponent() {
-  useMouse((event, type, data) => {
-    console.log(`Mouse ${type} at X: ${data.x}, Y: ${data.y}, button: ${data.button}`);
+  useMouse((event, type, button, data) => {
+    console.log(`Mouse ${type} button ${button} at X: ${data.x}, Y: ${data.y}`);
   }, {
     eventType: [MouseEventTypes.Move, MouseEventTypes.Click, MouseEventTypes.DoubleClick],
     eventButtons: [MouseButtons.Left],
@@ -274,8 +274,8 @@ Hook for handling pointer events with configurable event types, pointer types, a
 
 ```typescript
 interface UsePointerOptions {
-  eventType?: PointerEventType[]; // Default: ["pointermove", "pointerenter", "pointerleave", "pointerup", "pointerdown", "pointerover", "pointerout", "pointercancel"]
-  eventPointerTypes?: Array<"touch" | "mouse" | "pen">; // Default: ["touch", "mouse", "pen"]
+  eventType?: PointerEventType[]; // Default: ["pointermove", "pointerup", "pointerdown"]
+  eventPointerTypes?: PointerEventPointerType[]; // Default: ["touch", "mouse", "pen"]
   eventCapture?: boolean; // Default: false
   eventOnce?: boolean; // Default: false
   eventStopImmediatePropagation?: boolean; // Default: false
@@ -298,7 +298,7 @@ Hook for handling mouse-like events through pointer events with button filtering
 
 **Parameters:**
 
-- `callback: (event: MouseEvent, type: MouseEventType, data: MouseData) => void | boolean` - Called when a mouse event occurs
+- `callback: (event: MouseEvent, type: MouseEventType, button: MouseButton, data: MouseData) => void | boolean` - Called when a mouse event occurs
 - `options?: UseMouseOptions` - Optional configuration
 
 **Options:**
@@ -306,7 +306,7 @@ Hook for handling mouse-like events through pointer events with button filtering
 ```typescript
 interface UseMouseOptions {
   eventType?: MouseEventType[]; // Default: ["mousemove", "mousedown", "mouseup", "click", "dblclick"]
-  eventButtons?: Array<0 | 1 | 2 | 3 | 4>; // Default: [0, 1, 2]
+  eventButtons?: MouseButton[]; // Default: [0, 1, 2]
   eventCapture?: boolean; // Default: false
   eventOnce?: boolean; // Default: false
   eventStopImmediatePropagation?: boolean; // Default: false
@@ -399,7 +399,7 @@ Hook for handling single tap/click interactions.
 
 ```typescript
 interface UseTapOptions {
-  eventPointerTypes?: Array<"touch" | "mouse" | "pen">; // Default: ["touch", "mouse", "pen"]
+  eventPointerTypes?: TapEventPointerType[]; // Default: ["touch", "mouse", "pen"]
   eventCapture?: boolean; // Default: false
   eventOnce?: boolean; // Default: false
   eventStopImmediatePropagation?: boolean; // Default: false
@@ -431,7 +431,7 @@ Hook for handling double-tap / double-click interactions.
 
 ```typescript
 interface UseDoubleTapOptions {
-  eventPointerTypes?: Array<"touch" | "mouse" | "pen">; // Default: ["touch", "mouse", "pen"]
+  eventPointerTypes?: DoubleTapEventPointerType[]; // Default: ["touch", "mouse", "pen"]
   eventCapture?: boolean; // Default: false
   eventOnce?: boolean; // Default: false
   eventStopImmediatePropagation?: boolean; // Default: false
@@ -463,7 +463,7 @@ Hook for handling press-and-hold interactions.
 
 ```typescript
 interface UsePressOptions {
-  eventPointerTypes?: Array<"touch" | "mouse" | "pen">; // Default: ["touch", "mouse", "pen"]
+  eventPointerTypes?: PressEventPointerType[]; // Default: ["touch", "mouse", "pen"]
   eventCapture?: boolean; // Default: false
   eventOnce?: boolean; // Default: false
   eventStopImmediatePropagation?: boolean; // Default: false
@@ -496,7 +496,7 @@ Hook for handling touch swipe gestures with configurable distance and velocity t
 
 ```typescript
 interface UseSwipeOptions {
-  eventPointerTypes?: Array<"touch" | "mouse" | "pen">; // Default: ["touch", "mouse", "pen"]
+  eventPointerTypes?: SwipeEventPointerType[]; // Default: ["touch", "mouse", "pen"]
   eventCapture?: boolean; // Default: false
   eventOnce?: boolean; // Default: false
   eventStopImmediatePropagation?: boolean; // Default: false
@@ -530,7 +530,7 @@ Hook for handling pointer drag gestures with configurable threshold and pointer 
 
 ```typescript
 interface UseDragOptions {
-  eventPointerTypes?: Array<"touch" | "mouse" | "pen">; // Default: ["touch", "mouse", "pen"]
+  eventPointerTypes?: DragEventPointerType[]; // Default: ["touch", "mouse", "pen"]
   eventCapture?: boolean; // Default: false
   eventOnce?: boolean; // Default: false
   eventStopImmediatePropagation?: boolean; // Default: false
@@ -569,7 +569,7 @@ Hook for handling two-pointer pinch gestures with distance and scale tracking.
 
 ```typescript
 interface UsePinchOptions {
-  eventPointerTypes?: Array<"touch" | "mouse" | "pen">; // Default: ["touch"]
+  eventPointerTypes?: PinchEventPointerType[]; // Default: ["touch"]
   eventCapture?: boolean; // Default: false
   eventOnce?: boolean; // Default: false
   eventStopImmediatePropagation?: boolean; // Default: false

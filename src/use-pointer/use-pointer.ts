@@ -14,13 +14,8 @@ import { shouldHandleEvent } from "./event-guards";
 const defaultOptions: PointerOptions = {
   eventType: [
     PointerEventTypes.Move,
-    PointerEventTypes.Enter,
-    PointerEventTypes.Leave,
-    PointerEventTypes.Up,
     PointerEventTypes.Down,
-    PointerEventTypes.Over,
-    PointerEventTypes.Out,
-    PointerEventTypes.Cancel,
+    PointerEventTypes.Up,
   ],
   eventPointerTypes: [
     PointerEventPointerTypes.Touch,
