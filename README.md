@@ -2,13 +2,15 @@
 
 [![License](https://img.shields.io/badge/license-%20%20GNU%20GPLv3%20-green.svg)](https://github.com/msobiecki/react-marauders-path/blob/master/LICENSE)
 
-A lightweight, type-safe React library for handling keyboard, wheel, and gesture events including tap, double-tap, press, swipe, drag, and pinch interactions.
+A lightweight, type-safe React library for handling keyboard, pointer, mouse, wheel, and gesture events including tap, double-tap, press, swipe, drag, and pinch interactions.
 
 ![react-marauders-path](./docs/images/logotype.png)
 
 ## Features
 
 - 🎮 **Keyboard Event Handling** - Detect single keys, key combinations, and sequences with configurable timing thresholds
+- 🖱️ **Pointer Event Handling** - Listen to pointer movement and lifecycle events with pointer type filtering
+- 🖱️ **Mouse Event Handling** - Listen to mouse interactions through a pointer-powered mouse API with button filtering
 - 👐 **Gesture Event Handling** - Detect tap, double-tap, press, swipe, drag, and pinch gestures
   - 👆 **Tap Gesture Handling** - Detect single taps or clicks with configurable movement and duration thresholds
   - 👆👆 **Double-Tap Gesture Handling** - Detect consecutive taps or clicks with configurable timing and position thresholds
@@ -83,6 +85,39 @@ useKey(
     console.log(`Pressed ${key}`);
   },
 );
+```
+
+### Pointer Event Hook
+
+```typescript
+import { usePointer, PointerEventTypes } from '@msobiecki/react-marauders-path';
+
+function MyComponent() {
+  usePointer((event, type, data) => {
+    console.log(`Pointer ${type} at X: ${data.x}, Y: ${data.y}`);
+  }, {
+    eventType: [PointerEventTypes.Down, PointerEventTypes.Move, PointerEventTypes.Up],
+  });
+
+  return <div>Use pointer input</div>;
+}
+```
+
+### Mouse Event Hook
+
+```typescript
+import { useMouse, MouseEventTypes, MouseButtons } from '@msobiecki/react-marauders-path';
+
+function MyComponent() {
+  useMouse((event, type, data) => {
+    console.log(`Mouse ${type} at X: ${data.x}, Y: ${data.y}, button: ${data.button}`);
+  }, {
+    eventType: [MouseEventTypes.Move, MouseEventTypes.Click, MouseEventTypes.DoubleClick],
+    eventButtons: [MouseButtons.Left],
+  });
+
+  return <div>Use mouse input</div>;
+}
 ```
 
 ### Gesture Event Hook
@@ -223,6 +258,69 @@ interface UseKeyOptions {
   sequenceThreshold?: number; // Default: 1000 (ms) - Timeout between sequence keys
   combinationThreshold?: number; // Default: 200 (ms) - Timeout between combination keys
   container?: RefObject<HTMLElement>; // Default: window
+}
+```
+
+### `usePointer(callback, options?)`
+
+Hook for handling pointer events with configurable event types, pointer types, and listener options.
+
+**Parameters:**
+
+- `callback: (event: PointerEvent, type: PointerEventType, data: PointerData) => void | boolean` - Called when a pointer event occurs
+- `options?: UsePointerOptions` - Optional configuration
+
+**Options:**
+
+```typescript
+interface UsePointerOptions {
+  eventType?: PointerEventType[]; // Default: ["pointermove", "pointerenter", "pointerleave", "pointerup", "pointerdown", "pointerover", "pointerout", "pointercancel"]
+  eventPointerTypes?: Array<"touch" | "mouse" | "pen">; // Default: ["touch", "mouse", "pen"]
+  eventCapture?: boolean; // Default: false
+  eventOnce?: boolean; // Default: false
+  eventStopImmediatePropagation?: boolean; // Default: false
+  container?: RefObject<HTMLElement>; // Default: window
+}
+```
+
+**Pointer Data:**
+
+```typescript
+interface PointerData {
+  x: number; // Pointer X position
+  y: number; // Pointer Y position
+}
+```
+
+### `useMouse(callback, options?)`
+
+Hook for handling mouse-like events through pointer events with button filtering and synthesized click/double-click support.
+
+**Parameters:**
+
+- `callback: (event: MouseEvent, type: MouseEventType, data: MouseData) => void | boolean` - Called when a mouse event occurs
+- `options?: UseMouseOptions` - Optional configuration
+
+**Options:**
+
+```typescript
+interface UseMouseOptions {
+  eventType?: MouseEventType[]; // Default: ["mousemove", "mousedown", "mouseup", "click", "dblclick"]
+  eventButtons?: Array<0 | 1 | 2 | 3 | 4>; // Default: [0, 1, 2]
+  eventCapture?: boolean; // Default: false
+  eventOnce?: boolean; // Default: false
+  eventStopImmediatePropagation?: boolean; // Default: false
+  container?: RefObject<HTMLElement>; // Default: window
+}
+```
+
+**Mouse Data:**
+
+```typescript
+interface MouseData {
+  x: number; // Mouse X position
+  y: number; // Mouse Y position
+  button: 0 | 1 | 2 | 3 | 4; // Active mouse button
 }
 ```
 
@@ -587,21 +685,6 @@ npm run dev
 ```bash
 npm run lint
 ```
-
-## Project Status
-
-### Pointer / Mouse Hooks (Unified)
-
-- 🚧 **`usePointer`** – unified hook for MouseEvent, PointerEvent, and TouchEvent  
-  Supported events:
-  - `pointerdown`, `pointermove`, `pointerup`, `pointerenter`, `pointerleave`, `pointercancel`  
-    Filter by pointer type: `mouse` | `touch` | `pen`  
-    Callback returns unified data e.g.: `x`, `y`, `button`, `type`, `isPrimary`
-
-- 🚧 **`useMouse`** – alias for `usePointer` filtered to mouse only  
-  Supported events:
-  - `mousemove`, `mousedown`, `mouseup`, `click`, `dblclick`  
-    Buttons: `left`, `right`, `middle`
 
 ## License
 

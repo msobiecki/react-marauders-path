@@ -36,19 +36,20 @@ export interface MouseOptions {
 export interface MouseData {
   x: number;
   y: number;
-  button: MouseButton;
 }
 
 export type UseMouseCallback =
   | ((
       event: MouseEvent,
       type: MouseEventType,
+      button: MouseButton,
       data: MouseData,
       ...properties: unknown[]
     ) => void)
   | ((
       event: MouseEvent,
       type: MouseEventType,
+      button: MouseButton,
       data: MouseData,
       ...properties: unknown[]
     ) => boolean);

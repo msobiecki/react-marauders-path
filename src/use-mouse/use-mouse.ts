@@ -111,18 +111,18 @@ const useMouse = (
     (event: PointerEvent, type: PointerEventType, data: PointerData) => {
       let shouldPrevent = false;
 
+      const button = event.button as MouseButton;
+
       const isMoveEvent = type === PointerEventTypes.Move;
-      const isAllowedButton = eventButtons.includes(
-        event.button as MouseButton,
-      );
+      const isAllowedButton = eventButtons.includes(button);
 
       if (!isMoveEvent && !isAllowedButton) {
         return false;
       }
 
       const mouseData: MouseData = {
-        ...data,
-        button: event.button as MouseButton,
+        x: data.x,
+        y: data.y,
       };
 
       if (
@@ -130,8 +130,8 @@ const useMouse = (
         eventType.includes(MouseEventTypes.Move)
       ) {
         shouldPrevent =
-          mouseCallback(event, MouseEventTypes.Move, mouseData) === true ||
-          shouldPrevent;
+          mouseCallback(event, MouseEventTypes.Move, button, mouseData) ===
+            true || shouldPrevent;
       }
 
       if (
@@ -139,21 +139,21 @@ const useMouse = (
         eventType.includes(MouseEventTypes.Down)
       ) {
         shouldPrevent =
-          mouseCallback(event, MouseEventTypes.Down, mouseData) === true ||
-          shouldPrevent;
+          mouseCallback(event, MouseEventTypes.Down, button, mouseData) ===
+            true || shouldPrevent;
       }
 
       if (type === PointerEventTypes.Up) {
         if (eventType.includes(MouseEventTypes.Up)) {
           shouldPrevent =
-            mouseCallback(event, MouseEventTypes.Up, mouseData) === true ||
-            shouldPrevent;
+            mouseCallback(event, MouseEventTypes.Up, button, mouseData) ===
+              true || shouldPrevent;
         }
 
         if (eventType.includes(MouseEventTypes.Click)) {
           shouldPrevent =
-            mouseCallback(event, MouseEventTypes.Click, mouseData) === true ||
-            shouldPrevent;
+            mouseCallback(event, MouseEventTypes.Click, button, mouseData) ===
+              true || shouldPrevent;
         }
 
         if (eventType.includes(MouseEventTypes.DoubleClick)) {
@@ -172,8 +172,12 @@ const useMouse = (
               event.button === lastClick.button
             ) {
               shouldPrevent =
-                mouseCallback(event, MouseEventTypes.DoubleClick, mouseData) ===
-                  true || shouldPrevent;
+                mouseCallback(
+                  event,
+                  MouseEventTypes.DoubleClick,
+                  button,
+                  mouseData,
+                ) === true || shouldPrevent;
 
               lastClickReference.current = null;
             } else {

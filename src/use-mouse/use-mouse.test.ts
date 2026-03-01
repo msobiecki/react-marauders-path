@@ -55,7 +55,8 @@ describe("useMouse hook", () => {
       expect(callback).toHaveBeenCalledWith(
         expect.any(PointerEvent),
         MouseEventTypes.Down,
-        expect.objectContaining({ x: 14, y: 23, button: MouseButtons.Left }),
+        MouseButtons.Left,
+        expect.objectContaining({ x: 14, y: 23 }),
       );
     });
 
@@ -77,18 +78,21 @@ describe("useMouse hook", () => {
         1,
         expect.any(PointerEvent),
         MouseEventTypes.Click,
+        MouseButtons.Left,
         expect.any(Object),
       );
       expect(callback).toHaveBeenNthCalledWith(
         2,
         expect.any(PointerEvent),
         MouseEventTypes.Click,
+        MouseButtons.Left,
         expect.any(Object),
       );
       expect(callback).toHaveBeenNthCalledWith(
         3,
         expect.any(PointerEvent),
         MouseEventTypes.DoubleClick,
+        MouseButtons.Left,
         expect.any(Object),
       );
     });
@@ -112,6 +116,7 @@ describe("useMouse hook", () => {
         expect(callback).toHaveBeenCalledWith(
           expect.any(PointerEvent),
           MouseEventTypes.Down,
+          MouseButtons.Left,
           expect.any(Object),
         );
       });
