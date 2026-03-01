@@ -8,9 +8,10 @@ A lightweight, type-safe React library for handling keyboard, pointer, mouse, wh
 
 ## Features
 
-- 🎮 **Keyboard Event Handling** - Detect single keys, key combinations, and sequences with configurable timing thresholds
-- 🖱️ **Pointer Event Handling** - Listen to pointer movement and lifecycle events with pointer type filtering
-- 🖱️ **Mouse Event Handling** - Listen to mouse interactions through a pointer-powered mouse API with button filtering
+- 🎹 **Keyboard Event Handling** - Detect single keys, key combinations, and sequences with configurable timing thresholds
+- 🖱️ **Pointer Event Handling** - Detect pointer interactions events with pointer type filtering
+- 🖱️ **Mouse Event Handling** - Detect mouse interactions through a pointer-powered mouse events with button filtering
+- 🖱️ **Mouse Wheel Event Handling** - Detect mouse wheel delta values with optional `requestAnimationFrame` batching for smoother updates
 - 👐 **Gesture Event Handling** - Detect tap, double-tap, press, swipe, drag, and pinch gestures
   - 👆 **Tap Gesture Handling** - Detect single taps or clicks with configurable movement and duration thresholds
   - 👆👆 **Double-Tap Gesture Handling** - Detect consecutive taps or clicks with configurable timing and position thresholds
@@ -18,7 +19,6 @@ A lightweight, type-safe React library for handling keyboard, pointer, mouse, wh
   - 🖐️ **Swipe Gesture Handling** - Detect directional swipes with configurable distance, velocity, and pointer type filtering
   - ✊ **Drag Gesture Handling** - Detect movement, deltas, duration, and start/end positions with pointer type filtering and optional `requestAnimationFrame` batching
   - 🤏 **Pinch Gesture Handling** - Detect two-finger distance, delta, and scale with pointer type filtering and optional `requestAnimationFrame` batching
-- 🎡 **Wheel Event Handling** - Detect wheel delta values with optional `requestAnimationFrame` batching for smoother updates
 
 ## Installation
 
@@ -117,6 +117,20 @@ function MyComponent() {
   });
 
   return <div>Use mouse input</div>;
+}
+```
+
+### Mouse Wheel Event Hook
+
+```typescript
+import { useWheel } from '@msobiecki/react-marauders-path';
+
+function MyComponent() {
+  useWheel((event, data) => {
+    console.log(`Scrolled - X: ${data.deltaX}, Y: ${data.deltaY}`);
+  });
+
+  return <div>Scroll to interact</div>;
 }
 ```
 
@@ -220,20 +234,6 @@ function MyComponent() {
 }
 ```
 
-### Wheel Event Hook
-
-```typescript
-import { useWheel } from '@msobiecki/react-marauders-path';
-
-function MyComponent() {
-  useWheel((event, data) => {
-    console.log(`Scrolled - X: ${data.deltaX}, Y: ${data.deltaY}`);
-  });
-
-  return <div>Scroll to interact</div>;
-}
-```
-
 ## API
 
 ### `useKey(keyEvent, callback, options?)`
@@ -321,6 +321,39 @@ interface MouseData {
   x: number; // Mouse X position
   y: number; // Mouse Y position
   button: 0 | 1 | 2 | 3 | 4; // Active mouse button
+}
+```
+
+### `useWheel(callback, options?)`
+
+Hook for handling mouse wheel events with support for different delta modes and options.
+
+**Parameters:**
+
+- `callback: (event: WheelEvent, data: WheelData) => void | boolean` - Called when a wheel event occurs
+- `options?: UseWheelOptions` - Optional configuration
+
+**Options:**
+
+```typescript
+interface UseWheelOptions {
+  eventPassive?: boolean; // Default: true
+  eventCapture?: boolean; // Default: false
+  eventOnce?: boolean; // Default: false
+  eventStopImmediatePropagation?: boolean; // Default: false
+  container?: RefObject<HTMLElement>; // Default: window
+  raf?: boolean; // Default: false - Use requestAnimationFrame for batching
+}
+```
+
+**Wheel Data:**
+
+```typescript
+interface WheelData {
+  deltaX: number; // Delta X value
+  deltaY: number; // Delta Y value
+  deltaZ: number; // Delta Z value
+  deltaMode: number; // Delta mode value
 }
 ```
 
@@ -554,39 +587,6 @@ interface PinchData {
   delta: number; // Distance change since previous pinch update
   totalDelta: number; // Distance change since pinch start
   scale: number; // Current scale ratio (distance / startDistance)
-}
-```
-
-### `useWheel(callback, options?)`
-
-Hook for handling mouse wheel events with support for different delta modes and options.
-
-**Parameters:**
-
-- `callback: (event: WheelEvent, data: WheelData) => void | boolean` - Called when a wheel event occurs
-- `options?: UseWheelOptions` - Optional configuration
-
-**Options:**
-
-```typescript
-interface UseWheelOptions {
-  eventPassive?: boolean; // Default: true
-  eventCapture?: boolean; // Default: false
-  eventOnce?: boolean; // Default: false
-  eventStopImmediatePropagation?: boolean; // Default: false
-  container?: RefObject<HTMLElement>; // Default: window
-  raf?: boolean; // Default: false - Use requestAnimationFrame for batching
-}
-```
-
-**Wheel Data:**
-
-```typescript
-interface WheelData {
-  deltaX: number; // Delta X value
-  deltaY: number; // Delta Y value
-  deltaZ: number; // Delta Z value
-  deltaMode: number; // Delta mode value
 }
 ```
 
