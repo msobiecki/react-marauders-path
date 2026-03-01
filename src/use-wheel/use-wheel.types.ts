@@ -15,11 +15,7 @@ export interface WheelData {
 }
 
 export type UseWheelCallback =
-  | ((event: WheelEvent, delta: WheelData, ...properties: unknown[]) => void)
-  | ((
-      event: WheelEvent,
-      delta: WheelData,
-      ...properties: unknown[]
-    ) => boolean);
+  | ((event: WheelEvent, data: WheelData, ...properties: unknown[]) => void)
+  | ((event: WheelEvent, data: WheelData, ...properties: unknown[]) => boolean);
 
 export type UseWheelOptions = Partial<WheelOptions>;

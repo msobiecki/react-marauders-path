@@ -2,15 +2,20 @@ import { useCallback, useEffect, useRef } from "react";
 import {
   DragState,
   DragData,
+  DragOptions,
+  DragEventPointerTypes,
   UseDragCallback,
   UseDragOptions,
-  DragOptions,
-  DragEventPointerType,
 } from "./use-drag.types";
 import { invokeDragAction } from "./invoke-drag-action";
+import { shouldHandleEvent } from "./event-guards";
 
 const defaultOptions: DragOptions = {
-  eventPointerTypes: ["touch", "mouse", "pen"],
+  eventPointerTypes: [
+    DragEventPointerTypes.Touch,
+    DragEventPointerTypes.Mouse,
+    DragEventPointerTypes.Pen,
+  ],
   eventCapture: false,
   eventOnce: false,
   eventStopImmediatePropagation: false,
@@ -73,12 +78,10 @@ const useDrag = (
 
   const handlePointerDown = useCallback(
     (event: PointerEvent) => {
-      if (!event.isPrimary) {
-        return;
-      }
-
       if (
-        !eventPointerTypes.includes(event.pointerType as DragEventPointerType)
+        !shouldHandleEvent(event, {
+          eventPointerTypes,
+        })
       ) {
         return;
       }
@@ -97,17 +100,16 @@ const useDrag = (
 
   const handlePointerMove = useCallback(
     (event: PointerEvent) => {
-      const state = dragStateReference.current;
-      if (!state.active) {
-        return;
-      }
-      if (!event.isPrimary) {
+      if (
+        !shouldHandleEvent(event, {
+          eventPointerTypes,
+        })
+      ) {
         return;
       }
 
-      if (
-        !eventPointerTypes.includes(event.pointerType as DragEventPointerType)
-      ) {
+      const state = dragStateReference.current;
+      if (!state.active) {
         return;
       }
 
@@ -160,23 +162,21 @@ const useDrag = (
     },
     [
       eventPointerTypes,
+      eventStopImmediatePropagation,
+      eventOnce,
       threshold,
       raf,
       dragCallback,
-      eventStopImmediatePropagation,
-      eventOnce,
       flushFrame,
     ],
   );
 
   const handlePointerUp = useCallback(
     (event: PointerEvent) => {
-      if (!event.isPrimary) {
-        return;
-      }
-
       if (
-        !eventPointerTypes.includes(event.pointerType as DragEventPointerType)
+        !shouldHandleEvent(event, {
+          eventPointerTypes,
+        })
       ) {
         return;
       }
@@ -186,9 +186,20 @@ const useDrag = (
     [eventPointerTypes],
   );
 
-  const handlePointerCancel = useCallback(() => {
-    dragStateReference.current.active = false;
-  }, []);
+  const handlePointerCancel = useCallback(
+    (event: PointerEvent) => {
+      if (
+        !shouldHandleEvent(event, {
+          eventPointerTypes,
+        })
+      ) {
+        return;
+      }
+
+      dragStateReference.current.active = false;
+    },
+    [eventPointerTypes],
+  );
 
   useEffect(() => {
     targetReference.current = container?.current ?? globalThis;
@@ -204,7 +215,8 @@ const useDrag = (
     const pointerUpListener = (event: Event) =>
       event instanceof PointerEvent && handlePointerUp(event);
 
-    const pointerCancelListener = () => handlePointerCancel();
+    const pointerCancelListener = (event: Event) =>
+      event instanceof PointerEvent && handlePointerCancel(event);
 
     targetReference.current.addEventListener(
       "pointerdown",

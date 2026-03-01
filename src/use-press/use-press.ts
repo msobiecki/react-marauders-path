@@ -1,15 +1,20 @@
 import { useCallback, useEffect, useRef } from "react";
 import {
   PressOptions,
+  PressData,
+  PressEventPointerTypes,
   UsePressCallback,
   UsePressOptions,
-  PressEventPointerType,
-  PressData,
 } from "./use-press.types";
 import { invokePressAction } from "./invoke-press-action";
+import { shouldHandleEvent } from "./event-guards";
 
 const defaultOptions: PressOptions = {
-  eventPointerTypes: ["touch", "mouse", "pen"],
+  eventPointerTypes: [
+    PressEventPointerTypes.Touch,
+    PressEventPointerTypes.Mouse,
+    PressEventPointerTypes.Pen,
+  ],
   eventCapture: false,
   eventOnce: false,
   eventStopImmediatePropagation: false,
@@ -57,11 +62,10 @@ const usePress = (
 
   const handlePointerDown = useCallback(
     (event: PointerEvent) => {
-      if (!event.isPrimary) {
-        return;
-      }
       if (
-        !eventPointerTypes.includes(event.pointerType as PressEventPointerType)
+        !shouldHandleEvent(event, {
+          eventPointerTypes,
+        })
       ) {
         return;
       }
@@ -89,17 +93,25 @@ const usePress = (
       }, delay);
     },
     [
-      pressCallback,
-      delay,
       eventPointerTypes,
       eventOnce,
       eventStopImmediatePropagation,
+      delay,
+      pressCallback,
       clearPress,
     ],
   );
 
   const handlePointerMove = useCallback(
     (event: PointerEvent) => {
+      if (
+        !shouldHandleEvent(event, {
+          eventPointerTypes,
+        })
+      ) {
+        return;
+      }
+
       const state = pressStateReference.current;
       if (!state.active) {
         return;
@@ -112,11 +124,39 @@ const usePress = (
         clearPress();
       }
     },
-    [threshold, clearPress],
+    [eventPointerTypes, threshold, clearPress],
   );
 
-  const handlePointerUp = useCallback(() => clearPress(), [clearPress]);
-  const handlePointerCancel = useCallback(() => clearPress(), [clearPress]);
+  const handlePointerUp = useCallback(
+    (event: PointerEvent) => {
+      if (
+        !shouldHandleEvent(event, {
+          eventPointerTypes,
+        })
+      ) {
+        return;
+      }
+
+      clearPress();
+    },
+
+    [eventPointerTypes, clearPress],
+  );
+
+  const handlePointerCancel = useCallback(
+    (event: PointerEvent) => {
+      if (
+        !shouldHandleEvent(event, {
+          eventPointerTypes,
+        })
+      ) {
+        return;
+      }
+
+      clearPress();
+    },
+    [eventPointerTypes, clearPress],
+  );
 
   useEffect(() => {
     targetReference.current = container?.current ?? globalThis;
@@ -130,10 +170,10 @@ const usePress = (
       event instanceof PointerEvent && handlePointerMove(event);
 
     const pointerUpListener = (event: Event) =>
-      event instanceof PointerEvent && handlePointerUp();
+      event instanceof PointerEvent && handlePointerUp(event);
 
     const pointerCancelListener = (event: Event) =>
-      event instanceof PointerEvent && handlePointerCancel();
+      event instanceof PointerEvent && handlePointerCancel(event);
 
     targetReference.current.addEventListener(
       "pointerdown",

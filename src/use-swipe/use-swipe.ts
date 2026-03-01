@@ -2,19 +2,24 @@ import { useCallback, useEffect, useRef } from "react";
 import {
   SwipeDirection,
   SwipeState,
+  SwipeDirections,
   SwipeData,
+  SwipeOptions,
+  SwipeEventPointerTypes,
   UseSwipeSchema,
   UseSwipeOptions,
   UseSwipeCallback,
-  SwipeOptions,
-  SwipeDirections,
-  SwipeEventPointerType,
 } from "./use-swipe.types";
 import { parseSwipeDirection } from "./parse-swipe-direction";
 import { invokeSwipeAction } from "./invoke-swipe-action";
+import { shouldHandleEvent } from "./event-guards";
 
 const defaultOptions: SwipeOptions = {
-  eventPointerTypes: ["touch", "mouse", "pen"],
+  eventPointerTypes: [
+    SwipeEventPointerTypes.Touch,
+    SwipeEventPointerTypes.Mouse,
+    SwipeEventPointerTypes.Pen,
+  ],
   eventCapture: false,
   eventOnce: false,
   eventStopImmediatePropagation: false,
@@ -90,12 +95,10 @@ const useSwipe = (
 
   const handlePointerDown = useCallback(
     (event: PointerEvent) => {
-      if (!event.isPrimary) {
-        return;
-      }
-
       if (
-        !eventPointerTypes.includes(event.pointerType as SwipeEventPointerType)
+        !shouldHandleEvent(event, {
+          eventPointerTypes,
+        })
       ) {
         return;
       }
@@ -112,6 +115,14 @@ const useSwipe = (
 
   const endSwipe = useCallback(
     (event: PointerEvent) => {
+      if (
+        !shouldHandleEvent(event, {
+          eventPointerTypes,
+        })
+      ) {
+        return;
+      }
+
       const state = swipeStateReference.current;
       if (!state.active) {
         return;
@@ -160,34 +171,46 @@ const useSwipe = (
       });
     },
     [
+      eventPointerTypes,
+      eventOnce,
+      eventStopImmediatePropagation,
       threshold,
       velocity,
       resolveDirection,
       matchesSchema,
       swipeCallback,
-      eventOnce,
-      eventStopImmediatePropagation,
     ],
   );
 
   const handlePointerUp = useCallback(
     (event: PointerEvent) => {
-      if (!event.isPrimary) {
-        return;
-      }
       if (
-        !eventPointerTypes.includes(event.pointerType as SwipeEventPointerType)
+        !shouldHandleEvent(event, {
+          eventPointerTypes,
+        })
       ) {
         return;
       }
+
       endSwipe(event);
     },
-    [endSwipe, eventPointerTypes],
+    [eventPointerTypes, endSwipe],
   );
 
-  const handlePointerCancel = useCallback(() => {
-    swipeStateReference.current.active = false;
-  }, []);
+  const handlePointerCancel = useCallback(
+    (event: PointerEvent) => {
+      if (
+        !shouldHandleEvent(event, {
+          eventPointerTypes,
+        })
+      ) {
+        return;
+      }
+
+      swipeStateReference.current.active = false;
+    },
+    [eventPointerTypes],
+  );
 
   useEffect(() => {
     allowedDirectionsReference.current = parseSwipeDirection(swipe);
@@ -204,7 +227,8 @@ const useSwipe = (
     const pointerUpListener = (event: Event) =>
       event instanceof PointerEvent && handlePointerUp(event);
 
-    const pointerCancelListener = () => handlePointerCancel();
+    const pointerCancelListener = (event: Event) =>
+      event instanceof PointerEvent && handlePointerCancel(event);
 
     targetReference.current.addEventListener(
       "pointerdown",

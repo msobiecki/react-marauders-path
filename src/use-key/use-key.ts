@@ -2,17 +2,17 @@ import { useCallback, useEffect, useRef } from "react";
 
 import {
   KeyOptions,
+  KeyEventTypes,
   SequenceState,
+  CombinationState,
   UseKeySchema,
   UseKeyCallback,
   UseKeyOptions,
-  CombinationState,
-  KeyEventTypes,
 } from "./use-key.types";
 import { parseKeySequences } from "./parse-key-sequences";
 import { advanceSequenceState, resetSequenceState } from "./sequence-state";
 import { invokeKeyAction } from "./invoke-key-action";
-import { shouldHandleKeyboardEvent } from "./event-guards";
+import { shouldHandleEvent } from "./event-guards";
 import { SPECIAL_KEYS } from "./normalize-key";
 
 const defaultOptions: KeyOptions = {
@@ -120,15 +120,6 @@ const useKey = (
       sequenceReference.current,
     );
   }, []);
-
-  const shouldProcessEvent = useCallback(
-    (event: KeyboardEvent) => {
-      return shouldHandleKeyboardEvent(event, {
-        repeat: eventRepeat,
-      });
-    },
-    [eventRepeat],
-  );
 
   const registerKeyDown = useCallback((event: KeyboardEvent) => {
     const normalizedEventKey =
@@ -357,14 +348,18 @@ const useKey = (
 
   const handleEventListener = useCallback(
     (event: KeyboardEvent) => {
-      if (!shouldProcessEvent(event)) {
+      if (
+        !shouldHandleEvent(event, {
+          repeat: eventRepeat,
+        })
+      ) {
         return;
       }
 
       cleanupCombinationKeys();
       evaluateSequences(event);
     },
-    [shouldProcessEvent, cleanupCombinationKeys, evaluateSequences],
+    [cleanupCombinationKeys, evaluateSequences, eventRepeat],
   );
 
   useEffect(() => {

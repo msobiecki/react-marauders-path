@@ -1,9 +1,9 @@
 import { useCallback, useEffect, useRef } from "react";
 import {
-  UseWheelCallback,
-  UseWheelOptions,
   WheelData,
   WheelOptions,
+  UseWheelCallback,
+  UseWheelOptions,
 } from "./use-wheel.types";
 import { invokeWheelAction } from "./invoke-wheel-action";
 
@@ -85,7 +85,7 @@ const useWheel = (
         frameReference.current = requestAnimationFrame(flushFrame);
       }
     },
-    [raf, wheelCallback, eventStopImmediatePropagation, eventOnce, flushFrame],
+    [eventOnce, eventStopImmediatePropagation, raf, wheelCallback, flushFrame],
   );
 
   useEffect(() => {

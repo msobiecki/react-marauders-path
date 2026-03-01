@@ -1,11 +1,11 @@
 import { describe, it, expect } from "vitest";
 
-import { shouldHandleKeyboardEvent } from "./event-guards";
+import { shouldHandleEvent } from "./event-guards";
 
-describe("shouldHandleKeyboardEvent", () => {
+describe("shouldHandleEvent", () => {
   it("should return true when no restrictions are set", () => {
     const event = new KeyboardEvent("keydown", { repeat: false });
-    const result = shouldHandleKeyboardEvent(event, {
+    const result = shouldHandleEvent(event, {
       repeat: true,
     });
     expect(result).toBe(true);
@@ -13,7 +13,7 @@ describe("shouldHandleKeyboardEvent", () => {
 
   it("should return false when 'repeat' is false and event.repeat is true", () => {
     const event = new KeyboardEvent("keydown", { repeat: true });
-    const result = shouldHandleKeyboardEvent(event, {
+    const result = shouldHandleEvent(event, {
       repeat: false,
     });
     expect(result).toBe(false);
@@ -21,7 +21,7 @@ describe("shouldHandleKeyboardEvent", () => {
 
   it("should return true when 'repeat' is false but event.repeat is false", () => {
     const event = new KeyboardEvent("keydown", { repeat: false });
-    const result = shouldHandleKeyboardEvent(event, {
+    const result = shouldHandleEvent(event, {
       repeat: false,
     });
     expect(result).toBe(true);
@@ -29,7 +29,7 @@ describe("shouldHandleKeyboardEvent", () => {
 
   it("should return true when 'repeat' is true and event.repeat is true", () => {
     const event = new KeyboardEvent("keydown", { repeat: true });
-    const result = shouldHandleKeyboardEvent(event, {
+    const result = shouldHandleEvent(event, {
       repeat: true,
     });
     expect(result).toBe(true);

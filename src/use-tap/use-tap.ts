@@ -1,16 +1,21 @@
 import { useCallback, useEffect, useRef } from "react";
 import {
   TapOptions,
-  UseTapCallback,
-  UseTapOptions,
-  TapEventPointerType,
   TapState,
   TapData,
+  TapEventPointerTypes,
+  UseTapOptions,
+  UseTapCallback,
 } from "./use-tap.types";
 import { invokeTapAction } from "./invoke-tap-action";
+import { shouldHandleEvent } from "./event-guards";
 
 const defaultOptions: TapOptions = {
-  eventPointerTypes: ["touch", "mouse", "pen"],
+  eventPointerTypes: [
+    TapEventPointerTypes.Touch,
+    TapEventPointerTypes.Mouse,
+    TapEventPointerTypes.Pen,
+  ],
   eventCapture: false,
   eventOnce: false,
   eventStopImmediatePropagation: false,
@@ -42,12 +47,10 @@ const useTap = (tapCallback: UseTapCallback, options: UseTapOptions = {}) => {
 
   const handlePointerDown = useCallback(
     (event: PointerEvent) => {
-      if (!event.isPrimary) {
-        return;
-      }
-
       if (
-        !eventPointerTypes.includes(event.pointerType as TapEventPointerType)
+        !shouldHandleEvent(event, {
+          eventPointerTypes,
+        })
       ) {
         return;
       }
@@ -64,11 +67,16 @@ const useTap = (tapCallback: UseTapCallback, options: UseTapOptions = {}) => {
 
   const handlePointerUp = useCallback(
     (event: PointerEvent) => {
-      const state = tapStateReference.current;
-      if (!state.active) {
+      if (
+        !shouldHandleEvent(event, {
+          eventPointerTypes,
+        })
+      ) {
         return;
       }
-      if (!event.isPrimary) {
+
+      const state = tapStateReference.current;
+      if (!state.active) {
         return;
       }
 
@@ -101,17 +109,29 @@ const useTap = (tapCallback: UseTapCallback, options: UseTapOptions = {}) => {
       });
     },
     [
-      tapCallback,
-      threshold,
-      maxDuration,
+      eventPointerTypes,
       eventOnce,
       eventStopImmediatePropagation,
+      threshold,
+      maxDuration,
+      tapCallback,
     ],
   );
 
-  const handlePointerCancel = useCallback(() => {
-    tapStateReference.current.active = false;
-  }, []);
+  const handlePointerCancel = useCallback(
+    (event: PointerEvent) => {
+      if (
+        !shouldHandleEvent(event, {
+          eventPointerTypes,
+        })
+      ) {
+        return;
+      }
+
+      tapStateReference.current.active = false;
+    },
+    [eventPointerTypes],
+  );
 
   useEffect(() => {
     targetReference.current = container?.current ?? globalThis;
@@ -125,7 +145,7 @@ const useTap = (tapCallback: UseTapCallback, options: UseTapOptions = {}) => {
       event instanceof PointerEvent && handlePointerUp(event);
 
     const pointerCancelListener = (event: Event) =>
-      event instanceof PointerEvent && handlePointerCancel();
+      event instanceof PointerEvent && handlePointerCancel(event);
 
     targetReference.current.addEventListener(
       "pointerdown",

@@ -2,15 +2,16 @@ import { useCallback, useEffect, useRef } from "react";
 import {
   PinchState,
   PinchData,
+  PinchOptions,
+  PinchEventPointerTypes,
   UsePinchCallback,
   UsePinchOptions,
-  PinchOptions,
-  PinchEventPointerType,
 } from "./use-pinch.types";
 import { invokePinchAction } from "./invoke-pinch-action";
+import { shouldHandleEvent } from "./event-guards";
 
 const defaultOptions: PinchOptions = {
-  eventPointerTypes: ["touch"],
+  eventPointerTypes: [PinchEventPointerTypes.Touch],
   eventCapture: false,
   eventOnce: false,
   eventStopImmediatePropagation: false,
@@ -72,7 +73,9 @@ const usePinch = (
   const handlePointerDown = useCallback(
     (event: PointerEvent) => {
       if (
-        !eventPointerTypes.includes(event.pointerType as PinchEventPointerType)
+        !shouldHandleEvent(event, {
+          eventPointerTypes,
+        })
       ) {
         return;
       }
@@ -99,6 +102,14 @@ const usePinch = (
 
   const handlePointerMove = useCallback(
     (event: PointerEvent) => {
+      if (
+        !shouldHandleEvent(event, {
+          eventPointerTypes,
+        })
+      ) {
+        return;
+      }
+
       const state = pinchStateReference.current;
       if (!state.active) {
         return;
@@ -158,33 +169,56 @@ const usePinch = (
       }
     },
     [
+      eventPointerTypes,
+      eventOnce,
+      eventStopImmediatePropagation,
       threshold,
       raf,
       pinchCallback,
-      eventStopImmediatePropagation,
-      eventOnce,
       flushFrame,
     ],
   );
 
-  const handlePointerUp = useCallback((event: PointerEvent) => {
-    const state = pinchStateReference.current;
+  const handlePointerUp = useCallback(
+    (event: PointerEvent) => {
+      if (
+        !shouldHandleEvent(event, {
+          eventPointerTypes,
+        })
+      ) {
+        return;
+      }
 
-    state.pointers.delete(event.pointerId);
+      const state = pinchStateReference.current;
 
-    if (state.pointers.size < 2) {
+      state.pointers.delete(event.pointerId);
+
+      if (state.pointers.size < 2) {
+        state.active = false;
+        state.startDistance = 0;
+        state.lastDistance = 0;
+      }
+    },
+    [eventPointerTypes],
+  );
+
+  const handlePointerCancel = useCallback(
+    (event: PointerEvent) => {
+      if (
+        !shouldHandleEvent(event, {
+          eventPointerTypes,
+        })
+      ) {
+        return;
+      }
+
+      const state = pinchStateReference.current;
+
+      state.pointers.delete(event.pointerId);
       state.active = false;
-      state.startDistance = 0;
-      state.lastDistance = 0;
-    }
-  }, []);
-
-  const handlePointerCancel = useCallback((event: PointerEvent) => {
-    const state = pinchStateReference.current;
-
-    state.pointers.delete(event.pointerId);
-    state.active = false;
-  }, []);
+    },
+    [eventPointerTypes],
+  );
 
   useEffect(() => {
     targetReference.current = container?.current ?? globalThis;

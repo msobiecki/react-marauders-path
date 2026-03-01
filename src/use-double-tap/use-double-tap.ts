@@ -1,15 +1,20 @@
 import { useCallback, useEffect, useRef } from "react";
 import {
+  DoubleTapData,
   DoubleTapOptions,
+  DoubleTapEventPointerTypes,
   UseDoubleTapCallback,
   UseDoubleTapOptions,
-  DoubleTapEventPointerType,
-  DoubleTapData,
 } from "./use-double-tap.types";
 import { invokeDoubleTapAction } from "./invoke-double-tap-action";
+import { shouldHandleEvent } from "./event-guards";
 
 const defaultOptions: DoubleTapOptions = {
-  eventPointerTypes: ["touch", "mouse", "pen"],
+  eventPointerTypes: [
+    DoubleTapEventPointerTypes.Touch,
+    DoubleTapEventPointerTypes.Mouse,
+    DoubleTapEventPointerTypes.Pen,
+  ],
   eventCapture: false,
   eventOnce: false,
   eventStopImmediatePropagation: false,
@@ -43,13 +48,10 @@ const useDoubleTap = (
 
   const handlePointerUp = useCallback(
     (event: PointerEvent) => {
-      if (!event.isPrimary) {
-        return;
-      }
       if (
-        !eventPointerTypes.includes(
-          event.pointerType as DoubleTapEventPointerType,
-        )
+        !shouldHandleEvent(event, {
+          eventPointerTypes,
+        })
       ) {
         return;
       }
@@ -92,12 +94,12 @@ const useDoubleTap = (
       };
     },
     [
-      doubleTapCallback,
-      delay,
-      threshold,
       eventPointerTypes,
       eventOnce,
       eventStopImmediatePropagation,
+      delay,
+      threshold,
+      doubleTapCallback,
     ],
   );
 

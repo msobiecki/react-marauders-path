@@ -7,11 +7,11 @@
  * @returns {boolean} True if the event should be handled, false otherwise
  *
  * @example
- * const shouldHandle = shouldHandleKeyboardEvent(event, {
+ * const shouldHandle = shouldHandleEvent(event, {
  *   repeat: false
  * });
  */
-export const shouldHandleKeyboardEvent = (
+export const shouldHandleEvent = (
   event: KeyboardEvent,
   options: {
     repeat: boolean;
