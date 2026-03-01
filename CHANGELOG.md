@@ -1,3 +1,10 @@
+# [1.32.0](https://github.com/msobiecki/react-marauders-path/compare/v1.31.0...v1.32.0) (2026-03-01)
+
+
+### Features
+
+* update readme ([82de207](https://github.com/msobiecki/react-marauders-path/commit/82de207faf3156eeaab5007938fbbaf7586ed5b4))
+
 # [1.31.0](https://github.com/msobiecki/react-marauders-path/compare/v1.30.0...v1.31.0) (2026-03-01)
 
 

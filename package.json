@@ -1,6 +1,6 @@
 {
   "name": "@msobiecki/react-marauders-path",
-  "version": "1.31.0",
+  "version": "1.32.0",
   "private": false,
   "description": "A lightweight, type-safe React library for handling keyboard and pointer events in a unified way.",
   "keywords": [
