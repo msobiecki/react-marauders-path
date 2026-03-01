@@ -2,20 +2,21 @@
 
 [![License](https://img.shields.io/badge/license-%20%20GNU%20GPLv3%20-green.svg)](https://github.com/msobiecki/react-marauders-path/blob/master/LICENSE)
 
-A lightweight, type-safe React library for handling keyboard, wheel, tap, double-tap, press, swipe, drag, and pinch events. Perfect for games, interactive applications, and input-driven interfaces.
+A lightweight, type-safe React library for handling keyboard, wheel, and gesture events including tap, double-tap, press, swipe, drag, and pinch interactions.
 
 ![react-marauders-path](./docs/images/logotype.png)
 
 ## Features
 
 - 🎮 **Keyboard Event Handling** - Detect single keys, key combinations, and sequences with configurable timing thresholds
+- 👐 **Gesture Event Handling** - Detect tap, double-tap, press, swipe, drag, and pinch gestures
+  - 👆 **Tap Gesture Handling** - Detect single taps or clicks with configurable movement and duration thresholds
+  - 👆👆 **Double-Tap Gesture Handling** - Detect consecutive taps or clicks with configurable timing and position thresholds
+  - ✋ **Press Gesture Handling** - Detect press-and-hold interactions with configurable delay and movement thresholds
+  - 🖐️ **Swipe Gesture Handling** - Detect directional swipes with configurable distance, velocity, and pointer type filtering
+  - ✊ **Drag Gesture Handling** - Detect movement, deltas, duration, and start/end positions with pointer type filtering and optional `requestAnimationFrame` batching
+  - 🤏 **Pinch Gesture Handling** - Detect two-finger distance, delta, and scale with pointer type filtering and optional `requestAnimationFrame` batching
 - 🎡 **Wheel Event Handling** - Detect wheel delta values with optional `requestAnimationFrame` batching for smoother updates
-- 👆 **Tap Gesture Handling** - Detect single taps/clicks with configurable movement and duration thresholds
-- 👆👆 **Double-Tap Gesture Handling** - Detect consecutive taps/clicks with configurable timing and position thresholds
-- ✋ **Press Gesture Handling** - Detect press-and-hold interactions with configurable delay and movement thresholds
-- 🖐️ **Swipe Gesture Handling** - Detect directional swipes with configurable distance, velocity, and pointer type filtering
-- ✊ **Drag Gesture Handling** - Detect movement, deltas, duration, and start/end positions with pointer type filtering and optional `requestAnimationFrame` batching
-- 🤏 **Pinch Gesture Handling** - Detect two-finger distance, delta, and scale with pointer type filtering and optional `requestAnimationFrame` batching
 
 ## Installation
 
@@ -84,6 +85,106 @@ useKey(
 );
 ```
 
+### Gesture Event Hook
+
+```typescript
+import { useGesture } from '@msobiecki/react-marauders-path';
+
+function MyComponent() {
+  useGesture('tap', (event, data) => {
+    console.log(`Tapped at X: ${data.x}, Y: ${data.y}`);
+  }, {
+    threshold: 8,
+  });
+
+  return <div>Tap to interact</div>;
+}
+```
+
+#### Tap Event Hook
+
+```typescript
+import { useTap } from '@msobiecki/react-marauders-path';
+
+function MyComponent() {
+  useTap((event, data) => {
+    console.log(`Tapped at X: ${data.x}, Y: ${data.y}`);
+  });
+
+  return <div>Tap to interact</div>;
+}
+```
+
+#### Double Tap Event Hook
+
+```typescript
+import { useDoubleTap } from '@msobiecki/react-marauders-path';
+
+function MyComponent() {
+  useDoubleTap((event, data) => {
+    console.log(`Double tapped at X: ${data.x}, Y: ${data.y}`);
+  });
+
+  return <div>Double tap to interact</div>;
+}
+```
+
+#### Press Event Hook
+
+```typescript
+import { usePress } from '@msobiecki/react-marauders-path';
+
+function MyComponent() {
+  usePress((event, data) => {
+    console.log(`Pressed at X: ${data.x}, Y: ${data.y}`);
+  });
+
+  return <div>Press and hold to interact</div>;
+}
+```
+
+#### Swipe Event Hook
+
+```typescript
+import { useSwipe } from '@msobiecki/react-marauders-path';
+
+function MyComponent() {
+  useSwipe('left', (event, direction, data) => {
+    console.log(`Swiped ${direction} with velocity ${data.velocity}`);
+  });
+
+  return <div>Swipe left</div>;
+}
+```
+
+#### Drag Event Hook
+
+```typescript
+import { useDrag } from '@msobiecki/react-marauders-path';
+
+function MyComponent() {
+  useDrag((event, data) => {
+    console.log(`Dragged by X: ${data.deltaX}, Y: ${data.deltaY}`);
+  });
+
+  return <div>Drag to interact</div>;
+}
+```
+
+#### Pinch Event Hook
+
+```typescript
+import { usePinch } from '@msobiecki/react-marauders-path';
+
+function MyComponent() {
+  usePinch((event, data) => {
+    console.log(`Pinch scale: ${data.scale}, delta: ${data.delta}`);
+  });
+
+  return <div>Pinch to zoom</div>;
+}
+```
+
 ### Wheel Event Hook
 
 ```typescript
@@ -98,90 +199,6 @@ function MyComponent() {
 }
 ```
 
-### Tap Event Hook
-
-```typescript
-import { useTap } from '@msobiecki/react-marauders-path';
-
-function MyComponent() {
-  useTap((event, data) => {
-    console.log(`Tapped at X: ${data.x}, Y: ${data.y}`);
-  });
-
-  return <div>Tap to interact</div>;
-}
-```
-
-### Double Tap Event Hook
-
-```typescript
-import { useDoubleTap } from '@msobiecki/react-marauders-path';
-
-function MyComponent() {
-  useDoubleTap((event, data) => {
-    console.log(`Double tapped at X: ${data.x}, Y: ${data.y}`);
-  });
-
-  return <div>Double tap to interact</div>;
-}
-```
-
-### Press Event Hook
-
-```typescript
-import { usePress } from '@msobiecki/react-marauders-path';
-
-function MyComponent() {
-  usePress((event, data) => {
-    console.log(`Pressed at X: ${data.x}, Y: ${data.y}`);
-  });
-
-  return <div>Press and hold to interact</div>;
-}
-```
-
-### Swipe Event Hook
-
-```typescript
-import { useSwipe } from '@msobiecki/react-marauders-path';
-
-function MyComponent() {
-  useSwipe('left', (event, direction, data) => {
-    console.log(`Swiped ${direction} with velocity ${data.velocity}`);
-  });
-
-  return <div>Swipe left</div>;
-}
-```
-
-### Drag Event Hook
-
-```typescript
-import { useDrag } from '@msobiecki/react-marauders-path';
-
-function MyComponent() {
-  useDrag((event, data) => {
-    console.log(`Dragged by X: ${data.deltaX}, Y: ${data.deltaY}`);
-  });
-
-  return <div>Drag to interact</div>;
-}
-```
-
-### Pinch Event Hook
-
-```typescript
-import { usePinch } from '@msobiecki/react-marauders-path';
-
-function MyComponent() {
-  usePinch((event, data) => {
-    console.log(`Pinch scale: ${data.scale}, delta: ${data.delta}`);
-  });
-
-  return <div>Pinch to zoom</div>;
-}
-```
-
 ## API
 
 ### `useKey(keyEvent, callback, options?)`
@@ -190,8 +207,8 @@ Hook for keyboard event handling with support for single keys, combinations, and
 
 **Parameters:**
 
-- `keyEvent: string | string[]` - Single key, combination, or sequence to listen
-- `callback: (event: KeyboardEvent, key: string) => void | boolean` - Called when key event occurs
+- `keyEvent: string | string[]` - Single key, key combination, or key sequence to listen for
+- `callback: (event: KeyboardEvent, key: string) => void | boolean` - Called when a key event occurs
 - `options?: UseKeyOptions` - Optional configuration
 
 **Options:**
@@ -209,46 +226,42 @@ interface UseKeyOptions {
 }
 ```
 
-### `useWheel(callback, options?)`
+### `useGesture(gesture, callback, options?)`
 
-Hook for handling mouse wheel events with support for different delta modes and options.
+Hook for gesture event handling that delegates to one of the low-level gesture hooks.
 
 **Parameters:**
 
-- `callback: (event: WheelEvent, data: WheelData) => void | boolean` - Called when wheel event occurs
-- `options?: UseWheelOptions` - Optional configuration
+- `gesture: "tap" | "doubletap" | "press" | "swipe" | "drag" | "pinch"` - Gesture to bind (must stay the same between renders)
+- `callback` - Callback type is inferred from `gesture`
+- `options?` - Options type is inferred from `gesture`
 
-**Options:**
+**Swipe-only option:**
 
-```typescript
-interface UseWheelOptions {
-  eventPassive?: boolean; // Default: true
-  eventCapture?: boolean; // Default: false
-  eventOnce?: boolean; // Default: false
-  eventStopImmediatePropagation?: boolean; // Default: false
-  container?: RefObject<HTMLElement>; // Default: window
-  raf?: boolean; // Default: false - Use requestAnimationFrame for batching
-}
-```
+- `direction?: SwipeDirection` - Optional direction for `useGesture("swipe", ...)`; defaults to `"both"`
 
-**Wheel Data:**
+**Example:**
 
 ```typescript
-interface WheelData {
-  deltaX: number; // Delta X value
-  deltaY: number; // Delta Y value
-  deltaZ: number; // Delta Z value
-  deltaMode: number; // Delta mode value
-}
+useGesture(
+  "swipe",
+  (event, direction, data) => {
+    console.log(direction, data.velocity);
+  },
+  {
+    direction: "horizontal",
+    threshold: 40,
+  },
+);
 ```
 
-### `useTap(callback, options?)`
+#### `useTap(callback, options?)`
 
 Hook for handling single tap/click interactions.
 
 **Parameters:**
 
-- `callback: (event: PointerEvent, data: TapData) => void | boolean` - Called when tap gesture is recognized
+- `callback: (event: PointerEvent, data: TapData) => void | boolean` - Called when a tap gesture is recognized
 - `options?: UseTapOptions` - Optional configuration
 
 **Options:**
@@ -274,13 +287,13 @@ interface TapData {
 }
 ```
 
-### `useDoubleTap(callback, options?)`
+#### `useDoubleTap(callback, options?)`
 
 Hook for handling double-tap / double-click interactions.
 
 **Parameters:**
 
-- `callback: (event: PointerEvent, data: DoubleTapData) => void | boolean` - Called when double tap is recognized
+- `callback: (event: PointerEvent, data: DoubleTapData) => void | boolean` - Called when a double tap is recognized
 - `options?: UseDoubleTapOptions` - Optional configuration
 
 **Options:**
@@ -306,13 +319,13 @@ interface DoubleTapData {
 }
 ```
 
-### `usePress(callback, options?)`
+#### `usePress(callback, options?)`
 
 Hook for handling press-and-hold interactions.
 
 **Parameters:**
 
-- `callback: (event: PointerEvent, data: PressData) => void | boolean` - Called when press delay completes
+- `callback: (event: PointerEvent, data: PressData) => void | boolean` - Called when a press delay completes
 - `options?: UsePressOptions` - Optional configuration
 
 **Options:**
@@ -338,13 +351,13 @@ interface PressData {
 }
 ```
 
-### `useSwipe(swipe, callback, options?)`
+#### `useSwipe(swipe, callback, options?)`
 
 Hook for handling touch swipe gestures with configurable distance and velocity thresholds.
 
 **Parameters:**
 
-- `swipe: left | right | up | down | horizontal | vertical | both` - Allowed directions to listen
+- `swipe: "left" | "right" | "up" | "down" | "horizontal" | "vertical" | "both"` - Allowed directions to listen
 - `callback: (event: PointerEvent, direction: SwipeDirection, data: SwipeData) => void | boolean` - Called when a swipe event occurs
 - `options?: UseSwipeOptions` - Optional configuration
 
@@ -373,13 +386,13 @@ interface SwipeData {
 }
 ```
 
-### `useDrag(callback, options?)`
+#### `useDrag(callback, options?)`
 
 Hook for handling pointer drag gestures with configurable threshold and pointer types.
 
 **Parameters:**
 
-- `callback: (event: PointerEvent, data: DragData) => void | boolean` - Called when drag event occurs
+- `callback: (event: PointerEvent, data: DragData) => void | boolean` - Called when a drag event occurs
 - `options?: UseDragOptions` - Optional configuration
 
 **Options:**
@@ -412,13 +425,13 @@ interface DragData {
 }
 ```
 
-### `usePinch(callback, options?)`
+#### `usePinch(callback, options?)`
 
 Hook for handling two-pointer pinch gestures with distance and scale tracking.
 
 **Parameters:**
 
-- `callback: (event: PointerEvent, data: PinchData) => void | boolean` - Called when pinch event occurs
+- `callback: (event: PointerEvent, data: PinchData) => void | boolean` - Called when a pinch event occurs
 - `options?: UsePinchOptions` - Optional configuration
 
 **Options:**
@@ -443,6 +456,39 @@ interface PinchData {
   delta: number; // Distance change since previous pinch update
   totalDelta: number; // Distance change since pinch start
   scale: number; // Current scale ratio (distance / startDistance)
+}
+```
+
+### `useWheel(callback, options?)`
+
+Hook for handling mouse wheel events with support for different delta modes and options.
+
+**Parameters:**
+
+- `callback: (event: WheelEvent, data: WheelData) => void | boolean` - Called when a wheel event occurs
+- `options?: UseWheelOptions` - Optional configuration
+
+**Options:**
+
+```typescript
+interface UseWheelOptions {
+  eventPassive?: boolean; // Default: true
+  eventCapture?: boolean; // Default: false
+  eventOnce?: boolean; // Default: false
+  eventStopImmediatePropagation?: boolean; // Default: false
+  container?: RefObject<HTMLElement>; // Default: window
+  raf?: boolean; // Default: false - Use requestAnimationFrame for batching
+}
+```
+
+**Wheel Data:**
+
+```typescript
+interface WheelData {
+  deltaX: number; // Delta X value
+  deltaY: number; // Delta Y value
+  deltaZ: number; // Delta Z value
+  deltaMode: number; // Delta mode value
 }
 ```
 
@@ -546,14 +592,14 @@ npm run lint
 
 ### High-level Gesture Hook
 
-- 🚧 **`useGesture`** – high-level API for gesture handling  
+- ✅ **`useGesture`** – high-level API for gesture handling
   Supported gestures:
   - `tap` – single tap / click
-  - `doubleTap` – quick double tap
-  - `press` / `longPress` – press and hold
+  - `doubletap` – quick double tap
+  - `press` – press and hold
   - `swipe` – directional swipe
-  - `drag` / `pan` – track movement of finger or mouse
-  - `pinch` / `zoom` – two-finger pinch / zoom
+  - `drag` – track movement of finger or mouse
+  - `pinch` – two-finger pinch / zoom
 
 ### Pointer / Mouse Hooks (Unified)
 
