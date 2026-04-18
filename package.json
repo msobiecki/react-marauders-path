@@ -1,6 +1,6 @@
 {
   "name": "@msobiecki/react-marauders-path",
-  "version": "1.31.0",
+  "version": "1.32.0",
   "private": false,
   "description": "A lightweight, type-safe React library for handling keyboard and pointer events in a unified way.",
   "keywords": [
@@ -56,13 +56,13 @@
     "@vitejs/plugin-react-swc": "^4.2.3",
     "eslint": "^9.39.2",
     "husky": "^9.1.7",
-    "jsdom": "^28.1.0",
+    "jsdom": "^29.0.1",
     "lint-staged": "^16.2.7",
     "prettier": "^3.7.4",
     "semantic-release": "^25.0.3",
     "ts-node": "^10.9.2",
     "typescript": "^5.9.3",
-    "vite": "^7.3.0",
+    "vite": "^8.0.2",
     "vite-plugin-dts": "^4.5.4",
     "vitest": "^4.0.18"
   },

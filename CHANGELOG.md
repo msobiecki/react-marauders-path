@@ -1,62 +1,60 @@
-# [1.31.0](https://github.com/msobiecki/react-marauders-path/compare/v1.30.0...v1.31.0) (2026-03-01)
-
+# [1.32.0](https://github.com/msobiecki/react-marauders-path/compare/v1.31.0...v1.32.0) (2026-03-01)
 
 ### Features
 
-* implement useMouse hook ([c739ca3](https://github.com/msobiecki/react-marauders-path/commit/c739ca3f4ba6dd172dd68ff3a9e41a3ff86a5ec7))
+- update readme ([82de207](https://github.com/msobiecki/react-marauders-path/commit/82de207faf3156eeaab5007938fbbaf7586ed5b4))
+
+# [1.31.0](https://github.com/msobiecki/react-marauders-path/compare/v1.30.0...v1.31.0) (2026-03-01)
+
+### Features
+
+- implement useMouse hook ([c739ca3](https://github.com/msobiecki/react-marauders-path/commit/c739ca3f4ba6dd172dd68ff3a9e41a3ff86a5ec7))
 
 # [1.30.0](https://github.com/msobiecki/react-marauders-path/compare/v1.29.0...v1.30.0) (2026-03-01)
 
-
 ### Features
 
-* implement useMouse hook ([ffa942c](https://github.com/msobiecki/react-marauders-path/commit/ffa942ccfeadadc4f886d70a1da2f57c155608ac))
-* implement useMouse hook ([969d77a](https://github.com/msobiecki/react-marauders-path/commit/969d77a97c1ecf473c221d157d9830f67a0fcf61))
-* implement usePointer hook ([1072095](https://github.com/msobiecki/react-marauders-path/commit/10720955c9bcb3740b85a62757acc41e6c29ecb2))
+- implement useMouse hook ([ffa942c](https://github.com/msobiecki/react-marauders-path/commit/ffa942ccfeadadc4f886d70a1da2f57c155608ac))
+- implement useMouse hook ([969d77a](https://github.com/msobiecki/react-marauders-path/commit/969d77a97c1ecf473c221d157d9830f67a0fcf61))
+- implement usePointer hook ([1072095](https://github.com/msobiecki/react-marauders-path/commit/10720955c9bcb3740b85a62757acc41e6c29ecb2))
 
 # [1.29.0](https://github.com/msobiecki/react-marauders-path/compare/v1.28.0...v1.29.0) (2026-03-01)
 
-
 ### Features
 
-* implement useGesture hook ([5b5c902](https://github.com/msobiecki/react-marauders-path/commit/5b5c902d95ff1e09b3bbb2475834da495e626e00))
+- implement useGesture hook ([5b5c902](https://github.com/msobiecki/react-marauders-path/commit/5b5c902d95ff1e09b3bbb2475834da495e626e00))
 
 # [1.28.0](https://github.com/msobiecki/react-marauders-path/compare/v1.27.0...v1.28.0) (2026-03-01)
 
-
 ### Features
 
-* implement useGesture hook ([299d778](https://github.com/msobiecki/react-marauders-path/commit/299d77899cd4f7763ae0926e122ac7353fcb1adc))
+- implement useGesture hook ([299d778](https://github.com/msobiecki/react-marauders-path/commit/299d77899cd4f7763ae0926e122ac7353fcb1adc))
 
 # [1.27.0](https://github.com/msobiecki/react-marauders-path/compare/v1.26.0...v1.27.0) (2026-02-28)
 
-
 ### Features
 
-* implement useTap, usePress and useDoubleTapreadme ([8b96b6d](https://github.com/msobiecki/react-marauders-path/commit/8b96b6d7427c4b839ca66b9b929c3c333a215ab1))
+- implement useTap, usePress and useDoubleTapreadme ([8b96b6d](https://github.com/msobiecki/react-marauders-path/commit/8b96b6d7427c4b839ca66b9b929c3c333a215ab1))
 
 # [1.26.0](https://github.com/msobiecki/react-marauders-path/compare/v1.25.0...v1.26.0) (2026-02-28)
 
-
 ### Features
 
-* implement useTap, usePress and useDoubleTapreadme ([ccf0ed0](https://github.com/msobiecki/react-marauders-path/commit/ccf0ed016d4774394011bbed32358854135f9cb1))
+- implement useTap, usePress and useDoubleTapreadme ([ccf0ed0](https://github.com/msobiecki/react-marauders-path/commit/ccf0ed016d4774394011bbed32358854135f9cb1))
 
 # [1.25.0](https://github.com/msobiecki/react-marauders-path/compare/v1.24.3...v1.25.0) (2026-02-28)
 
-
 ### Features
 
-* implement useTap, usePress and useDoubleTap ([b36bce6](https://github.com/msobiecki/react-marauders-path/commit/b36bce67b085d8f17d59fba1391a248ca17502cd))
-* implement useTap, usePress and useDoubleTap ([73c57dd](https://github.com/msobiecki/react-marauders-path/commit/73c57dd6388ab993bc09dd44977b568084cf259d))
+- implement useTap, usePress and useDoubleTap ([b36bce6](https://github.com/msobiecki/react-marauders-path/commit/b36bce67b085d8f17d59fba1391a248ca17502cd))
+- implement useTap, usePress and useDoubleTap ([73c57dd](https://github.com/msobiecki/react-marauders-path/commit/73c57dd6388ab993bc09dd44977b568084cf259d))
 
 ## [1.24.3](https://github.com/msobiecki/react-marauders-path/compare/v1.24.2...v1.24.3) (2026-02-28)
 
-
 ### Bug Fixes
 
-* release publish ([e26ec3f](https://github.com/msobiecki/react-marauders-path/commit/e26ec3f3f4dc30dea0f0230b70d46c82a43e7189))
-* release publish ([f10972d](https://github.com/msobiecki/react-marauders-path/commit/f10972d9be24239c68809adac3052232c12dc636))
+- release publish ([e26ec3f](https://github.com/msobiecki/react-marauders-path/commit/e26ec3f3f4dc30dea0f0230b70d46c82a43e7189))
+- release publish ([f10972d](https://github.com/msobiecki/react-marauders-path/commit/f10972d9be24239c68809adac3052232c12dc636))
 
 ## [1.24.2](https://github.com/msobiecki/react-marauders-path/compare/v1.24.1...v1.24.2) (2026-02-25)
 
