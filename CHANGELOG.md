@@ -1,3 +1,12 @@
+# [1.33.0](https://github.com/msobiecki/react-marauders-path/compare/v1.32.0...v1.33.0) (2026-04-18)
+
+
+### Features
+
+* update deps tree ([0108d78](https://github.com/msobiecki/react-marauders-path/commit/0108d7848e1de5f36b0e53e9d96f8fbe4f7cfcb1))
+* update deps tree ([a1d00b6](https://github.com/msobiecki/react-marauders-path/commit/a1d00b69227044d0368825085b56065f553c9097))
+* update deps tree ([22ae595](https://github.com/msobiecki/react-marauders-path/commit/22ae5959e8ceb3159ba21fc33403b7a675d56a9d))
+
 # [1.32.0](https://github.com/msobiecki/react-marauders-path/compare/v1.31.0...v1.32.0) (2026-03-01)
 
 ### Features
