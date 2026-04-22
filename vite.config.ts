@@ -5,9 +5,6 @@ import { nodeExternals } from "rollup-plugin-node-externals";
 
 export default defineConfig(({ mode }) => {
   const isProduction = mode === "production";
-
-  console.log(`Building in ${mode} mode...`);
-
   return {
     plugins: [
       nodeExternals(),
@@ -19,13 +16,12 @@ export default defineConfig(({ mode }) => {
         entry: "src/index.ts",
         formats: ["es"],
       },
+      sourcemap: !isProduction,
       minify: isProduction,
-      sourcemap: isProduction,
       rollupOptions: {
         output: {
           entryFileNames: "[name].js",
           preserveModules: true,
-          preserveModulesRoot: "src",
         },
       },
     },
