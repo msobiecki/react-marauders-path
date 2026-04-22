@@ -9,7 +9,7 @@ export default defineConfig(({ mode }) => {
     plugins: [
       nodeExternals(),
       react(),
-      dts({ tsconfigPath: "./tsconfig.build.json" }),
+      dts({ tsconfigPath: "./tsconfig.build.json", rollupTypes: true }),
     ],
     build: {
       lib: {
