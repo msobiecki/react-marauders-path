@@ -1,41 +1,33 @@
-import path from "node:path";
-
 import react from "@vitejs/plugin-react-swc";
 import { defineConfig } from "vite";
 import dts from "vite-plugin-dts";
+import { nodeExternals } from "rollup-plugin-node-externals";
 
-// https://vite.dev/config/
-export default defineConfig({
-  plugins: [
-    react(),
-    dts({ tsconfigPath: "./tsconfig.build.json", rollupTypes: true }),
-  ],
-  resolve: {
-    alias: {
-      "@": path.resolve(import.meta.dirname, "src"),
-    },
-  },
-  build: {
-    lib: {
-      entry: path.resolve(import.meta.dirname, "src/index.ts"),
-      name: "MaraudersPath",
-      fileName: (format) => `index.${format}.js`,
-      formats: ["es"],
-    },
-    rollupOptions: {
-      external: ["react", "react-dom"],
-      output: {
-        preserveModules: true,
-        preserveModulesRoot: "src",
-        dir: "dist",
-        globals: {
-          react: "React",
-          "react-dom": "ReactDOM",
+export default defineConfig(({ mode }) => {
+  const isProduction = mode === "production";
+
+  console.log(`Building in ${mode} mode...`);
+
+  return {
+    plugins: [
+      nodeExternals(),
+      react(),
+      dts({ tsconfigPath: "./tsconfig.build.json" }),
+    ],
+    build: {
+      lib: {
+        entry: "src/index.ts",
+        formats: ["es"],
+      },
+      minify: isProduction,
+      sourcemap: isProduction,
+      rollupOptions: {
+        output: {
+          entryFileNames: "[name].js",
+          preserveModules: true,
+          preserveModulesRoot: "src",
         },
-        entryFileNames: "[name].js",
       },
     },
-    minify: true,
-    sourcemap: true,
-  },
+  };
 });
