@@ -1,3 +1,10 @@
+# [1.35.0](https://github.com/msobiecki/react-marauders-path/compare/v1.34.0...v1.35.0) (2026-04-22)
+
+
+### Features
+
+* clean config ([403b79f](https://github.com/msobiecki/react-marauders-path/commit/403b79fb1a0640970ba7b5e8b2ddac102a69a022))
+
 # [1.34.0](https://github.com/msobiecki/react-marauders-path/compare/v1.33.0...v1.34.0) (2026-04-22)
 
 
