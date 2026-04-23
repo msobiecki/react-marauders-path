@@ -5,6 +5,13 @@
 
 * update vitest plugin ([0d042ca](https://github.com/msobiecki/react-marauders-path/commit/0d042ca6ba14483901464f8139e8ac584b5afeb2))
 
+# [1.38.0](https://github.com/msobiecki/react-marauders-path/compare/v1.37.0...v1.38.0) (2026-04-23)
+
+
+### Features
+
+* update vitest plugin ([0d042ca](https://github.com/msobiecki/react-marauders-path/commit/0d042ca6ba14483901464f8139e8ac584b5afeb2))
+
 # [1.37.0](https://github.com/msobiecki/react-marauders-path/compare/v1.36.0...v1.37.0) (2026-04-23)
 
 
