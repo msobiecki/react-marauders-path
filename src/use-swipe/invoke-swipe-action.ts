@@ -1,4 +1,4 @@
-import { SwipeData, SwipeDirection } from "./use-swipe.types";
+import { type SwipeData, type SwipeDirection } from "./use-swipe.types";
 
 /**
  * Invokes a swipe action callback with optional event modifications.

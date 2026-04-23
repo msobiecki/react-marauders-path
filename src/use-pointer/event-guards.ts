@@ -1,4 +1,4 @@
-import { PointerEventPointerType } from "./use-pointer.types";
+import { type PointerEventPointerType } from "./use-pointer.types";
 
 /**
  * Determines whether a pointer event should be handled based on event options.

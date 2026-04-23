@@ -1,11 +1,11 @@
 import { useCallback, useEffect, useRef } from "react";
 import {
-  TapOptions,
-  TapState,
-  TapData,
+  type TapOptions,
+  type TapState,
+  type TapData,
   TapEventPointerTypes,
-  UseTapOptions,
-  UseTapCallback,
+  type UseTapOptions,
+  type UseTapCallback,
 } from "./use-tap.types";
 import { invokeTapAction } from "./invoke-tap-action";
 import { shouldHandleEvent } from "./event-guards";

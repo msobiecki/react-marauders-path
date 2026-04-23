@@ -1,7 +1,7 @@
-import { describe, it, expect, vi, beforeEach, Mock } from "vitest";
+import { describe, it, expect, vi, beforeEach, type Mock } from "vitest";
 
 import { invokeWheelAction } from "./invoke-wheel-action";
-import { WheelData } from "./use-wheel.types";
+import { type WheelData } from "./use-wheel.types";
 
 describe("invokeWheelAction", () => {
   let mockEvent: WheelEvent;

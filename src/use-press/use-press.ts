@@ -1,10 +1,10 @@
 import { useCallback, useEffect, useRef } from "react";
 import {
-  PressOptions,
-  PressData,
+  type PressOptions,
+  type PressData,
   PressEventPointerTypes,
-  UsePressCallback,
-  UsePressOptions,
+  type UsePressCallback,
+  type UsePressOptions,
 } from "./use-press.types";
 import { invokePressAction } from "./invoke-press-action";
 import { shouldHandleEvent } from "./event-guards";

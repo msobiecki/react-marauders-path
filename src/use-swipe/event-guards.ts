@@ -1,4 +1,4 @@
-import { SwipeEventPointerType } from "./use-swipe.types";
+import { type SwipeEventPointerType } from "./use-swipe.types";
 
 /**
  * Determines whether a pointer event should be handled based on event options.

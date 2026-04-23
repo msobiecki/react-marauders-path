@@ -1,4 +1,4 @@
-import { DragData } from "./use-drag.types";
+import { type DragData } from "./use-drag.types";
 
 /**
  * Invokes a drag action callback with optional event modifications.

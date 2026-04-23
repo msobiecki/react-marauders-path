@@ -1,5 +1,5 @@
 import { normalizeKeySequence } from "./normalize-key";
-import { SequenceState, KeyEvent } from "./use-key.types";
+import { type SequenceState, type KeyEvent } from "./use-key.types";
 
 /**
  * Parses keyboard event patterns into sequence states.

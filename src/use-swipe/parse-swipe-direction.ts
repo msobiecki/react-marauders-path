@@ -1,4 +1,4 @@
-import { SwipeDirection } from "./use-swipe.types";
+import { type SwipeDirection } from "./use-swipe.types";
 
 /**
  * Parses the swipe direction schema into an array of swipe directions.

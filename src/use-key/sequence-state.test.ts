@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 
-import { SequenceState } from "./use-key.types";
+import { type SequenceState } from "./use-key.types";
 
 import { resetSequenceState, advanceSequenceState } from "./sequence-state";
 

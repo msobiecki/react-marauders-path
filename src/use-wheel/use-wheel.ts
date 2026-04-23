@@ -1,9 +1,9 @@
 import { useCallback, useEffect, useRef } from "react";
 import {
-  WheelData,
-  WheelOptions,
-  UseWheelCallback,
-  UseWheelOptions,
+  type WheelData,
+  type WheelOptions,
+  type UseWheelCallback,
+  type UseWheelOptions,
 } from "./use-wheel.types";
 import { invokeWheelAction } from "./invoke-wheel-action";
 

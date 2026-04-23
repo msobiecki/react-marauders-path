@@ -1,7 +1,7 @@
-import { describe, it, expect, vi, beforeEach, Mock } from "vitest";
+import { describe, it, expect, vi, beforeEach, type Mock } from "vitest";
 
 import { invokePressAction } from "./invoke-press-action";
-import { PressData } from "./use-press.types";
+import { type PressData } from "./use-press.types";
 
 describe("invokePressAction", () => {
   let mockEvent: PointerEvent;

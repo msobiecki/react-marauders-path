@@ -1,4 +1,4 @@
-import { PointerData, PointerEventType } from "./use-pointer.types";
+import { type PointerData, type PointerEventType } from "./use-pointer.types";
 
 /**
  * Invokes a pointer action callback with optional event modifications.

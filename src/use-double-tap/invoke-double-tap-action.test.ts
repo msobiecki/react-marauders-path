@@ -1,7 +1,7 @@
-import { describe, it, expect, vi, beforeEach, Mock } from "vitest";
+import { describe, it, expect, vi, beforeEach, type Mock } from "vitest";
 
 import { invokeDoubleTapAction } from "./invoke-double-tap-action";
-import { DoubleTapData } from "./use-double-tap.types";
+import { type DoubleTapData } from "./use-double-tap.types";
 
 describe("invokeDoubleTapAction", () => {
   let mockEvent: PointerEvent;

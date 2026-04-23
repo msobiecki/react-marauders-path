@@ -1,7 +1,7 @@
-import { describe, it, expect, vi, beforeEach, Mock } from "vitest";
+import { describe, it, expect, vi, beforeEach, type Mock } from "vitest";
 
 import { invokePointerAction } from "./invoke-pointer-action";
-import { PointerData, PointerEventType } from "./use-pointer.types";
+import { type PointerData, type PointerEventType } from "./use-pointer.types";
 
 describe("invokePointerAction", () => {
   let mockEvent: PointerEvent;

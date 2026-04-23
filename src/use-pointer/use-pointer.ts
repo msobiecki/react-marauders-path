@@ -1,12 +1,12 @@
 import { useCallback, useEffect, useRef } from "react";
 import {
-  PointerData,
-  PointerEventType,
+  type PointerData,
+  type PointerEventType,
   PointerEventPointerTypes,
   PointerEventTypes,
-  PointerOptions,
-  UsePointerCallback,
-  UsePointerOptions,
+  type PointerOptions,
+  type UsePointerCallback,
+  type UsePointerOptions,
 } from "./use-pointer.types";
 import { invokePointerAction } from "./invoke-pointer-action";
 import { shouldHandleEvent } from "./event-guards";

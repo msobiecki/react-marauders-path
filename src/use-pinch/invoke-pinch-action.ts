@@ -1,4 +1,4 @@
-import { PinchData } from "./use-pinch.types";
+import { type PinchData } from "./use-pinch.types";
 
 /**
  * Invokes a pinch action callback with optional event modifications.

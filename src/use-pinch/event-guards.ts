@@ -1,4 +1,4 @@
-import { PinchEventPointerType } from "./use-pinch.types";
+import { type PinchEventPointerType } from "./use-pinch.types";
 
 /**
  * Determines whether a pointer event should be handled based on event options.

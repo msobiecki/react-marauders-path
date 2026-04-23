@@ -1,13 +1,16 @@
-import { UseDoubleTapCallback, UseDoubleTapOptions } from "../use-double-tap";
-import { UseDragCallback, UseDragOptions } from "../use-drag";
-import { UsePinchCallback, UsePinchOptions } from "../use-pinch";
-import { UsePressCallback, UsePressOptions } from "../use-press";
 import {
-  SwipeDirection,
-  UseSwipeCallback,
-  UseSwipeOptions,
+  type UseDoubleTapCallback,
+  type UseDoubleTapOptions,
+} from "../use-double-tap";
+import { type UseDragCallback, type UseDragOptions } from "../use-drag";
+import { type UsePinchCallback, type UsePinchOptions } from "../use-pinch";
+import { type UsePressCallback, type UsePressOptions } from "../use-press";
+import {
+  type SwipeDirection,
+  type UseSwipeCallback,
+  type UseSwipeOptions,
 } from "../use-swipe";
-import { UseTapCallback, UseTapOptions } from "../use-tap";
+import { type UseTapCallback, type UseTapOptions } from "../use-tap";
 
 export const GestureTypes = {
   Tap: "tap",

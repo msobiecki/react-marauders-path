@@ -1,4 +1,4 @@
-import { PressEventPointerType } from "./use-press.types";
+import { type PressEventPointerType } from "./use-press.types";
 
 /**
  * Determines whether a pointer event should be handled based on event options.

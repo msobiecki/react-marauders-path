@@ -1,7 +1,7 @@
-import { describe, it, expect, vi, beforeEach, Mock } from "vitest";
+import { describe, it, expect, vi, beforeEach, type Mock } from "vitest";
 
 import { invokeDragAction } from "./invoke-drag-action";
-import { DragData } from "./use-drag.types";
+import { type DragData } from "./use-drag.types";
 
 describe("invokeDragAction", () => {
   let mockEvent: PointerEvent;

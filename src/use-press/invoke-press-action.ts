@@ -1,4 +1,4 @@
-import { PressData } from "./use-press.types";
+import { type PressData } from "./use-press.types";
 
 /**
  * Invokes a press action callback with optional event modifications.

@@ -1,4 +1,4 @@
-import { DragEventPointerType } from "./use-drag.types";
+import { type DragEventPointerType } from "./use-drag.types";
 
 /**
  * Determines whether a pointer event should be handled based on event options.

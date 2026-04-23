@@ -1,21 +1,21 @@
 import { useCallback, useMemo, useRef } from "react";
 import {
-  MouseData,
-  MouseButton,
+  type MouseData,
+  type MouseButton,
   MouseButtons,
-  MouseEventType,
+  type MouseEventType,
   MouseEventTypes,
-  MouseOptions,
-  UseMouseCallback,
-  UseMouseOptions,
+  type MouseOptions,
+  type UseMouseCallback,
+  type UseMouseOptions,
 } from "./use-mouse.types";
 import { usePointer } from "../use-pointer";
 import {
-  PointerData,
+  type PointerData,
   PointerEventPointerTypes,
-  PointerEventType,
+  type PointerEventType,
   PointerEventTypes,
-  PointerOptions,
+  type PointerOptions,
 } from "../use-pointer/use-pointer.types";
 
 const defaultOptions: MouseOptions = {

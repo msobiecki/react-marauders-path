@@ -1,4 +1,4 @@
-import { TapEventPointerType } from "./use-tap.types";
+import { type TapEventPointerType } from "./use-tap.types";
 
 /**
  * Determines whether a pointer event should be handled based on event options.

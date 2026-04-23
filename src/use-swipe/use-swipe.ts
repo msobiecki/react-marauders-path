@@ -1,14 +1,14 @@
 import { useCallback, useEffect, useRef } from "react";
 import {
-  SwipeDirection,
-  SwipeState,
+  type SwipeDirection,
+  type SwipeState,
   SwipeDirections,
-  SwipeData,
-  SwipeOptions,
+  type SwipeData,
+  type SwipeOptions,
   SwipeEventPointerTypes,
-  UseSwipeSchema,
-  UseSwipeOptions,
-  UseSwipeCallback,
+  type UseSwipeSchema,
+  type UseSwipeOptions,
+  type UseSwipeCallback,
 } from "./use-swipe.types";
 import { parseSwipeDirection } from "./parse-swipe-direction";
 import { invokeSwipeAction } from "./invoke-swipe-action";

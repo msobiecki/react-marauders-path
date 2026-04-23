@@ -1,13 +1,13 @@
 import { useCallback, useEffect, useRef } from "react";
 
 import {
-  KeyOptions,
+  type KeyOptions,
   KeyEventTypes,
-  SequenceState,
-  CombinationState,
-  UseKeySchema,
-  UseKeyCallback,
-  UseKeyOptions,
+  type SequenceState,
+  type CombinationState,
+  type UseKeySchema,
+  type UseKeyCallback,
+  type UseKeyOptions,
 } from "./use-key.types";
 import { parseKeySequences } from "./parse-key-sequences";
 import { advanceSequenceState, resetSequenceState } from "./sequence-state";

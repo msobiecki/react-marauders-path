@@ -3,14 +3,14 @@ import { useRef } from "react";
 import { useTap } from "../use-tap";
 import { useDoubleTap } from "../use-double-tap";
 import { usePress } from "../use-press";
-import { SwipeDirections, useSwipe, UseSwipeSchema } from "../use-swipe";
+import { SwipeDirections, useSwipe, type UseSwipeSchema } from "../use-swipe";
 import { useDrag } from "../use-drag";
 import { usePinch } from "../use-pinch";
 
 import {
-  UseGestureSchema,
-  UseGestureCallback,
-  UseGestureOptions,
+  type UseGestureSchema,
+  type UseGestureCallback,
+  type UseGestureOptions,
 } from "./use-gesture.types";
 
 const useGestureTap = (

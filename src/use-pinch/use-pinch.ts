@@ -1,11 +1,11 @@
 import { useCallback, useEffect, useRef } from "react";
 import {
-  PinchState,
-  PinchData,
-  PinchOptions,
+  type PinchState,
+  type PinchData,
+  type PinchOptions,
   PinchEventPointerTypes,
-  UsePinchCallback,
-  UsePinchOptions,
+  type UsePinchCallback,
+  type UsePinchOptions,
 } from "./use-pinch.types";
 import { invokePinchAction } from "./invoke-pinch-action";
 import { shouldHandleEvent } from "./event-guards";

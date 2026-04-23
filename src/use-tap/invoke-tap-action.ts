@@ -1,4 +1,4 @@
-import { TapData } from "./use-tap.types";
+import { type TapData } from "./use-tap.types";
 
 /**
  * Invokes a tap action callback with optional event modifications.

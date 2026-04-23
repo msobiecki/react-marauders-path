@@ -1,4 +1,4 @@
-import { WheelData } from "./use-wheel.types";
+import { type WheelData } from "./use-wheel.types";
 
 /**
  * Invokes a wheel action callback with optional event modifications.

@@ -1,10 +1,10 @@
 import { useCallback, useEffect, useRef } from "react";
 import {
-  DoubleTapData,
-  DoubleTapOptions,
+  type DoubleTapData,
+  type DoubleTapOptions,
   DoubleTapEventPointerTypes,
-  UseDoubleTapCallback,
-  UseDoubleTapOptions,
+  type UseDoubleTapCallback,
+  type UseDoubleTapOptions,
 } from "./use-double-tap.types";
 import { invokeDoubleTapAction } from "./invoke-double-tap-action";
 import { shouldHandleEvent } from "./event-guards";

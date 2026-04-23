@@ -1,11 +1,11 @@
 import { useCallback, useEffect, useRef } from "react";
 import {
-  DragState,
-  DragData,
-  DragOptions,
+  type DragState,
+  type DragData,
+  type DragOptions,
   DragEventPointerTypes,
-  UseDragCallback,
-  UseDragOptions,
+  type UseDragCallback,
+  type UseDragOptions,
 } from "./use-drag.types";
 import { invokeDragAction } from "./invoke-drag-action";
 import { shouldHandleEvent } from "./event-guards";

@@ -1,4 +1,4 @@
-import { DoubleTapData } from "./use-double-tap.types";
+import { type DoubleTapData } from "./use-double-tap.types";
 
 /**
  * Invokes a double tap action callback with optional event modifications.

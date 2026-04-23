@@ -1,4 +1,4 @@
-import { SequenceState } from "./use-key.types";
+import { type SequenceState } from "./use-key.types";
 
 /**
  * Resets a sequence state to its initial values.

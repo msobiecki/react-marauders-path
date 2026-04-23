@@ -1,4 +1,4 @@
-import { DoubleTapEventPointerType } from "./use-double-tap.types";
+import { type DoubleTapEventPointerType } from "./use-double-tap.types";
 
 /**
  * Determines whether a pointer event should be handled based on event options.

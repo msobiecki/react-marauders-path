@@ -1,7 +1,7 @@
-import { describe, it, expect, vi, beforeEach, Mock } from "vitest";
+import { describe, it, expect, vi, beforeEach, type Mock } from "vitest";
 
 import { invokeSwipeAction } from "./invoke-swipe-action";
-import { SwipeData, SwipeDirection } from "./use-swipe.types";
+import { type SwipeData, type SwipeDirection } from "./use-swipe.types";
 
 describe("invokeSwipeAction", () => {
   let mockEvent: PointerEvent;
