@@ -1,3 +1,11 @@
+# [1.36.0](https://github.com/msobiecki/react-marauders-path/compare/v1.35.0...v1.36.0) (2026-04-23)
+
+
+### Features
+
+* update eslint ([a985ad9](https://github.com/msobiecki/react-marauders-path/commit/a985ad9a93c0cad1a94269bac538711e4f8a94bc))
+* update eslint ([3c55722](https://github.com/msobiecki/react-marauders-path/commit/3c5572254c03c98abfc3251fb9ce9f54da6d82ba))
+
 # [1.35.0](https://github.com/msobiecki/react-marauders-path/compare/v1.34.0...v1.35.0) (2026-04-22)
 
 
