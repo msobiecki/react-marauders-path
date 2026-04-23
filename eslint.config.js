@@ -5,6 +5,7 @@ import {
   reactPreset,
   importPreset,
   nodePreset,
+  vitestPreset,
 } from "@msobiecki/eslint-config";
 
 export default defineConfig([
@@ -15,14 +16,9 @@ export default defineConfig([
   bestPracticePreset,
   reactPreset,
   importPreset,
+  vitestPreset,
   {
     files: ["vite.config.ts"],
     extends: [nodePreset],
-  },
-  {
-    rules: {
-      "security/detect-object-injection": "off",
-      "unicorn/no-null": "off",
-    },
   },
 ]);

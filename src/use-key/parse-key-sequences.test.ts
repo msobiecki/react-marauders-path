@@ -14,7 +14,7 @@ describe("parseKeySequences", () => {
       });
     });
 
-    it("should parse a single key schema", () => {
+    it("should normalize uppercase single key schema", () => {
       const result = parseKeySequences("A");
       expect(result[0]).toEqual({
         key: "a",
@@ -35,7 +35,7 @@ describe("parseKeySequences", () => {
       });
     });
 
-    it("should parse special key schema", () => {
+    it("should normalize uppercase Enter special key schema", () => {
       const result = parseKeySequences("ENTER");
       expect(result[0]).toEqual({
         key: "Enter",
@@ -45,7 +45,7 @@ describe("parseKeySequences", () => {
       });
     });
 
-    it("should parse special key schema", () => {
+    it("should normalize uppercase Space special key schema", () => {
       const result = parseKeySequences("SPACE");
       expect(result[0]).toEqual({
         key: "Space",
@@ -68,7 +68,7 @@ describe("parseKeySequences", () => {
       });
     });
 
-    it("should parse a simple combination schema", () => {
+    it("should normalize uppercase simple combination schema", () => {
       const result = parseKeySequences("A+B");
       expect(result).toHaveLength(1);
       expect(result[0]).toEqual({
@@ -89,7 +89,7 @@ describe("parseKeySequences", () => {
       });
     });
 
-    it("should parse a complex combination schema", () => {
+    it("should normalize uppercase complex combination schema", () => {
       const result = parseKeySequences("CTRL+SHIFT+S");
       expect(result).toHaveLength(1);
       expect(result[0]).toEqual({
@@ -113,7 +113,7 @@ describe("parseKeySequences", () => {
       });
     });
 
-    it("should parse a simple sequential schema", () => {
+    it("should normalize uppercase simple sequential schema", () => {
       const result = parseKeySequences("A B");
       expect(result).toHaveLength(1);
       expect(result[0]).toEqual({
@@ -124,7 +124,7 @@ describe("parseKeySequences", () => {
       });
     });
 
-    it("should parse a simple sequential schema", () => {
+    it("should parse a deep simple sequential schema", () => {
       const result = parseKeySequences("a b c d");
       expect(result).toHaveLength(1);
       expect(result[0]).toEqual({
@@ -146,7 +146,7 @@ describe("parseKeySequences", () => {
       });
     });
 
-    it("should parse a complex sequential schema", () => {
+    it("should parse mixed sequential schema ending with combination", () => {
       const result = parseKeySequences("a b c ctrl+s");
       expect(result).toHaveLength(1);
       expect(result[0]).toEqual({
