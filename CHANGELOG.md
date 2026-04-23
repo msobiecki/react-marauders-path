@@ -1,3 +1,10 @@
+# [1.37.0](https://github.com/msobiecki/react-marauders-path/compare/v1.36.0...v1.37.0) (2026-04-23)
+
+
+### Features
+
+* update github actions ([71683f4](https://github.com/msobiecki/react-marauders-path/commit/71683f4ce8a73d29c22ed35b18b1f79811f2e372))
+
 # [1.36.0](https://github.com/msobiecki/react-marauders-path/compare/v1.35.0...v1.36.0) (2026-04-23)
 
 
